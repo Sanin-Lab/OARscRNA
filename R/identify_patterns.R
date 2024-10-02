@@ -27,15 +27,18 @@ find_unique_patterns <- function(data) {
 #' @export
 #'
 #' @examples
-#' pvalue.list.KW <- unlist(lapply(cl, FUN = MDP.KW, mdp = mdp))
+#' \dontrun{
+#' pvalue.list.KW <- unlist(lapply(cl, FUN = missing_pattern_pval_kw, mdp = mdp))
+#' }
 #' 
 missing_pattern_pval_kw = function(x, mdp){
   y.l <- x[!is.na(x)] # subset observed genes of the nth cell to y.l
   mdp.l <- mdp[!is.na(x)] # subset observed genes of the nth cell to y.l
-  if (length(unique(mdp.l)) == 1) {stop("Not enough missing data patterns for using the tests\n")}
-  freq.mdp <- binned_sum(x = mdp.l, bin = factor(mdp.l)) # missing data pattern compilation at the cell level
-  un.p <- rownames(freq.mdp[as.vector(freq.mdp[,"count"]==1),]) # Patterns that occurred once
-  if (length(un.p)<dim(freq.mdp)[1L]) {mdp.l[mdp.l %in% un.p] <- sample(mdp.l[mdp.l %in% un.p], size = 1)}# Combine patterns that occurred once
   
-  kruskal.test(x = y.l, g = factor(mdp.l))$p.value
+  if (length(unique(mdp.l)) == 1) {stop("Not enough missing data patterns for using the tests\n")}
+  freq.mdp <- ffbase::binned_sum(x = mdp.l, bin = factor(mdp.l)) # missing data pattern compilation at the cell level
+  un.p <- rownames(freq.mdp[as.vector(freq.mdp[,"count"]==1),]) # Patterns that occurred once
+  
+  if (length(un.p)<dim(freq.mdp)[1L]) {mdp.l[mdp.l %in% un.p] <- sample(mdp.l[mdp.l %in% un.p], size = 1)}# Combine patterns that occurred once
+  stats::kruskal.test(x = y.l, g = factor(mdp.l))$p.value
 }

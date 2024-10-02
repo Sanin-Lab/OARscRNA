@@ -14,8 +14,16 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
+    data.table,
     digest,
+    doParallel,
     dplyr,
-    ff,
     ffbase,
-    naniar
+    foreach,
+    Matrix,
+    methods,
+    naniar,
+    parallel,
+    Seurat,
+    SeuratObject,
+    stats

@@ -18,6 +18,8 @@ list with a p-value for each cell
 Kruskal-Wallis test to generate a per cell p-value based on missing data patterns
 }
 \examples{
-pvalue.list.KW <- unlist(lapply(cl, FUN = MDP.KW, mdp = mdp))
+\dontrun{
+pvalue.list.KW <- unlist(lapply(cl, FUN = missing_pattern_pval_kw, mdp = mdp))
+}
 
 }
