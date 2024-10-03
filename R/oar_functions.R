@@ -226,5 +226,3 @@ oar_fold <- function (data, seurat_v5 = T, count.filter = 1,
     return(output)
   }
 }
-
-
