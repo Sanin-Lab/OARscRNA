@@ -20,7 +20,7 @@ A variable called folds that contains a numeric value
 Identify number of folds to use for data based on desired gene-cell ratio
 }
 \examples{
-\dontrun {
+\dontrun{
 folds <- oaridentifyfolds(data)
 }
 }

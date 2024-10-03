@@ -6,7 +6,9 @@
 #' @export
 #'
 #' @examples 
+#' \dontrun{
 #' mdp <- find_unique_patterns(data)
+#' }
 find_unique_patterns <- function(data) {
   
   # Apply a hashing function to each row to get unique pattern IDs

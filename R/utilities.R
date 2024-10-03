@@ -9,8 +9,8 @@
 #' @export
 #'
 #' @examples 
-#' \dontrun {
-#' data <- oarpreprocessdata(pbmcs)
+#' \dontrun{
+#' data <- oarpreprocessdata(data)
 #' }
 oarpreprocessdata <- function(data, tr, seurat_v5 = T, blacklisted.genes = NULL) {
   #read in Seurat object
@@ -51,7 +51,7 @@ oarpreprocessdata <- function(data, tr, seurat_v5 = T, blacklisted.genes = NULL)
 #' @export
 #'
 #' @examples
-#' \dontrun {
+#' \dontrun{
 #' folds <- oaridentifyfolds(data)
 #' }
 oaridentifyfolds <- function(data, gene.ratio, max.cells) {

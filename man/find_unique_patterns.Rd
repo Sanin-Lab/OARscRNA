@@ -16,5 +16,7 @@ A matrix with counts per pattern
 Find unique patterns in matrix
 }
 \examples{
+\dontrun{
 mdp <- find_unique_patterns(data)
+}
 }

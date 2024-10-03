@@ -22,7 +22,7 @@ Data matrix with blacklisted gens removed
 Prepare data for oar fold functions
 }
 \examples{
-\dontrun {
-data <- oarpreprocessdata(pbmcs)
+\dontrun{
+data <- oarpreprocessdata(data)
 }
 }

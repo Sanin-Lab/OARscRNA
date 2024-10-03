@@ -57,7 +57,8 @@ oarbase <- function(data) {
 #'
 #' @examples
 #' \dontrun{
-#' pmbcs <- oar_fold(pmbcs)}
+#' pmbcs <- oar_fold(pmbcs)
+#' }
 oar_fold <- function (data, seurat_v5 = T, count.filter = 1,
                       blacklisted.genes = NULL, gene.ratio = 20,
                       iterations = 10, parallel.loop = T,

@@ -43,5 +43,6 @@ Generate OAR fold stats for Seurat object and add them to meta data, run iterati
 }
 \examples{
 \dontrun{
-pmbcs <- oar_fold(pmbcs)}
+pmbcs <- oar_fold(pmbcs)
+}
 }
