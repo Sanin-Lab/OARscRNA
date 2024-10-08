@@ -8,6 +8,7 @@
 #' @importFrom foreach %dopar%
 #' @importFrom rlang .data
 #' @importFrom stats complete.cases
+#' @importFrom stats kruskal.test
 #' @importFrom stats median
 #' @importFrom stats model.matrix
 #' @importFrom stats p.adjust

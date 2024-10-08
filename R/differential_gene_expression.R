@@ -21,9 +21,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' degs <- oardeg(data)
+#' degs <- oar_deg(data)
 #' }
-oardeg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
+oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
                     splines = TRUE, degrees.freedom = 5,
                     method = "glmGamPoi",
                     blacklisted.genes = NULL, ncores = 12,

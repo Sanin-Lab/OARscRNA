@@ -10,9 +10,9 @@
 #'
 #' @examples 
 #' \dontrun{
-#' data <- oarpreprocessdata(data)
+#' data <- oar_preprocess_data(data)
 #' }
-oarpreprocessdata <- function(data, tr, seurat_v5 = T, blacklisted.genes = NULL) {
+oar_preprocess_data <- function(data, tr, seurat_v5 = T, blacklisted.genes = NULL) {
   #read in Seurat object
   if(seurat_v5){
     layersList <- lapply(data@assays$RNA@layers,function(x){dim(x)}) #Identify empty layers
@@ -52,9 +52,9 @@ oarpreprocessdata <- function(data, tr, seurat_v5 = T, blacklisted.genes = NULL)
 #'
 #' @examples
 #' \dontrun{
-#' folds <- oaridentifyfolds(data)
+#' folds <- oar_identify_folds(data)
 #' }
-oaridentifyfolds <- function(data, gene.ratio, max.cells) {
+oar_identify_folds <- function(data, gene.ratio, max.cells) {
   print("Identifying effective ratio:")
   if(max.cells >= data@Dim[[2]]){
     folds = 1

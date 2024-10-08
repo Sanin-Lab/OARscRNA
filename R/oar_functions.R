@@ -11,9 +11,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' output <- oarbase(data)
+#' output <- oar_base(data)
 #' }
-oarbase <- function(data) {
+oar_base <- function(data) {
 
   rownames(data) = NULL # remove gene names
   cl = lapply(seq_len(dim(data)[2L]), function(i) data[,i]) #convert mtx to list of cell vectors
@@ -94,7 +94,7 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
   }
   
   #read in Seurat object & remove blacklisted genes
-  data <- oarpreprocessdata(data, tr, seurat_v5, blacklisted.genes)
+  data <- oar_preprocess_data(data, tr, seurat_v5, blacklisted.genes)
   
   #save Cell names
   cell.names = colnames(data)
@@ -102,7 +102,7 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
   #Identify number of folds based on ratio
   max.cells = ceiling(data@Dim[[1]]/gene.ratio)
   
-  folds <- oaridentifyfolds(data, gene.ratio, max.cells)
+  folds <- oar_identify_folds(data, gene.ratio, max.cells)
   print(paste0("Number of folds: ",folds))
   
   # Notify of time to completion
@@ -141,7 +141,7 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
       folds = names(fold.data),
       .verbose = T,
       .packages = c("OAR", "dplyr")) %dopar% {
-        print(f.data) #this line fixes s4 subsetting issue and I do not know why
+       print(f.data) #this line fixes s4 subsetting issue and I do not know why
         # Replace 0 with NA
         f.data[f.data == 0] <- NA
         
@@ -158,7 +158,7 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
         }
         
         # Run test
-        w <- oarbase(data = f.data) %>%
+        w <- oar_base(data = f.data) %>%
           dplyr::mutate(Fold = folds,
                  barcodes = cells)
         return(w)
@@ -184,7 +184,7 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
       }
       
       # Run test
-      output[[n]] <- oarbase(data = i) %>%
+      output[[n]] <- oar_base(data = i) %>%
         dplyr::mutate(Fold = paste0("fold_",n),
                barcodes = cells)
       n=n+1
