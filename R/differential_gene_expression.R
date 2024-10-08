@@ -128,10 +128,10 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   if(splines){
     warning("Using splines increases calculation time by 3-5x\n")
     
-    X <- splines::ns(df$score.name, df = degrees.freedom) # Any df between 3 - 5 usually works well.
+    X <- splines::ns(df[, score.name], df = degrees.freedom) # Any df between 3 - 5 usually works well.
     mm <- model.matrix(~X) # Model matrix with splines
   }else{
-    mm <- model.matrix(~df$score.name) #Model no splines
+    mm <- model.matrix(~df[, score.name]) #Model no splines
   }
   
   #Run differential analysis####
