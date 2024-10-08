@@ -59,7 +59,7 @@ oarbase <- function(data) {
 #' \dontrun{
 #' pmbcs <- oar_fold(pmbcs)
 #' }
-oar_fold <- function (data, seurat_v5 = T, count.filter = 1,
+oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
                       blacklisted.genes = NULL, gene.ratio = 20,
                       iterations = 10, parallel.loop = T,
                       cores = 12, suffix = "") {
@@ -95,9 +95,6 @@ oar_fold <- function (data, seurat_v5 = T, count.filter = 1,
   
   #read in Seurat object & remove blacklisted genes
   data <- oarpreprocessdata(data, tr, seurat_v5, blacklisted.genes)
-  
-  #Filter low expression genes
-  data <- data[Matrix::rowSums(data > 0) > data@Dim[[2]]*tr,]
   
   #save Cell names
   cell.names = colnames(data)
@@ -135,19 +132,21 @@ oar_fold <- function (data, seurat_v5 = T, count.filter = 1,
       cores,
       type = "PSOCK"
     )
+    
     doParallel::registerDoParallel(cl = my.cluster) #register it to be used by %dopar%
     
     #Run the loop in parallel
     output <- foreach::foreach(
       f.data = fold.data,
       folds = names(fold.data),
-      .verbose = F,
-      .packages = c("OAR")) %dopar% {
+      .verbose = T,
+      .packages = c("OAR", "dplyr")) %dopar% {
+        print(f.data) #this line fixes s4 subsetting issue and I do not know why
         # Replace 0 with NA
         f.data[f.data == 0] <- NA
         
         # Convert to a dense matrix
-        f.data <- f.data %>% as.matrix()
+        f.data <- as.matrix(f.data)
         
         # store column names
         cells = colnames(f.data)
@@ -205,7 +204,7 @@ oar_fold <- function (data, seurat_v5 = T, count.filter = 1,
     dplyr::summarise(
       OARscore.sd = sd(OARscore),
       OARscore = median(OARscore),
-      pct.missing = median(naniar::pct.missing)
+      pct.missing = median(pct.missing)
     )
   
   print("Analysis completed at:")

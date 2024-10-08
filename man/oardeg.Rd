@@ -15,15 +15,16 @@ oardeg(
   blacklisted.genes = NULL,
   ncores = 12,
   auto.threshold = TRUE,
-  custom.tr = NULL
+  custom.tr = NULL,
+  score.name = "OARscore"
 )
 }
 \arguments{
 \item{data}{A Seurat (v5) object or a data.frame with cell barcodes as column names and genes as row names. Seurat object must have a column in metadata with OARscore.}
 
-\item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is TRUE}
+\item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is TRUE. If false, need to provide score vector.}
 
-\item{score}{A named numeric vector with OARscores to be used in the model. Names should be cell barcodes. Ignored if Seurat object is supplied.}
+\item{score}{A named numeric vector with OARscores to be used in the model if provided a dataframe instead of Seurat object. Names should be cell barcodes. Ignored if Seurat object is supplied.}
 
 \item{count.filter}{A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.}
 
@@ -40,6 +41,8 @@ oardeg(
 \item{auto.threshold}{A Boolean to indicate if FDR threshold should be calculated from the data, default is TRUE}
 
 \item{custom.tr}{A numeric value to use as an FDR threshold. Ignored if \code{auto.threshold} is set to TRUE.}
+
+\item{score.name}{Name of OAR score in dataset, default is "OARscore". If suffix used on previous functions, would need to include full new name here.}
 }
 \value{
 A dataframe with p-values for genes that significantly contribute to OAR score.

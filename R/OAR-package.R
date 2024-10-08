@@ -6,6 +6,7 @@
 #' @importFrom dplyr %>%
 #' @importFrom dplyr filter
 #' @importFrom foreach %dopar%
+#' @importFrom rlang .data
 #' @importFrom stats complete.cases
 #' @importFrom stats median
 #' @importFrom stats model.matrix

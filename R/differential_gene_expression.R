@@ -4,8 +4,8 @@
 #' Generate DEGs based on OAR score
 #'
 #' @param data A Seurat (v5) object or a data.frame with cell barcodes as column names and genes as row names. Seurat object must have a column in metadata with OARscore.
-#' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
-#' @param score A named numeric vector with OARscores to be used in the model. Names should be cell barcodes. Ignored if Seurat object is supplied.
+#' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE. If false, need to provide score vector. 
+#' @param score A named numeric vector with OARscores to be used in the model if provided a dataframe instead of Seurat object. Names should be cell barcodes. Ignored if Seurat object is supplied.
 #' @param count.filter A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.
 #' @param splines A Boolean to indicate if splines should be used to fit model, default is TRUE
 #' @param degrees.freedom A numeric value indicating the degrees of freedom to calculate splines. Default is 5. Values between 3 and 5 are recommended.
@@ -14,6 +14,7 @@
 #' @param ncores A numeric value indicating the number of cores to use un parallel processing. Use `detectCores()` to identify possibilities. Default is 2. Ignored if `parallel.loop` set to FALSE.
 #' @param auto.threshold A Boolean to indicate if FDR threshold should be calculated from the data, default is TRUE
 #' @param custom.tr A numeric value to use as an FDR threshold. Ignored if `auto.threshold` is set to TRUE.
+#' @param score.name Name of OAR score in dataset, default is "OARscore". If suffix used on previous functions, would need to include full new name here. 
 #'
 #' @return A dataframe with p-values for genes that significantly contribute to OAR score. 
 #' @export
@@ -26,7 +27,7 @@ oardeg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
                     splines = TRUE, degrees.freedom = 5,
                     method = "glmGamPoi",
                     blacklisted.genes = NULL, ncores = 12,
-                    auto.threshold = TRUE, custom.tr = NULL)
+                    auto.threshold = TRUE, custom.tr = NULL, score.name = "OARscore")
 {
   print("Analysis started on:")
   print(Sys.time())
@@ -50,7 +51,7 @@ oardeg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   
   #Load and filter expression data####
   if(seurat_v5){
-    if(!sum(colnames(data@meta.data) %chin% "OARscore") == 1){
+    if(!sum(colnames(data@meta.data) %chin% score.name) == 1){
       stop("OARscore column not present, or repeated, in the Seurat object. Have you run OARfold?\n")
     }
     
@@ -82,14 +83,14 @@ oardeg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
              !grepl("rps",gene_id))
     
     tr = count.filter/100
-    dt <- dt[matrix::rowSums(dt[,-1]) > dim(dt)[[2]]*tr,]
+    dt <- dt[Matrix::rowSums(dt[,-1]) > dim(dt)[[2]]*tr,]
     
     rownames(dt) <- dt$gene_id
     dt <- dt[,-1]
     
     df <- data@meta.data %>% #Prepare count metadata with residuals as the only information
       dplyr::mutate(ID = rownames(.)) %>%
-      dplyr::select("ID","OARscore")
+      dplyr::select("ID", score.name)
     
   }else{
     dt <- data %>%
@@ -109,14 +110,14 @@ oardeg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
              !grepl("rps",gene_id))
     
     tr = count.filter/100
-    dt <- dt[matrix::rowSums(dt[,-1]) > dim(dt)[[2]]*tr,]
+    dt <- dt[Matrix::rowSums(dt[,-1]) > dim(dt)[[2]]*tr,]
     
     rownames(dt) <- dt$gene_id
     dt <- dt[,-1]
     
     df <- data.frame(
       "ID" = names(score),
-      "OARscore" = score)
+      score.name = score)
   }
   
   print("FDR threshold set to:")
@@ -127,10 +128,10 @@ oardeg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   if(splines){
     warning("Using splines increases calculation time by 3-5x\n")
     
-    X <- splines::ns(df$OARscore, df=degrees.freedom) # Any df between 3 - 5 usually works well.
+    X <- splines::ns(df$score.name, df=degrees.freedom) # Any df between 3 - 5 usually works well.
     mm <- model.matrix(~X) # Model matrix with splines
   }else{
-    mm <- model.matrix(~df$OARscore) #Model no splines
+    mm <- model.matrix(~df$score.name) #Model no splines
   }
   
   #Run differential analysis####
@@ -165,14 +166,14 @@ oardeg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
       colData = df,
       design = mm)
     scr <- scran::computeSumFactors(dds) # compute scran sum factors
-    DESeq::sizeFactors(dds) <- DESeq::sizeFactors(scr) # use scran's sum factor as sizeFactors
+    DESeq2::sizeFactors(dds) <- DESeq2::sizeFactors(scr) # use scran's sum factor as sizeFactors
     rm(scr)
     if(splines){mmr = mm[,-c(2:6)] %>% as.matrix()}else{mmr = mm[,-2] %>% as.matrix()}
-    dds <- DESeq::DESeq(
+    dds <- DESeq2::DESeq(
       dds, test="LRT", reduced = mmr,
       useT = T, parallel = T,
       minmu=1e-6, minRep=Inf)
-    out <- DESeq::results(dds) %>%
+    out <- DESeq2::results(dds) %>%
       data.frame() %>%
       rownames_to_column(var = 'name') %>%
       filter(padj < threshold)

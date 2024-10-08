@@ -6,7 +6,7 @@
 \usage{
 oar_fold(
   data,
-  seurat_v5 = T,
+  seurat_v5 = TRUE,
   count.filter = 1,
   blacklisted.genes = NULL,
   gene.ratio = 20,
