@@ -139,9 +139,10 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
     output <- foreach::foreach(
       f.data = fold.data,
       folds = names(fold.data),
-      .verbose = T,
+      .verbose = F,
       .packages = c("OAR", "dplyr")) %dopar% {
-       print(f.data) #this line fixes s4 subsetting issue and I do not know why
+#        print(f.data) #this line fixes s4 subsetting issue and I do not know why
+        
         # Replace 0 with NA
         f.data[f.data == 0] <- NA
         

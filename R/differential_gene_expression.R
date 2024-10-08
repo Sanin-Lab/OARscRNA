@@ -11,7 +11,7 @@
 #' @param degrees.freedom A numeric value indicating the degrees of freedom to calculate splines. Default is 5. Values between 3 and 5 are recommended.
 #' @param method A character with one of `"glmGamPoi","DESeq2","edgeR"` to indicate preferred method. glmGamPoi is default. 
 #' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
-#' @param ncores A numeric value indicating the number of cores to use un parallel processing. Use `detectCores()` to identify possibilities. Default is 2. Ignored if `parallel.loop` set to FALSE.
+#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `detectCores()` to identify possibilities. Default is 2. Ignored if `parallel.loop` set to FALSE.
 #' @param auto.threshold A Boolean to indicate if FDR threshold should be calculated from the data, default is TRUE
 #' @param custom.tr A numeric value to use as an FDR threshold. Ignored if `auto.threshold` is set to TRUE.
 #' @param score.name Name of OAR score in dataset, default is "OARscore". If suffix used on previous functions, would need to include full new name here. 
@@ -26,14 +26,14 @@
 oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
                     splines = TRUE, degrees.freedom = 5,
                     method = "glmGamPoi",
-                    blacklisted.genes = NULL, ncores = 12,
+                    blacklisted.genes = NULL, cores = 12,
                     auto.threshold = TRUE, custom.tr = NULL, score.name = "OARscore")
 {
   print("Analysis started on:")
   print(Sys.time())
   
   if(!is.numeric(count.filter)){stop("count.filter must be numeric\n")}
-  if(method == "DESeq2" && !is.numeric(ncores)){stop("ncores must be numeric\n")}
+  if(method == "DESeq2" && !is.numeric(cores)){stop("cores must be numeric\n")}
   if(!auto.threshold && !is.numeric(custom.tr)){stop("custom.tr must be numeric\n")}
   if (count.filter > 2) {
     warning("Overfiltering expression matrix (count.filter > 2) may lower signal detection\n")
@@ -128,7 +128,7 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   if(splines){
     warning("Using splines increases calculation time by 3-5x\n")
     
-    X <- splines::ns(df$score.name, df=degrees.freedom) # Any df between 3 - 5 usually works well.
+    X <- splines::ns(df$score.name, df = degrees.freedom) # Any df between 3 - 5 usually works well.
     mm <- model.matrix(~X) # Model matrix with splines
   }else{
     mm <- model.matrix(~df$score.name) #Model no splines
@@ -160,7 +160,7 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
     ### The default size factors are not optimal for single cell count matrices,
     ### instead consider setting sizeFactors from scran::computeSumFactors.
     
-    options(MulticoreParam = BiocParallel::MulticoreParam(workers=ncores))
+    options(MulticoreParam = BiocParallel::MulticoreParam(workers=cores))
     dds <- DESeq2::DESeqDataSetFromMatrix( #Build DESeq Object with the design
       countData = dt %>% as.matrix(),
       colData = df,
