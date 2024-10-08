@@ -1,7 +1,7 @@
 #run the build-check action
 name: build-check
 on:
-    pull_request:
+    push:
         branches:
         - 'main'
     workflow_dispatch:
