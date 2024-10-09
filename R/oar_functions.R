@@ -87,6 +87,7 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
   if (gene.ratio > 30) {
     warning("A large gene to cell ratio may result in unreliable outputs\n")
   }
+  if (parallel.loop && cores > parallel::detectCores() -1 ) {stop("Your computer does not have enough cores to proceed, choose a lower number")}
   
   #store Seurat object for later
   if(seurat_v5){
