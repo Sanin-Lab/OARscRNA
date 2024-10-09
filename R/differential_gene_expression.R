@@ -45,7 +45,8 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   }else if(degrees.freedom <= 0 && splines){
     stop("1 or more degrees of freedom are necessary in spline calculation\n")
   }
-  if (parallel.loop && cores > parallel::detectCores() -1 ) {stop("Your computer does not have enough cores to proceed, choose a lower number")}
+  if (method == "DESeq2"  && cores > parallel::detectCores() -1 ) {stop("Your computer does not have enough cores to proceed, choose a lower number")}
+  if(seurat_v5 == F && is.null(score)) {stop("must provide score vector if input is dataframe")}
   
   #Set filtering threshold
   tr = count.filter/100
