@@ -37,8 +37,10 @@ missing_pattern_pval_kw = function(x, mdp){
   y.l <- x[!is.na(x)] # subset observed genes of the nth cell to y.l
   mdp.l <- mdp[!is.na(x)] # subset observed genes of the nth cell to y.l
   
+  freq.mdp <- table(mdp.l)
+  un.p <- names(freq.mdp)[freq.mdp < 2]
+  if (length(un.p)<dim(freq.mdp)[1L]) {mdp.l[mdp.l %in% un.p] <- sample(mdp.l[mdp.l %in% un.p], size = 1)}# Combine patterns that occurred once
   if (length(unique(mdp.l)) == 1) {stop("Not enough missing data patterns for using the tests\n")}
   
-  if (sum(!duplicated(mdp.l))>1) {mdp.l[!duplicated(mdp.l)] <- sample(mdp.l[!duplicated(mdp.l)], size = 1)}# Combine patterns that occurred once
   kruskal.test(x = y.l, g = factor(mdp.l))$p.value
 }
