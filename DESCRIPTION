@@ -29,6 +29,7 @@ Imports:
     parallel,
     rlang,
     scran,
+    Seurat,
     SeuratObject,
     splines,
     stats,

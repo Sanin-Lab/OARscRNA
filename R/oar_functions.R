@@ -227,3 +227,51 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
     return(output)
   }
 }
+
+##===================================================================
+#Iterative Oar Fold Test By Cluster
+##===================================================================
+#' Generate OAR score within each cluster and add them to full objects metadata
+#'
+#' @param data A Seurat (v5) object or a matrix with cell barcodes as column names and genes as row names, with cluster as ActiveIdent.
+#' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
+#' @param count.filter A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.
+#' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
+#' @param gene.ratio A numeric value indicating the ratio of genes to cells to partition data matrix. Default is 20. Values between 15 and 25 are recommended.
+#' @param iterations A numeric value indicating the number of times to iterate the OARscore calculation. Default and recommendation is 10. Can use 1 to not iterate the calculation.
+#' @param parallel.loop A Boolean to indicate if process should be run in parallel cores. Currently only `doParallel` and `foreach` are supported, default is FALSE
+#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `detectCores()` to identify possibilities. Default is 12. Ignored if `parallel.loop` set to FALSE.
+#' @param suffix A string to append to the output variables. Default is empty
+#'
+#' @return A Seurat object with OAR stats added into meta data
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' pmbcs <- oar_by_cluster(pmbcs)
+#' }
+oar_by_cluster <- function (data, seurat_v5 = TRUE, count.filter = 1,
+                            blacklisted.genes = NULL, gene.ratio = 20,
+                            iterations = 10, parallel.loop = T,
+                            cores = 12, suffix = "") {
+  
+  if(!seurat_v5){stop("must be seurat object")}
+  
+  data_list <- Seurat::SplitObject(data) #split into list of objects by active ident
+  
+  #run oar_fold on each object
+  data_oar <- lapply(data_list, oar_fold, count.filter = count.filter, blacklisted.genes = blacklisted.genes, gene.ratio = gene.ratio, iterations = iterations, parallel.loop = parallel.loop, cores = cores, suffix = suffix)
+  #combine objects back together 
+  oar_combine <- merge(data_oar[[1]], data_oar[-1], merge.data = T)
+  
+  #get oar score from combined object meta data, and add it to original meta_data (since original has kept its reduction and graph values)
+  meta_data <- data@meta.data
+  meta_data_2 <- oar_sep@meta.data
+  meta_data <- meta_data %>% tibble::rownames_to_column()
+  meta_data_2 <- meta_data_2 %>% select(OARscore.sd, OARscore, pct.missing) %>% tibble::rownames_to_column() 
+  meta_data <- meta_data %>% left_join(meta_data_2)
+  meta_data <- meta_data %>% tibble::column_to_rownames(var = "rowname")
+  data@meta.data <- meta_data
+  
+  return(data)
+}
