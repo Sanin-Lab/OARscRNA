@@ -11,7 +11,7 @@
 #' @param degrees.freedom A numeric value indicating the degrees of freedom to calculate splines. Default is 5. Values between 3 and 5 are recommended.
 #' @param method A character with one of `"glmGamPoi","DESeq2","edgeR"` to indicate preferred method. glmGamPoi is default. 
 #' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
-#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `detectCores()` to identify possibilities. Default is 2. Ignored if `parallel.loop` set to FALSE.
+#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `detectCores()` to identify possibilities. Default is 12. Ignored if `parallel.loop` set to FALSE.
 #' @param auto.threshold A Boolean to indicate if FDR threshold should be calculated from the data, default is TRUE
 #' @param custom.tr A numeric value to use as an FDR threshold. Ignored if `auto.threshold` is set to TRUE.
 #' @param score.name Name of OAR score in dataset, default is "OARscore". If suffix used on previous functions, would need to include full new name here. 
@@ -208,3 +208,4 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   #output
   return(out)
 }
+

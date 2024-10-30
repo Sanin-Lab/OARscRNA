@@ -34,6 +34,7 @@ oar_base <- function(data) {
   #output
   out <- data.frame(score,pvalue.list.KW,pvalue.KW.BH,sp)
   colnames(out) <- c("OARscore","KW.pvalue","KW.BH.pvalue","pct.missing")
+  if(sum(is.na(out$OARscore)) > 0){warning("NA OARscores have been created")}
   return(out)
 }
 
@@ -213,6 +214,7 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
   
   # Clean up output
   colnames(output)[-1] <- paste0(colnames(output)[-1],suffix)
+  if(sum(is.na(output$OARscore)) > 0){warning("NA OARscores have been created")}
   
   #output
   if(seurat_v5){
@@ -265,13 +267,16 @@ oar_by_cluster <- function (data, seurat_v5 = TRUE, count.filter = 1,
   oar_combine <- merge(data_oar[[1]], data_oar[-1], merge.data = T)
   
   #get oar score from combined object meta data, and add it to original meta_data (since original has kept its reduction and graph values)
-  meta_data <- data@meta.data
-  meta_data_2 <- oar_sep@meta.data
-  meta_data <- meta_data %>% tibble::rownames_to_column()
-  meta_data_2 <- meta_data_2 %>% select(OARscore.sd, OARscore, pct.missing) %>% tibble::rownames_to_column() 
-  meta_data <- meta_data %>% left_join(meta_data_2)
-  meta_data <- meta_data %>% tibble::column_to_rownames(var = "rowname")
-  data@meta.data <- meta_data
+  oar_combine <- oar_combine@meta.data %>% 
+    dplyr::select(OARscore.sd, OARscore, pct.missing) %>% 
+    tibble::rownames_to_column(var = "barcodes") 
   
+  idx <- match(rownames(data@meta.data), oar_combine$barcodes)
+  
+  data@meta.data <- base::cbind(
+    data@meta.data,
+    oar_combine[idx,!colnames(oar_combine) %in% "barcodes"])
+  
+  if(sum(is.na(data$OARscore)) > 0){warning("NA OARscores have been created")}
   return(data)
 }
