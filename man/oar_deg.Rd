@@ -36,7 +36,7 @@ oar_deg(
 
 \item{blacklisted.genes}{A character vector with gene names to be excluded from the analysis. Default is empty.}
 
-\item{cores}{A numeric value indicating the number of cores to use un parallel processing. Use \code{detectCores()} to identify possibilities. Default is 2. Ignored if \code{parallel.loop} set to FALSE.}
+\item{cores}{A numeric value indicating the number of cores to use un parallel processing. Use \code{detectCores()} to identify possibilities. Default is 12. Ignored if \code{parallel.loop} set to FALSE.}
 
 \item{auto.threshold}{A Boolean to indicate if FDR threshold should be calculated from the data, default is TRUE}
 

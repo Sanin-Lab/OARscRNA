@@ -22,6 +22,8 @@ Imports:
     dplyr,
     edgeR,
     foreach,
+    ggplot2,
+    ggrastr,
     glmGamPoi,
     Matrix,
     methods,
