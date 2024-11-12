@@ -9,10 +9,11 @@ oar_fold(
   seurat_v5 = TRUE,
   count.filter = 1,
   blacklisted.genes = NULL,
-  gene.ratio = 20,
+  gene.ratio = 15,
   iterations = 10,
   parallel.loop = T,
   cores = 12,
+  distance = 1,
   suffix = ""
 )
 }
@@ -25,13 +26,15 @@ oar_fold(
 
 \item{blacklisted.genes}{A character vector with gene names to be excluded from the analysis. Default is empty.}
 
-\item{gene.ratio}{A numeric value indicating the ratio of genes to cells to partition data matrix. Default is 20. Values between 15 and 25 are recommended.}
+\item{gene.ratio}{A numeric value indicating the ratio of genes to cells to partition data matrix. Default is 15. Values between 10 and 25 are recommended.}
 
 \item{iterations}{A numeric value indicating the number of times to iterate the OARscore calculation. Default and recommendation is 10. Can use 1 to not iterate the calculation.}
 
 \item{parallel.loop}{A Boolean to indicate if process should be run in parallel cores. Currently only \code{doParallel} and \code{foreach} are supported, default is FALSE}
 
 \item{cores}{A numeric value indicating the number of cores to use un parallel processing. Use \code{detectCores()} to identify possibilities. Default is 12. Ignored if \code{parallel.loop} set to FALSE.}
+
+\item{distance}{A maximum euclidean distance between gene vectors. Default is 1.}
 
 \item{suffix}{A string to append to the output variables. Default is empty}
 }

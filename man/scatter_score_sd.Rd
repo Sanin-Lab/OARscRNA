@@ -4,12 +4,14 @@
 \alias{scatter_score_sd}
 \title{Create scatter plot of OAR score vs OAR score Standard Deviation}
 \usage{
-scatter_score_sd(data, seurat_v5 = TRUE)
+scatter_score_sd(data, seurat_v5 = TRUE, suffix = "")
 }
 \arguments{
 \item{data}{A seurat v5 object that has oar score in meta data.}
 
 \item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is TRUE}
+
+\item{suffix}{A string that was previously appended to the output variables. Default is empty.}
 }
 \value{
 Scatter plot of OAR score standard deviation vs OAR score, colored by percent missingness of each cell.

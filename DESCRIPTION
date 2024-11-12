@@ -21,10 +21,12 @@ Imports:
     doParallel,
     dplyr,
     edgeR,
+    fields,
     foreach,
     ggplot2,
     ggrastr,
     glmGamPoi,
+    igraph,
     Matrix,
     methods,
     naniar,
@@ -36,3 +38,6 @@ Imports:
     splines,
     stats,
     tibble
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

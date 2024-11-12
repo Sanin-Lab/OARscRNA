@@ -4,10 +4,12 @@
 \alias{oar_base}
 \title{Generate scores and p-values to determine heterogeneity of data by looking at whether missingness is observed-at-random (OAR)}
 \usage{
-oar_base(data)
+oar_base(data, distance = 1)
 }
 \arguments{
 \item{data}{A gene-cell expression matrix with NA values in place of 0s.}
+
+\item{distance}{A maximum euclidean distance between gene vectors. Default is 1.}
 }
 \value{
 Data frame with OAR-score, p-value, adjusted p-value, and percent missing data for each cell.
