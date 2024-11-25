@@ -14,14 +14,9 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
-    BiocParallel,
     data.table,
-    DESeq2,
     digest,
-    doParallel,
     dplyr,
-    edgeR,
-    fields,
     foreach,
     ggplot2,
     ggrastr,
@@ -30,9 +25,10 @@ Imports:
     Matrix,
     methods,
     naniar,
-    parallel,
+    parallelDist,
+    parallelly,
+    reshape2,
     rlang,
-    scran,
     Seurat,
     SeuratObject,
     splines,

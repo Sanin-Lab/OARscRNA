@@ -1,25 +1,83 @@
-#' Kruskal-Wallis test to generate a per cell p-value based on missing data patterns
+##===================================================================
+#Identify missing data patterns with exact matches
+##===================================================================
+#' Identify missing data patterns with exact matches and combine all unique missing data patterns
 #'
-#' @param x Item from list of cell gene expression vectors
-#' @param mdp Matrix with counts per pattern
+#' @param data a minimal dataset ready for processing.
 #'
-#' @return list with a p-value for each cell
+#' @return missing data pattern vector
 #' @export
 #'
-#' @examples
+#' @examples 
 #' \dontrun{
-#' pvalue.list.KW <- unlist(lapply(cl, FUN = missing_pattern_pval_kw, mdp = mdp))
+#' mdp <- oar_exact_missing_data_patterns(data)
 #' }
-#' 
-missing_pattern_pval_kw = function(x, mdp){
-  y.l <- x[!is.na(x)] # subset observed genes of the nth cell to y.l
-  mdp.l <- mdp[!is.na(x)] # subset observed genes of the nth cell to y.l
+oar_exact_missing_data_patterns <- function (data) {
+  gl = lapply(seq_len(dim(data)[1L]), function(i) data[i,]) #convert mtx to list of gene vectors
+  mdp <- unlist(lapply(gl, function(x) digest::digest(1 * is.na(x), algo = "md5"))) # Apply a hashing function to each row to get unique pattern IDs
+  mdp <- as.numeric(factor(mdp))
   
-  freq.mdp <- table(mdp.l)
+  if (length(unique(mdp)) == 1) {stop("Not enough missing data patterns detected\n")}
+  freq.mdp <- table(mdp)
   un.p <- names(freq.mdp)[freq.mdp < 2]
-  if (length(un.p) == length(mdp.l)){warning("NAs generated in OARscore, may be fixed by changing gene.ratio\n")}
-  if (length(un.p)<dim(freq.mdp)[1L]) {mdp.l[mdp.l %in% un.p] <- sample(mdp.l[mdp.l %in% un.p], size = 1)}# Combine patterns that occurred once
-  if (length(unique(mdp.l)) == 1) {stop("Not enough missing data patterns for using the tests\n")}
   
-  kruskal.test(x = y.l, g = factor(mdp.l))$p.value
+  if (length(un.p) < dim(freq.mdp)[1L]) {mdp[mdp %in% un.p] <- "unique"}# Combine patterns that occurred once
+  if (length(unique(mdp)) == 1) {stop("All missing data patterns were unique.\nConsider allowing for mismatch")}
+  
+  print(paste0(
+    "Identified ",
+    length(unique(mdp))-1," non-unique missing data patterns, encompassing ",
+    sum(table(mdp)) - sum(table(mdp)["unique"]), " genes"))
+  
+  return(mdp)
+}
+
+##===================================================================
+#Identify missing data patterns allowing for mismatch
+##===================================================================
+#' Identify missing data patterns allowing for mismatch
+#'
+#' @param data a minimal dataset ready for processing.
+#' @param tolerance A logical or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
+#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities.
+#'
+#' @return Matrix of gene vector hamming distances
+#' @export
+#'
+#' @examples 
+#' \dontrun{
+#' ##Automatic tolerance setting
+#' mdp <- oar_missing_data_patterns(data, tolerance = T)
+#'
+#' ##User defined
+#' mdp <- oar_missing_data_patterns(data, tolerance = 0.05)
+#' }
+oar_missing_data_patterns <- function (data, tolerance = TRUE, cores = 1) {
+  print("Calculating Hamming distances between gene vectors using specified cores.")
+  print("This operation may take several minutes")
+  dm <- parallelDist::parDist(
+    x = +(!is.na(data)), method = "hamming", 
+    threads = cores) %>% as.matrix() # Calculate Hamming distance between gene vectors
+  
+  p = 1
+  tol = 0
+  if(is.logical(tolerance) && tolerance){
+    print("Scanning for optimal tolerance...")
+    for(i in seq(0.01,0.05,by = 0.01)){
+      mdp <- oar_missing_data_graph(dm, tol = i)
+      if(length(unique(mdp)) > p){mdp.f = mdp; tol = i; p = length(unique(mdp))}
+    }
+    mdp = mdp.f
+    print(paste0("Identified ",p-1," non-unique missing data patterns"))
+    print(paste0("Tolerance set to ",tol))
+    print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["unique"])," genes captured in non-unique patterns"))
+  } else if(is.numeric(tolerance)){
+    mdp <- oar_missing_data_graph(dm, tol = tolerance)
+    print(paste0("Identified ",length(unique(mdp))-1," non-unique missing data patterns"))
+    print(paste0("Tolerance set to ",tolerance))
+    print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["unique"])," genes captured in non-unique patterns"))
+  }else{
+    stop("Tolerance must be TRUE or a mumerical value less than 1")
+  }
+  return(mdp)
 }

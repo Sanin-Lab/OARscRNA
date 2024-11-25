@@ -4,19 +4,24 @@
 \alias{oar_preprocess_data}
 \title{Prepare data for oar fold functions}
 \usage{
-oar_preprocess_data(data, tr, seurat_v5 = T, blacklisted.genes = NULL)
+oar_preprocess_data(
+  data,
+  tr = 0.01,
+  seurat_v5 = TRUE,
+  blacklisted.genes = NULL
+)
 }
 \arguments{
 \item{data}{Seurat object or gene expression matrix}
 
-\item{tr}{Filtering threshold}
+\item{tr}{Filtering threshold.}
 
 \item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is TRUE}
 
 \item{blacklisted.genes}{A character vector with gene names to be excluded from the analysis. Default is empty.}
 }
 \value{
-Data matrix with blacklisted gens removed
+Data matrix with blacklisted genes removed
 }
 \description{
 Prepare data for oar fold functions

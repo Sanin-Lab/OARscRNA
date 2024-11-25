@@ -11,9 +11,7 @@ oar_deg(
   count.filter = 1,
   splines = TRUE,
   degrees.freedom = 5,
-  method = "glmGamPoi",
   blacklisted.genes = NULL,
-  cores = 12,
   auto.threshold = TRUE,
   custom.tr = NULL,
   score.name = "OARscore"
@@ -22,7 +20,7 @@ oar_deg(
 \arguments{
 \item{data}{A Seurat (v5) object or a data.frame with cell barcodes as column names and genes as row names. Seurat object must have a column in metadata with OARscore.}
 
-\item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is TRUE. If false, need to provide score vector.}
+\item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is \code{TRUE}. If \code{FALSE}, user must supply a  score vector.}
 
 \item{score}{A named numeric vector with OARscores to be used in the model if provided a dataframe instead of Seurat object. Names should be cell barcodes. Ignored if Seurat object is supplied.}
 
@@ -32,11 +30,7 @@ oar_deg(
 
 \item{degrees.freedom}{A numeric value indicating the degrees of freedom to calculate splines. Default is 5. Values between 3 and 5 are recommended.}
 
-\item{method}{A character with one of \verb{"glmGamPoi","DESeq2","edgeR"} to indicate preferred method. glmGamPoi is default.}
-
 \item{blacklisted.genes}{A character vector with gene names to be excluded from the analysis. Default is empty.}
-
-\item{cores}{A numeric value indicating the number of cores to use un parallel processing. Use \code{detectCores()} to identify possibilities. Default is 12. Ignored if \code{parallel.loop} set to FALSE.}
 
 \item{auto.threshold}{A Boolean to indicate if FDR threshold should be calculated from the data, default is TRUE}
 

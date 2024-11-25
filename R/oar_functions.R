@@ -1,10 +1,10 @@
 ##===================================================================
-#Base Oar Test
+#Base Test
 ##===================================================================
 #' Generate scores and p-values to determine heterogeneity of data by looking at whether missingness is observed-at-random (OAR)
 #'
 #' @param data A gene-cell expression matrix with NA values in place of 0s.
-#' @param distance A maximum euclidean distance between gene vectors. Default is 1. 
+#' @param mdp A vector indicating the pattern to which each gene belongs. 
 #'
 #' @return Data frame with OAR-score, p-value, adjusted p-value, and percent missing data for each cell. 
 #' 
@@ -12,213 +12,116 @@
 #'
 #' @examples
 #' \dontrun{
-#' output <- oar_base(data)
+#' output <- oar_base(data, mdp)
 #' }
-oar_base <- function (data, distance = 1) {
-rownames(data) = NULL # remove gene names
-cl = lapply(seq_len(dim(data)[2L]), function(i) data[,i]) #convert mtx to list of cell vectors
-dm <- fields::fields.rdist.near(
-  1 * is.na(data), delta = distance) # Calculate distance between gene vectors
-mdp <- igraph::graph_from_data_frame(d = dm$ind, directed = FALSE) %>% # Create an igraph based on similar gene patterns
-  igraph::simplify() %>% # Remove multiple edges between nodes 
-  igraph::cluster_fast_greedy() %>% # detect communities
-  igraph::membership() # extract community memberships
-names(mdp) <- NULL # vector of communities
-
-pvalue.list.KW <- unlist(lapply(cl, FUN = missing_pattern_pval_kw, mdp = mdp)) # Calculate p value
-pvalue.KW.BH = p.adjust(pvalue.list.KW, method = "BH") # Benjamini & Hochberg correction ("BH" or its alias "fdr")
-
-#transform and scale adjusted pvalues
-score = scale(-log10(pvalue.KW.BH), center = T, scale = T)*-1
-
-#calculate missing values
-sp = unlist(lapply(cl, naniar::pct_miss))
-
-#Remove data to free up memory#
-rm(data)
-
-#output
-out <- data.frame(score,pvalue.list.KW,pvalue.KW.BH,sp)
-colnames(out) <- c("OARscore","KW.pvalue","KW.BH.pvalue","pct.missing")
-return(out)
+oar_base <- function (data, mdp) {
+  cl = lapply(seq_len(dim(data)[2L]), function(i) data[,i]) #convert mtx to list of cell vectors
+  pvalue.list.KW <- unlist(lapply(cl, FUN = missing_pattern_pval_kw, mdp = mdp)) # Calculate p value
+  pvalue.KW.BH = p.adjust(pvalue.list.KW, method = "BH") # Benjamini & Hochberg correction ("BH" or its alias "fdr")
+  
+  #transform and scale adjusted pvalues
+  score = scale(-log10(pvalue.KW.BH), center = T, scale = T)*-1
+  
+  #calculate missing values
+  sp = unlist(lapply(cl, naniar::pct_miss))
+  
+  #output
+  out <- data.frame(score,pvalue.list.KW,pvalue.KW.BH,sp)
+  colnames(out) <- c("OARscore","KW.pvalue","KW.BH.pvalue","pct.missing")
+  return(out)
 }
 
-
 ##===================================================================
-#Iterative Oar Fold Test
+#Wrapper function to run full OAR scoring
 ##===================================================================
-#' Generate OAR fold stats for Seurat object and add them to meta data, run iteratively with different partitions of data and average across them. 
+#' Single line pipeline to run complete analysis
 #'
-#' @param data A Seurat (v5) object or a matrix with cell barcodes as column names and genes as row names.
-#' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
-#' @param count.filter A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.
-#' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
-#' @param gene.ratio A numeric value indicating the ratio of genes to cells to partition data matrix. Default is 15. Values between 10 and 25 are recommended.
-#' @param iterations A numeric value indicating the number of times to iterate the OARscore calculation. Default and recommendation is 10. Can use 1 to not iterate the calculation. 
-#' @param parallel.loop A Boolean to indicate if process should be run in parallel cores. Currently only `doParallel` and `foreach` are supported, default is FALSE
-#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `detectCores()` to identify possibilities. Default is 12. Ignored if `parallel.loop` set to FALSE.
-#' @param distance A maximum euclidean distance between gene vectors. Default is 1.
-#' @param suffix A string to append to the output variables. Default is empty
+#' @param data a Seurat (v5) object or a matrix with cell barcodes as column names and genes as row names.
+#' @param seurat_v5 a Boolean to indicate if supplied data is a Seurat object, default is TRUE
+#' @param count.filter a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.
+#' @param blacklisted.genes a character vector with gene names to be excluded from the analysis. Default is empty.
+#' @param suffix is a string to append to the output variables. Default is empty
+#' @param mismatch a boolean to determine to allow minimal mismatch in missing data pattern identification. Default `TRUE`
+#' @param tolerance A logical or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
+#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities. Default is 1.
 #'
-#' @return A Seurat object with OAR stats added into meta data
+#' @return A Seurat object with OAR stats added into meta data, or a matrix with OAR stats. 
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' pmbcs <- oar_fold(pmbcs)
+#' pbmcs <- oar(pbmcs)
 #' }
-oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
-                      blacklisted.genes = NULL, gene.ratio = 15,
-                      iterations = 10, parallel.loop = T,
-                      cores = 12, distance = 1, suffix = "") {
-  print("Analysis started on:")
-  print(Sys.time())
+#' 
+oar <- function (data, seurat_v5 = TRUE, count.filter = 1, 
+                 blacklisted.genes = NULL, suffix = "", 
+                 mismatch = TRUE, tolerance = TRUE, cores = 1) {
   
   #Set filtering threshold
   tr = count.filter/100
   
+  #Check parameters were correctly supplied
   if(!is.numeric(count.filter)){stop("count.filter must be numeric\n")}
-  if(!is.numeric(iterations)){stop("iterations must be numeric\n")}
-  if(parallel.loop && !is.numeric(cores)){stop("cores must be numeric\n")}
-  if(!is.numeric(gene.ratio)){stop("gene.ratio must be numeric\n")}
   if(!is.character(suffix)){stop("suffix must be a string\n")}
+  if(!is.logical(tolerance)){if(!is.numeric(tolerance))stop("tolerance must be logical or numeric\n")}
+  if(!is.logical(mismatch)){stop("mismatch must be TRUE or FALSE\n")}
+  if(!is.logical(seurat_v5)){stop("seurat_v5 must be TRUE or FALSE\n")}
+  if(!is.null(blacklisted.genes)){if(!is.character(blacklisted.genes))stop("Supplied blacklisted genes are not characters\n")}
+  
+  #Value range warnings
   if (count.filter > 2) {
     warning("Overfiltering expression matrix (count.filter > 2) may lower signal detection\n")
   }else if(count.filter == 0) {
-    #stop("Minimum fraction of cells expressing any given gene must be greater than 0\n")
     warning("Minimum fraction of cells expressing any given gene should be greater than 0\n")
   }
-  if (gene.ratio < 10) {
-    warning("A small gene to cell ratio may result in unreliable outputs\n")
+  if(is.numeric(tolerance)){
+    if (mismatch && tolerance == 0) {
+      warning("Tolerance should be greater than 0\n")
+    }else if(tolerance >= 0.1) {
+      warning("Tolerances greater than 0.10 are not recommended\n")
+    }
   }
-  if (gene.ratio > 25) {
-    warning("A large gene to cell ratio may result in unreliable outputs\n")
-  }
-  if (parallel.loop && cores > parallel::detectCores() -1 ) {stop("Your computer does not have enough cores to proceed, choose a lower number")}
+  
+  #Processing Warnings 
+  if (parallelly::availableCores() < cores ){
+    stop("Specified cores are greater than available in your machine.\nRun `parallelly::availableCores()` to identify appropriate number\n")}
+  if (cores < 2 ) {
+    warning("Running process in fewer than 2 cores will considerably slow down progress\n")}
   
   #store Seurat object for later
   if(seurat_v5){
     sc.data = data
+    cells = colnames(sc.data)
+  }else{
+    cells = colnames(data)
   }
   
   #read in Seurat object & remove blacklisted genes
+  print("Extracting data...")
   data <- oar_preprocess_data(data, tr, seurat_v5, blacklisted.genes)
   
-  #save Cell names
-  cell.names = colnames(data)
+  ot <- Sys.time()
+  print("Analysis started on:")
+  print(ot)
   
-  #Identify number of folds based on ratio
-  max.cells = ceiling(data@Dim[[1]]/gene.ratio)
-  folds <- oar_identify_folds(data, gene.ratio, max.cells)
-  print(paste0("Number of folds: ",folds))
-  
-  # Notify of time to completion
-  print(paste0("Anticipated time to completion: ",
-               round(folds*iterations*10/60/cores/2,0)+1," minutes, if using parallel processing"))
-  
-  #Generate list of cell vectors for parallel or sequential processing
-  fold.data = list()
-  for(j in 1:iterations){
-    a = cell.names
-    for(i in 1:folds){
-      if(length(a) == 0) break
-      s <- paste0("iteration_",j,"_","fold_",i)
-      if(length(a) <= max.cells){max.cells = length(a)}
-      cells = sample(a,max.cells)
-      a = a[!a %chin% cells]
-      fold.data[[s]] = data[,colnames(data) %chin% cells]
-    }
-  }
-  
-  print("Identifying missing patterns and scoring across folds...")
-  #parallel or sequential processing
-  if(parallel.loop){
-    
-    #register cluster
-    my.cluster <- parallel::makeCluster(
-      cores,
-      type = "PSOCK"
-    )
-    
-    doParallel::registerDoParallel(cl = my.cluster) #register it to be used by %dopar%
-    
-    #Run the loop in parallel
-    output <- foreach::foreach(
-      f.data = fold.data,
-      distance = distance,
-      folds = names(fold.data),
-      .verbose = F,
-      .packages = c("OAR", "dplyr", "Matrix")) %dopar% {
-        
-        # Replace 0 with NA
-        f.data[f.data == 0] <- NA
-        
-        # Convert to a dense matrix
-        f.data <- as.matrix(f.data)
-        
-        # store column names
-        cells = colnames(f.data)
-        colnames(f.data) = NULL
-        
-        # data must be in .data.frame()
-        if (all(complete.cases(f.data))) {
-          stop("No missing data exists\n")
-        }
-        
-        # Run test
-        w <- oar_base(data = f.data, distance = distance) %>%
-          dplyr::mutate(Fold = folds,
-                 barcodes = cells)
-        return(w)
-      }
-    parallel::stopCluster(cl = my.cluster)
+  #Identify missing data patterns
+  print("Identifying missing data patterns...")
+  if(mismatch){
+    dm <- oar_missing_data_patterns(data = data, cores = cores, tolerance = tolerance)
   }else{
-    output <- list()
-    n = 1
-    for(i in fold.data){
-      # Replace 0 with NA
-      i[i == 0] <- NA
-      
-      # Convert to a dense matrix
-      i <- i %>% as.matrix()
-      
-      # store column names
-      cells = colnames(i)
-      colnames(i) = NULL
-      
-      # data must be in .data.frame()
-      if (all(complete.cases(i))) {
-        stop("No missing data exists\n")
-      }
-      
-      # Run test
-      output[[n]] <- oar_base(data = i) %>%
-        dplyr::mutate(Fold = paste0("fold_",n),
-               barcodes = cells)
-      n=n+1
-    }
+    mdp <- oar_exact_missing_data_patterns(data = data)
   }
   
-  print("Score calculation completed")
-  
-  print("Consolidating results")
-  
-  #Consolidate results
-  output = do.call(rbind,output) %>%
-    dplyr::group_by(barcodes) %>%
-    dplyr::summarise(
-      OARscore.sd = sd(OARscore, na.rm = T),
-      OARscore = median(OARscore, na.rm = T),
-      OARscore.margin = qt(0.975,df=iterations-1)*OARscore.sd/sqrt(iterations),
-      pct.missing = median(pct.missing),
-      NA_count = sum(is.na(OARscore))
-    )
-  
-  print("Analysis completed at:")
-  print(Sys.time())
+  #Run missingness test
+  print("Calculating scores")
+  output <- oar_base(data, mdp)
+  output$barcodes = cells
   
   # Clean up output
-  colnames(output)[-1] <- paste0(colnames(output)[-1],suffix)
+  print("Collecting results")
+  colnames(output)[-ncol(output)] <- paste0(colnames(output)[-ncol(output)],suffix)
+  
+  print(paste0("Analysis completed succesully in ", round((Sys.time()-ot)/60,2)," min!\n"))
   
   #output
   if(seurat_v5){
@@ -235,7 +138,7 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
 }
 
 ##===================================================================
-#Iterative Oar Fold Test By Cluster
+#Oar Test By Cluster
 ##===================================================================
 #' Generate OAR score within each cluster and add them to full objects metadata
 #'
@@ -243,12 +146,10 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
 #' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
 #' @param count.filter A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.
 #' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
-#' @param gene.ratio A numeric value indicating the ratio of genes to cells to partition data matrix. Default is 15. Values between 10 and 25 are recommended.
-#' @param iterations A numeric value indicating the number of times to iterate the OARscore calculation. Default and recommendation is 10. Can use 1 to not iterate the calculation.
-#' @param parallel.loop A Boolean to indicate if process should be run in parallel cores. Currently only `doParallel` and `foreach` are supported, default is FALSE
-#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `detectCores()` to identify possibilities. Default is 12. Ignored if `parallel.loop` set to FALSE.
-#' @param distance A maximum euclidean distance between gene vectors. Default is 1.
 #' @param suffix A string to append to the output variables. Default is empty
+#' @param mismatch a boolean to determine to allow minimal mismatch in missing data pattern identification. Default `TRUE`
+#' @param tolerance A logical or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
+#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities.
 #'
 #' @return A Seurat object with OAR stats added into meta data
 #' @export
@@ -258,38 +159,27 @@ oar_fold <- function (data, seurat_v5 = TRUE, count.filter = 1,
 #' pmbcs <- oar_by_cluster(pmbcs)
 #' }
 oar_by_cluster <- function (data, seurat_v5 = TRUE, count.filter = 1,
-                            blacklisted.genes = NULL, gene.ratio = 15,
-                            iterations = 10, parallel.loop = T,
-                            cores = 12, distance = 1, suffix = "") {
+                            blacklisted.genes = NULL, suffix = "",
+                            mismatch = TRUE, tolerance = TRUE,
+                            cores = 1) {
   
-  if(!seurat_v5){stop("must be seurat object")}
+  if(!seurat_v5){stop("Must be a seurat object\n")}
   
   print("Splitting data by cluster...")
   
   data_list <- Seurat::SplitObject(data) #split into list of objects by active ident
-  print(names(data_list))
   
-  #run oar_fold on each object
-  data_oar <- lapply(data_list, oar_fold, count.filter = count.filter, blacklisted.genes = blacklisted.genes, gene.ratio = gene.ratio, iterations = iterations, parallel.loop = parallel.loop, cores = cores, suffix = suffix)
-  #combine objects back together 
-  oar_combine <- merge(data_oar[[1]], data_oar[-1], merge.data = T)
+  #run oar on each object
+  data_oar <- lapply(data_list, oar, count.filter = count.filter,
+                     blacklisted.genes = blacklisted.genes, 
+                     suffix = suffix, mismatch = mismatch, 
+                     tolerance = tolerance, cores = cores)
   
-  #get oar score from combined object meta data, and add it to original meta_data (since original has kept its reduction and graph values)
-  sd.name <- paste0("OARscore.sd", suffix)
-  score.name <- paste0("OARscore", suffix)
-  missing.name <- paste0("pct.missing", suffix)
-  margin.name <- paste0("OARscore.margin", suffix)
-  NA_name <- paste0("NA_count", suffix)
-  
-  oar_combine <- oar_combine@meta.data %>% 
-    dplyr::select(.data[[sd.name]], .data[[score.name]], .data[[missing.name]], .data[[margin.name]], .data[[margin.name]]) %>%
-    tibble::rownames_to_column(var = "barcodes") 
-  
-  idx <- match(rownames(data@meta.data), oar_combine$barcodes)
-  
-  data@meta.data <- base::cbind(
-    data@meta.data,
-    oar_combine[idx,!colnames(oar_combine) %in% "barcodes"])
+  #combine objects back together
+  collect <- paste0(c("OARscore","KW.pvalue","KW.BH.pvalue","pct.missing"),suffix)
+  oar_combine <- lapply(data_oar, function(x){x@meta.data %>% dplyr::select(dplyr::all_of(collect))})
+  oar_combine <- do.call(rbind,oar_combine)
+  data <- SeuratObject::AddMetaData(data, metadata = oar_combine)
   
   return(data)
 }

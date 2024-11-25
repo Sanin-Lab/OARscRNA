@@ -1,18 +1,21 @@
+##===================================================================
+#Preprocess data
+##===================================================================
 #' Prepare data for oar fold functions
 #'
 #' @param data Seurat object or gene expression matrix
-#' @param tr Filtering threshold
+#' @param tr Filtering threshold.
 #' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
 #' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
 #'
-#' @return Data matrix with blacklisted gens removed
+#' @return Data matrix with blacklisted genes removed
 #' @export
 #'
 #' @examples 
 #' \dontrun{
 #' data <- oar_preprocess_data(data)
 #' }
-oar_preprocess_data <- function(data, tr, seurat_v5 = T, blacklisted.genes = NULL) {
+oar_preprocess_data <- function(data, tr = 0.01, seurat_v5 = TRUE, blacklisted.genes = NULL) {
   #read in Seurat object
   if(seurat_v5){
     layersList <- lapply(data@assays$RNA@layers,function(x){dim(x)}) #Identify empty layers
@@ -35,62 +38,76 @@ oar_preprocess_data <- function(data, tr, seurat_v5 = T, blacklisted.genes = NUL
   }
   
   #Remove blacklisted genes
-  if(length(blacklisted.genes) > 0 && is.character(blacklisted.genes)){
+  if(!is.null(blacklisted.genes)){
     data <- data[!rownames(data) %chin% blacklisted.genes,]
   }
+  
+  #Convert to a dense matrix and Replace 0 with NA
+  data <- data %>% as.matrix()
+  colnames(data) = NULL
+  rownames(data) = NULL
+  data[data == 0] <- NA
+  
+  # data must be in .data.frame()
+  if (all(complete.cases(data))) {
+    stop("No missing data exists\n")
+  }
+  
   return(data)
 }
 
-#' Identify number of folds to use for data based on desired gene-cell ratio
+##===================================================================
+#Group missing data patterns based on tolerance with a graph
+##===================================================================
+#' Group missing data patterns based on tolerance with a graph
 #'
-#' @param data A matrix with low expression genes filtered
-#' @param gene.ratio A numeric value indicating the ratio of genes to cells to partition data matrix. Default is 20. Values between 15 and 25 are recommended.
-#' @param max.cells Total number of cells available in data
+#' @param dm a matrix of gene vector hamming distances.
+#' @param tol a numeric value indicating the maximum fraction of mismatch in genes to group as a pattern, default is 0.05.
 #'
-#' @return A variable called folds that contains a numeric value
+#' @return missing data pattern vector
+#' @export
+#'
+#' @examples 
+#' \dontrun{
+#' mdp <- oar_missing_data_patterns(dm, tol = 0.05)
+#' }
+oar_missing_data_graph <- function (dm, tol = 0.05) {
+  g <- igraph::graph_from_adjacency_matrix(
+    adjmatrix = dm <= tol, mode = "undirected", diag = F) # Create an graph based on similar gene patterns
+  unp <- igraph::V(g)[igraph::degree(g) <= 0]$name # Identify genes with unique patterns
+  g <- igraph::decompose(g) # Split into connected nodes
+  mdp <- rep(NA,nrow(dm)) # create space holder for patterns
+  ps <- 1:length(g) # create pattern numbers
+  n=1
+  for(i in g){ # Assign pattern numbers
+    mdp[as.numeric(igraph::V(i)$name)] <- ps[n]
+    n=1+n
+  }
+  mdp[as.numeric(unp)] <- "unique"
+  return(mdp)
+}
+
+##===================================================================
+#Test gene distributions across patterns
+##===================================================================
+#' Kruskal-Wallis test to generate a per cell p-value based on missing data patterns
+#'
+#' @param x Item from list of cell gene expression vectors
+#' @param mdp Matrix with counts per pattern
+#'
+#' @return list with a p-value for each cell
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' folds <- oar_identify_folds(data)
+#' pvalue.list.KW <- unlist(lapply(cl, FUN = missing_pattern_pval_kw, mdp = mdp))
 #' }
-oar_identify_folds <- function(data, gene.ratio, max.cells) {
-  print("Identifying effective ratio:")
-  if(max.cells >= data@Dim[[2]]){
-    folds = 1
-    max.cells = data@Dim[[2]]
-  }else{
-    n=1
-    while(!data@Dim[[2]] %% max.cells == 0){
-      max.cells = ceiling(ceiling(data@Dim[[1]]/(gene.ratio*runif(n = 1,0.85,1.15))))
-      if(
-        dplyr::between(
-          x = data@Dim[[2]] %% max.cells,
-          left = max.cells*0.80,
-          right = max.cells*1.2)) break
-      n = n+1
-      if(n == 50){
-        gene.ratio = gene.ratio+2
-      }
-      if(n > 100){
-        stop("Maximum number of iterations reached. Choose a different starting gene.ratio\n")
-      }
-    }
-    folds = ceiling(data@Dim[[2]]/max.cells)
-  }
+#' 
+missing_pattern_pval_kw = function(x, mdp){
+  y.l <- x[!is.na(x)] # subset observed genes of the nth cell to y.l
+  mdp.l <- mdp[!is.na(x)] # subset observed genes of the nth cell to y.l
+  pval = kruskal.test(x = y.l, g = factor(mdp.l))$p.value
   
-  print(paste0("Effective ratio: ",ceiling(data@Dim[[1]])/max.cells))
-  
-  if (ceiling(data@Dim[[1]])/max.cells < 15) {
-    warning("A small gene to cell ratio may result in unreliable outputs\n")
-  }
-  
-  if (ceiling(data@Dim[[1]])/max.cells > 30) {
-    warning("A large gene to cell ratio may result in unreliable outputs\n")
-  }
-  
-  return(folds)
+  return(pval)
 }
 
-
-  

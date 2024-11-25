@@ -4,14 +4,12 @@
 #' Generate DEGs based on OAR score
 #'
 #' @param data A Seurat (v5) object or a data.frame with cell barcodes as column names and genes as row names. Seurat object must have a column in metadata with OARscore.
-#' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE. If false, need to provide score vector. 
+#' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is `TRUE`. If `FALSE`, user must supply a  score vector. 
 #' @param score A named numeric vector with OARscores to be used in the model if provided a dataframe instead of Seurat object. Names should be cell barcodes. Ignored if Seurat object is supplied.
 #' @param count.filter A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.
 #' @param splines A Boolean to indicate if splines should be used to fit model, default is TRUE
 #' @param degrees.freedom A numeric value indicating the degrees of freedom to calculate splines. Default is 5. Values between 3 and 5 are recommended.
-#' @param method A character with one of `"glmGamPoi","DESeq2","edgeR"` to indicate preferred method. glmGamPoi is default. 
 #' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
-#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `detectCores()` to identify possibilities. Default is 12. Ignored if `parallel.loop` set to FALSE.
 #' @param auto.threshold A Boolean to indicate if FDR threshold should be calculated from the data, default is TRUE
 #' @param custom.tr A numeric value to use as an FDR threshold. Ignored if `auto.threshold` is set to TRUE.
 #' @param score.name Name of OAR score in dataset, default is "OARscore". If suffix used on previous functions, would need to include full new name here. 
@@ -24,16 +22,14 @@
 #' degs <- oar_deg(data)
 #' }
 oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
-                    splines = TRUE, degrees.freedom = 5,
-                    method = "glmGamPoi",
-                    blacklisted.genes = NULL, cores = 12,
-                    auto.threshold = TRUE, custom.tr = NULL, score.name = "OARscore")
+                     splines = TRUE, degrees.freedom = 5,
+                     blacklisted.genes = NULL, auto.threshold = TRUE, 
+                     custom.tr = NULL, score.name = "OARscore")
 {
   print("Analysis started on:")
   print(Sys.time())
   
   if(!is.numeric(count.filter)){stop("count.filter must be numeric\n")}
-  if(method == "DESeq2" && !is.numeric(cores)){stop("cores must be numeric\n")}
   if(!auto.threshold && !is.numeric(custom.tr)){stop("custom.tr must be numeric\n")}
   if (count.filter > 2) {
     warning("Overfiltering expression matrix (count.filter > 2) may lower signal detection\n")
@@ -45,8 +41,7 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   }else if(degrees.freedom <= 0 && splines){
     stop("1 or more degrees of freedom are necessary in spline calculation\n")
   }
-  if (method == "DESeq2"  && cores > parallel::detectCores() -1 ) {stop("Your computer does not have enough cores to proceed, choose a lower number")}
-  if(seurat_v5 == F && is.null(score)) {stop("must provide score vector if input is dataframe")}
+  if(seurat_v5 == F && is.null(score)) {stop("Must provide score vector if input is dataframe")}
   
   #Set filtering threshold
   tr = count.filter/100
@@ -137,70 +132,16 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   }
   
   #Run differential analysis####
-  if(method == "glmGamPoi"){
-    #glmGamPoi####
-    
-    fit <- glmGamPoi::glm_gp(
-      data = dt %>% as.matrix(),
-      design = mm,
-      col_data = df,
-      size_factors = "deconvolution",
-      on_disk = F)
-    
-    out <- glmGamPoi::test_de(
-      fit, reduced_design = ~1, sort_by = "adj_pval") %>%
-      filter(adj_pval < threshold)
-    
-    rm(fit)
-  }else if(method == "DESeq2"){
-    #DEseq2####
-    # Use test="LRT" for significance testing when working with single-cell data,
-    # over the Wald test. This has been observed across multiple single-cell benchmarks.
-    ## Set the following DESeq arguments to these values: useT=TRUE, minmu=1e-6, and minRep=Inf.
-    ## The default setting of minmu was benchmarked on bulk RNA-seq and is not appropriate for
-    ## single cell data when the expected count is often much less than 1.
-    ### The default size factors are not optimal for single cell count matrices,
-    ### instead consider setting sizeFactors from scran::computeSumFactors.
-    
-    options(MulticoreParam = BiocParallel::MulticoreParam(workers=cores))
-    dds <- DESeq2::DESeqDataSetFromMatrix( #Build DESeq Object with the design
-      countData = dt %>% as.matrix(),
-      colData = df,
-      design = mm)
-    scr <- scran::computeSumFactors(dds) # compute scran sum factors
-    DESeq2::sizeFactors(dds) <- DESeq2::sizeFactors(scr) # use scran's sum factor as sizeFactors
-    rm(scr)
-    if(splines){mmr = mm[,-c(2:6)] %>% as.matrix()}else{mmr = mm[,-2] %>% as.matrix()}
-    dds <- DESeq2::DESeq(
-      dds, test="LRT", reduced = mmr,
-      useT = T, parallel = T,
-      minmu=1e-6, minRep=Inf)
-    out <- DESeq2::results(dds) %>%
-      data.frame() %>%
-      rownames_to_column(var = 'name') %>%
-      filter(padj < threshold)
-    rm(dds)
-    
-  }else if(method == "edgeR"){
-    #edgeR####
-    er <- edgeR::estimateDisp(y = DGEList(dt), design = mm)
-    er <- edgeR::glmQLFit(er, mm, robust=TRUE)
-    if(splines){er <- edgeR::glmQLFTest(er, coef = 2:6)}else{er <- edgeR::glmQLFTest(er, coef = 2)}
-    out <- edgeR::topTags(
-      er,
-      sort.by = "PValue",
-      n = Inf) %>%
-      as.data.frame() %>%
-      rownames_to_column("name") %>%
-      filter(FDR < threshold)
-    
-    rm(er)
-  }else{
-    stop("Method key not recognized\n")
-  }
+  fit <- glmGamPoi::glm_gp(
+    data = dt %>% as.matrix(),
+    design = mm,
+    col_data = df,
+    size_factors = "deconvolution",
+    on_disk = F)
   
-  #clean up
-  rm(dt, df)
+  out <- glmGamPoi::test_de(
+    fit, reduced_design = ~1, sort_by = "adj_pval") %>%
+    filter(adj_pval < threshold)
   
   print("Analysis completed at:")
   print(Sys.time())

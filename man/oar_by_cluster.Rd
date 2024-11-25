@@ -9,12 +9,10 @@ oar_by_cluster(
   seurat_v5 = TRUE,
   count.filter = 1,
   blacklisted.genes = NULL,
-  gene.ratio = 15,
-  iterations = 10,
-  parallel.loop = T,
-  cores = 12,
-  distance = 1,
-  suffix = ""
+  suffix = "",
+  mismatch = TRUE,
+  tolerance = TRUE,
+  cores = 1
 )
 }
 \arguments{
@@ -26,17 +24,13 @@ oar_by_cluster(
 
 \item{blacklisted.genes}{A character vector with gene names to be excluded from the analysis. Default is empty.}
 
-\item{gene.ratio}{A numeric value indicating the ratio of genes to cells to partition data matrix. Default is 15. Values between 10 and 25 are recommended.}
-
-\item{iterations}{A numeric value indicating the number of times to iterate the OARscore calculation. Default and recommendation is 10. Can use 1 to not iterate the calculation.}
-
-\item{parallel.loop}{A Boolean to indicate if process should be run in parallel cores. Currently only \code{doParallel} and \code{foreach} are supported, default is FALSE}
-
-\item{cores}{A numeric value indicating the number of cores to use un parallel processing. Use \code{detectCores()} to identify possibilities. Default is 12. Ignored if \code{parallel.loop} set to FALSE.}
-
-\item{distance}{A maximum euclidean distance between gene vectors. Default is 1.}
-
 \item{suffix}{A string to append to the output variables. Default is empty}
+
+\item{mismatch}{a boolean to determine to allow minimal mismatch in missing data pattern identification. Default \code{TRUE}}
+
+\item{tolerance}{A logical or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
+
+\item{cores}{A numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities.}
 }
 \value{
 A Seurat object with OAR stats added into meta data
