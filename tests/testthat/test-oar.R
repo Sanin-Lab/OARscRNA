@@ -1,4 +1,6 @@
 test_that("oar works with defaults", {
+  skip_on_cran()
+  
   oar_input <- readRDS(test_path("fixtures", "pdcs.rds"))
   oar_output <- readRDS(test_path("fixtures", "oar_pdcs_out.rds"))
   check_oar <- oar(oar_input)
@@ -10,6 +12,8 @@ test_that("oar works with defaults", {
 })
 
 test_that("oar works with no mismatch", {
+  skip_on_cran()
+  
   oar_input <- readRDS(test_path("fixtures", "pdcs.rds"))
   oar_output <- readRDS(test_path("fixtures", "oar_pdcs_no_mismatch_output.rds"))
   check_oar_no_mis <- oar(oar_input, mismatch = F)
