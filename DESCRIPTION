@@ -33,7 +33,8 @@ Imports:
     SeuratObject,
     splines,
     stats,
-    tibble
+    tibble,
+    waldo
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3

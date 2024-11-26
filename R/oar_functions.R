@@ -85,7 +85,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   #Processing Warnings 
   if (parallelly::availableCores() < cores ){
     stop("Specified cores are greater than available in your machine.\nRun `parallelly::availableCores()` to identify appropriate number\n")}
-  if (cores < 2 ) {
+  if (cores <= 2 ) {
     warning("Running process in fewer than 2 cores will considerably slow down progress\n")}
   
   #store Seurat object for later
@@ -107,7 +107,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   #Identify missing data patterns
   print("Identifying missing data patterns...")
   if(mismatch){
-    dm <- oar_missing_data_patterns(data = data, cores = cores, tolerance = tolerance)
+    mdp <- oar_missing_data_patterns(data = data, cores = cores, tolerance = tolerance)
   }else{
     mdp <- oar_exact_missing_data_patterns(data = data)
   }
@@ -121,7 +121,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   print("Collecting results")
   colnames(output)[-ncol(output)] <- paste0(colnames(output)[-ncol(output)],suffix)
   
-  print(paste0("Analysis completed succesully in ", round((Sys.time()-ot)/60,2)," min!\n"))
+  print(paste0("Analysis completed succesully in ", round((Sys.time()-ot)/60,2)," min!"))
   
   #output
   if(seurat_v5){
