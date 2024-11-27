@@ -18,24 +18,38 @@
 scatter_score_missing <- function(data, group.by = 'seurat_clusters', seurat_v5 = TRUE, suffix = "") {
   if(seurat_v5){
     input_data <- data@meta.data
+    
+    plot <- ggplot(
+      data = input_data,
+      aes(x = .data[[paste0("pct.missing", suffix)]],
+          y = .data[[paste0("OARscore", suffix)]],
+          color = .data[[group.by]])) +
+      geom_point(size = 1) +
+      theme_classic() +
+      labs(x = "% Missing Values",
+           y = paste0("OAR score", suffix)) +
+      geom_hline(yintercept = 0,
+                 linetype = "dashed",
+                 color = "black", linewidth = 0.5) +
+      theme(aspect.ratio = 1)
+    
   }else{
     input_data <- data
+    
+    plot <- ggplot(
+      data = input_data,
+      aes(x = .data[[paste0("pct.missing", suffix)]],
+          y = .data[[paste0("OARscore", suffix)]])) +
+      geom_point(size = 1) +
+      theme_classic() +
+      labs(x = "% Missing Values",
+           y = paste0("OAR score", suffix)) +
+      geom_hline(yintercept = 0,
+                 linetype = "dashed",
+                 color = "black", linewidth = 0.5) +
+      theme(aspect.ratio = 1)
   }
   
-   plot <- ggplot(
-    data = input_data,
-    aes(x = .data[[paste0("pct.missing", suffix)]],
-        y = .data[[paste0("OARscore", suffix)]],
-        color = .data[[group.by]])) +
-    geom_point(size = 1) +
-    theme_classic() +
-    labs(x = "% Missing Values",
-         y = paste0("OAR score", suffix)) +
-    geom_hline(yintercept = 0,
-               linetype = "dashed",
-               color = "black", linewidth = 0.5) +
-    theme(aspect.ratio = 1)
-   
  return(plot)
 }
 
