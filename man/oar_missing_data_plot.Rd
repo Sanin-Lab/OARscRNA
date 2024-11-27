@@ -4,12 +4,14 @@
 \alias{oar_missing_data_plot}
 \title{Plot identified missing data patterns}
 \usage{
-oar_missing_data_plot(data, mdp)
+oar_missing_data_plot(data, mdp = NULL, seurat_v5 = TRUE)
 }
 \arguments{
 \item{data}{A gene-cell expression matrix with NA values in place of 0s.}
 
-\item{mdp}{A vector indicating the pattern to which each gene belongs.}
+\item{mdp}{A vector indicating the pattern to which each gene belongs. Default is Null.}
+
+\item{seurat_v5}{A Boolean to indicate where or not the input data is a Seurat object. Default is T.}
 }
 \value{
 Plot of missing data patterns.

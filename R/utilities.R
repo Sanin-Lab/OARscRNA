@@ -4,7 +4,7 @@
 #' Prepare data for oar fold functions
 #'
 #' @param data Seurat object or gene expression matrix
-#' @param tr Filtering threshold.
+#' @param tr Filtering threshold. Default is 0.01.
 #' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
 #' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
 #'
@@ -42,6 +42,9 @@ oar_preprocess_data <- function(data, tr = 0.01, seurat_v5 = TRUE, blacklisted.g
     data <- data[!rownames(data) %chin% blacklisted.genes,]
   }
   
+  #save gene names
+  gene_names <- rownames(data)
+  
   #Convert to a dense matrix and Replace 0 with NA
   data <- data %>% as.matrix()
   colnames(data) = NULL
@@ -52,8 +55,10 @@ oar_preprocess_data <- function(data, tr = 0.01, seurat_v5 = TRUE, blacklisted.g
   if (all(complete.cases(data))) {
     stop("No missing data exists\n")
   }
+  output <- list(data, gene_names)
   
-  return(data)
+  return(output)
+  
 }
 
 ##===================================================================

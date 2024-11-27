@@ -14,7 +14,7 @@ oar_preprocess_data(
 \arguments{
 \item{data}{Seurat object or gene expression matrix}
 
-\item{tr}{Filtering threshold.}
+\item{tr}{Filtering threshold. Default is 0.01.}
 
 \item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is TRUE}
 

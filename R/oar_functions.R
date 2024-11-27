@@ -85,7 +85,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   #Processing Warnings 
   if (parallelly::availableCores() < cores ){
     stop("Specified cores are greater than available in your machine.\nRun `parallelly::availableCores()` to identify appropriate number\n")}
-  if (cores <= 2 ) {
+  if (cores < 2 ) {
     warning("Running process in fewer than 2 cores will considerably slow down progress\n")}
   
   #store Seurat object for later
@@ -98,7 +98,9 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   
   #read in Seurat object & remove blacklisted genes
   print("Extracting data...")
-  data <- oar_preprocess_data(data, tr, seurat_v5, blacklisted.genes)
+  output <- oar_preprocess_data(data, tr, seurat_v5, blacklisted.genes)
+  data <- output[[1]]
+  gene_names <- output[[2]]
   
   ot <- Sys.time()
   print("Analysis started on:")
@@ -112,10 +114,14 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
     mdp <- oar_exact_missing_data_patterns(data = data)
   }
   
+  
   #Run missingness test
   print("Calculating scores")
   output <- oar_base(data, mdp)
   output$barcodes = cells
+  
+  #add names to mdp
+  names(mdp) <- gene_names
   
   # Clean up output
   print("Collecting results")
@@ -130,6 +136,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
     sc.data@meta.data <- base::cbind(
       sc.data@meta.data,
       output[idx,!colnames(output) %in% "barcodes"])
+    sc.data[["RNA"]]<- SeuratObject::AddMetaData(sc.data[["RNA"]], mdp, col.name = "mdp")
     
     return(sc.data)
   }else{

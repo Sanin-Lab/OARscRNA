@@ -22,4 +22,12 @@ library(OAR)
 
 In this vignette we will walk you through the very basic steps of generating and analyzing OARscores from your single cell dataset.
 
+There are two possible starting points: 
+1. Gene expression matrix.
+2. Seurat v5 Object
+
+### Starting from a Gene Expression Matrix
+```{r}
+
+```
 

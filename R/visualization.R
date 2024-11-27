@@ -18,6 +18,8 @@
 scatter_score_missing <- function(data, group.by = 'seurat_clusters', seurat_v5 = TRUE, suffix = "") {
   if(seurat_v5){
     input_data <- data@meta.data
+  }else{
+    input_data <- data
   }
   
    plot <- ggplot(
@@ -43,7 +45,8 @@ scatter_score_missing <- function(data, group.by = 'seurat_clusters', seurat_v5 
 #' Plot identified missing data patterns
 #'
 #' @param data A gene-cell expression matrix with NA values in place of 0s.
-#' @param mdp A vector indicating the pattern to which each gene belongs. 
+#' @param mdp A vector indicating the pattern to which each gene belongs. Default is Null.
+#' @param seurat_v5 A Boolean to indicate where or not the input data is a Seurat object. Default is T. 
 #'
 #' @return Plot of missing data patterns. 
 #' 
@@ -53,7 +56,16 @@ scatter_score_missing <- function(data, group.by = 'seurat_clusters', seurat_v5 
 #' \dontrun{
 #' output <- oar_missing_data_plot(data, mdp)
 #' }
-oar_missing_data_plot <- function (data,mdp) {
+oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
+  if(seurat_v5){
+    mdp <- data@assays$RNA@meta.data$mdp
+    output <- oar_preprocess_data(data)
+    data <- output[[1]]
+  }else{
+    data <- data
+    mdp <- mdp
+  }
+  
   freq.mdp <- table(mdp)
   p <- names(freq.mdp)
   
