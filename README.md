@@ -30,7 +30,7 @@ Sparsity has been used to:
 
 At the core of the OAR score is the identification of missing data patterns, followed by comparing the distribution of genes expressed in the identified patterns in each cell individually.
 
-<img scr="images/Test_OV.png" height="200"/>
+![Base Test](images/Test_OV.png)
 
 To calculate the OAR score we:
 
