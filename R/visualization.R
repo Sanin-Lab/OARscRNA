@@ -7,6 +7,7 @@
 #' @param group.by meta data category to color data by. Default is seurat_clusters. 
 #' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
 #' @param suffix A string that was previously appended to the output variables. Default is empty.
+#' @param pt.size A numerical value for the size of points to be passed to the size argument in `geom_point`. Default is 0.5.
 #' 
 #' @return Scatter plot of OAR score vs percent missing, colored by grouping of choice. 
 #' @export
@@ -15,7 +16,9 @@
 #' \dontrun{
 #' pmbcs_oar <- scatter_score_missing(pmbcs_oar)
 #' }
-scatter_score_missing <- function(data, group.by = 'seurat_clusters', seurat_v5 = TRUE, suffix = "") {
+scatter_score_missing <- function(
+    data, group.by = 'seurat_clusters', seurat_v5 = TRUE, suffix = "",
+    pt.size = 0.5) {
   if(seurat_v5){
     input_data <- data@meta.data
     
@@ -24,13 +27,10 @@ scatter_score_missing <- function(data, group.by = 'seurat_clusters', seurat_v5 
       aes(x = .data[[paste0("pct.missing", suffix)]],
           y = .data[[paste0("OARscore", suffix)]],
           color = .data[[group.by]])) +
-      geom_point(size = 1) +
+      geom_point(size = pt.size) +
       theme_classic() +
       labs(x = "% Missing Values",
            y = paste0("OAR score", suffix)) +
-      geom_hline(yintercept = 0,
-                 linetype = "dashed",
-                 color = "black", linewidth = 0.5) +
       theme(aspect.ratio = 1)
     
   }else{
@@ -40,13 +40,10 @@ scatter_score_missing <- function(data, group.by = 'seurat_clusters', seurat_v5 
       data = input_data,
       aes(x = .data[[paste0("pct.missing", suffix)]],
           y = .data[[paste0("OARscore", suffix)]])) +
-      geom_point(size = 1) +
+      geom_point(size = pt.size) +
       theme_classic() +
       labs(x = "% Missing Values",
            y = paste0("OAR score", suffix)) +
-      geom_hline(yintercept = 0,
-                 linetype = "dashed",
-                 color = "black", linewidth = 0.5) +
       theme(aspect.ratio = 1)
   }
   
@@ -58,7 +55,7 @@ scatter_score_missing <- function(data, group.by = 'seurat_clusters', seurat_v5 
 ##===================================================================
 #' Plot identified missing data patterns
 #'
-#' @param data A gene-cell expression matrix with NA values in place of 0s.
+#' @param data A gene-cell expression matrix with NA values in place of 0s or a Seurat Object to which `oar` has been applied to.
 #' @param mdp A vector indicating the pattern to which each gene belongs. Default is Null.
 #' @param seurat_v5 A Boolean to indicate where or not the input data is a Seurat object. Default is T. 
 #'

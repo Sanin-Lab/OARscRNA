@@ -61,11 +61,15 @@ This will automatically filter low expression genes, identify a suitable toleran
 
 For full details on all parameters, including a step by step breakdown of the process, please visit our [documentation](https://oar.readthedocs.io) or view our vignette with `browseVignettes(package = "oar")`.
 
-## Applications
+## Tutorials and Applications
+
+### Quick overview
+
+Follow our [quick guide](https://oar.readthedocs.io/introdoctury_vignette) on running the analysis with a single line.
 
 ### Cell prioritization for downstream analysis
 
-Follow our [base tutorial](https://oar.readthedocs.io/pDCs) on exploring how we can identify highly activated plasmacytoid dendritic cells based on a high OAR score.
+Follow our [step-by-step tutorial](https://oar.readthedocs.io/detailed_tutorial) on exploring how we can identify highly activated plasmacytoid dendritic cells based on a high OAR score.
 
 ### Model gene expression data at the single cell level
 

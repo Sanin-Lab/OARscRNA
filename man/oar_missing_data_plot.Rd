@@ -7,7 +7,7 @@
 oar_missing_data_plot(data, mdp = NULL, seurat_v5 = TRUE)
 }
 \arguments{
-\item{data}{A gene-cell expression matrix with NA values in place of 0s.}
+\item{data}{A gene-cell expression matrix with NA values in place of 0s or a Seurat Object to which \code{oar} has been applied to.}
 
 \item{mdp}{A vector indicating the pattern to which each gene belongs. Default is Null.}
 

@@ -1,8 +1,8 @@
 ---
-title: "Introductory Vignette for OARscRNA"
+title: "Step-by-step guide to running OAR"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{introductory_vignette}
+  %\VignetteIndexEntry{detailed_tutorial}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -34,21 +34,6 @@ knit_hooks$set(output = function(x, options) {
    x <- paste(c(x, ""), collapse = "\n")
    hook_output(x, options)
  })
-
-opts_chunk$set(eval=TRUE,
-   ## text results
-   echo=TRUE,
-   results=c('markup', 'asis', 'hold', 'hide')[1],
-   ## plots
-   fig.path=c('figure', 'figure/minimal-')[1],
-   fig.keep=c('high', 'none', 'all', 'first', 'last')[1],
-   fig.align=c('center', 'left', 'right', 'default')[1],
-   fig.show=c('hold', 'asis', 'animate', 'hide')[1],
-   dev=c('pdf', 'png', 'tikz')[1],
-   fig.width=7, fig.height=7, #inches
-   fig.env=c('figure', 'marginfigure')[1],
-   fig.pos=c('', 'h', 't', 'b', 'p', 'H')[1]
-   )
 ```
 
 ```{r setup}
@@ -64,11 +49,11 @@ path_to_file_2 <- "/Users/repository/Git/OARscore/inst/extdata/pdcs_matrix.rds"
 
 # Overview
 
-In this vignette we will walk you through the very basic steps of generating and analyzing OAR scores from your single cell dataset.
+In this vignette we will walk you through the very basic steps of generating and analyzing OARscores from your single cell dataset.
 
 There are two possible starting points: 1. Seurat v5 Object 2. Gene Expression Matrix
 
-Here we will walk you through steps of the analysis, beginning with a gene expression matrix from plasmacytoid dendritic cell dataset that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/inst/extdata).
+Here we will walk you through steps of the analysis, beginning with a gene expression matrix from plasmacytoid dendritic cell dataset that you can download from our [github](https://github.com/davidsanin/OARscRNA/tree/main/inst/extdata).
 
 ## Starting from v5 Seurat Object
 
@@ -81,7 +66,7 @@ data_obj <- readRDS(file = path_to_file_1)
 data_obj
 ```
 
-Once you have the seurat version 5 object loaded, you can run the oar function. This function requires the input data, as well as some information on the number of cores (which is set to 1 by **DEFAULT**).
+Once you have the seurat verwion 5 object loaded, you can run the oar function. This function requires the input data, as well as some information on the number of cores (which is set to 1 by **DEFAULT**).
 
 To determine your computers capacity, you can run parallelly::availableCores(). Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommened as it will go much faster in the identification of the patterns.
 
@@ -123,8 +108,8 @@ There are several way to visualize your resulting seurat object:
 ```{r create scatter plot, out.width="100%", fig.cap="Scatter Plots"}
 library(patchwork)
 library(ggplot2)
-p1 <- scatter_score_missing(oar_obj, pt.size = 0.5)+theme(legend.position = "none")
-p2 <- scatter_score_missing(oar_obj, pt.size = 0.5, group.by = "condition")+theme(legend.position = "none")
+p1 <- scatter_score_missing(oar_obj)+theme(legend.position = "bottom")
+p2 <- scatter_score_missing(oar_obj,group.by = "condition")+theme(legend.position = "bottom")
 p1+p2
 ```
 
@@ -135,15 +120,14 @@ These plot reveals which clusters have the highest OAR scores, as well as how th
 Visualize patterns found by OAR:
 
 ```{r create visual of patterns found, out.width="100%", fig.cap="Missing Data Pattern Plot"}
-p3 <- oar_missing_data_plot(oar_obj)
-p3
+oar_missing_data_plot(oar_obj)
 ```
 
 In this case we have a combination of all unique patterns, and 3 patterns found across cells, with the assigned indices of 9102, 6, and 3. Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell. For example, in pattern 9102, about half the cells have some of these 13 genes expressed.
 
 To get a list of the highly variable genes withing each pattern, use:
 
-```{r get list of genes involved in patterns}
+```{r get list of genes involved in patterns"}
 mdp <- get_missing_pattern_genes(oar_obj)
 ```
 
@@ -151,12 +135,11 @@ mdp <- get_missing_pattern_genes(oar_obj)
 
 To visualize which cells/clusters have the most heterogeneity:
 
-```{r Examine at OAR score in featureplot, out.width="50%", fig.cap="Feature plot of results"}
+```{r Examine at OAR score in featureplot, fig.cap="Feature plot of results"}
 library(Seurat)
-p4 <- FeaturePlot(
+FeaturePlot(
   oar_obj, features = "OARscore", order = T, pt.size = 0.5, 
   min.cutoff = "q40", max.cutoff = "q90")
-p4
 ```
 
 ## Starting from a Gene Expression Matrix
@@ -190,6 +173,5 @@ This results in a table with the following columns:
 We can visualize these OARscores via scatter plot against the percent missing genes.
 
 ```{r Scatter plot, out.width="50%", fig.cap="Scatter plot of results"}
-p5 <- scatter_score_missing(oar_data, seurat_v5 = F)
-p5
+scatter_score_missing(oar_data, seurat_v5 = F)
 ```

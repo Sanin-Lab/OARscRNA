@@ -8,7 +8,8 @@ scatter_score_missing(
   data,
   group.by = "seurat_clusters",
   seurat_v5 = TRUE,
-  suffix = ""
+  suffix = "",
+  pt.size = 0.5
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ scatter_score_missing(
 \item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is TRUE}
 
 \item{suffix}{A string that was previously appended to the output variables. Default is empty.}
+
+\item{pt.size}{A numerical value for the size of points to be passed to the size argument in \code{geom_point}. Default is 0.5.}
 }
 \value{
 Scatter plot of OAR score vs percent missing, colored by grouping of choice.
