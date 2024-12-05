@@ -6,10 +6,26 @@
 \alias{OAR-package}
 \title{OAR: Heterogeneity Scoring on scRNA Sequencing Data Based on Missingness}
 \description{
-What the package does (one paragraph).
+OAR (observed at random) score is a measure of heterogeneity among cells, allowing cell prioritization for downstream applications. For best results, test a group of similar cells where you expect some heterogeneity - i.e. one cell type across various biological samples or conditions.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/davidsanin/OARscRNA}
+  \item Report bugs at \url{https://github.com/davidsanin/OARscRNA/issues}
+}
+
 }
 \author{
-\strong{Maintainer}: David Sanin \email{david.sanin@jhu.edu} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: David Sanin \email{david.sanin@jhu.edu} (\href{https://orcid.org/0000-0003-0188-7267}{ORCID})
+
+Authors:
+\itemize{
+  \item Ruizhe Chen \email{rzchen@jhu.edu} (\href{https://orcid.org/0000-0003-3924-3328}{ORCID})
+  \item Hannah Moore \email{hmoore14@jhmi.edu} (\href{https://orcid.org/0009-0006-8245-5368}{ORCID})
+  \item Dmitrijs Lvovs \email{dlvovs1@jh.edu} (\href{https://orcid.org/0009-0003-2152-6853}{ORCID})
+  \item Paul Gueguen \email{paul.gueguen@fgcz.ethz.ch} (\href{https://orcid.org/0000-0003-2930-6073}{ORCID})
+}
 
 }
 \keyword{internal}

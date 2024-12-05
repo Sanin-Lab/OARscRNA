@@ -2,7 +2,7 @@
 % Please edit documentation in R/identify_patterns.R
 \name{get_missing_pattern_genes}
 \alias{get_missing_pattern_genes}
-\title{Identify missing data patterns allowing for mismatch}
+\title{Create list of which genes partipate in each pattern.}
 \usage{
 get_missing_pattern_genes(data)
 }
@@ -13,7 +13,7 @@ get_missing_pattern_genes(data)
 Dataframe of variable genes and the missing data pattern they participate in.
 }
 \description{
-Identify missing data patterns allowing for mismatch
+Create list of which genes partipate in each pattern.
 }
 \examples{
 \dontrun{
