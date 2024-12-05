@@ -2,7 +2,7 @@
 
 ## Heterogeneity scoring on scRNAseq data based on missingness
 
-The OAR score (observed at random) test reveals cellular heterogeneity, allowing **cell prioritization** for downstream applications. The results of this test will highlight distinct cells within a dataset (cells with a high OAR score) for further exploration. For best results, test a group of similar cells where you expect some heterogeneity - *i.e. one cell type across various biological samples or conditions*. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:
+The OAR (observed at random) score reveals cellular heterogeneity, allowing **cell prioritization** for downstream applications. The results of this test will highlight distinct cells within a dataset (cells with a high OAR score) for further exploration. For best results, test a group of similar cells where you expect some heterogeneity - *i.e. one cell type across various biological samples or conditions*. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:
 
 -   Technologies
 -   Technical batches/library preparations
@@ -30,7 +30,7 @@ Sparsity has been used to:
 
 At the core of the OAR score is the identification of missing data patterns, followed by comparing the distribution of genes expressed in the identified patterns in each cell individually.
 
-<img scr="images/test_OV.png" height="200"/>
+<img scr="images/Test_OV.png" height="200"/>
 
 To calculate the OAR score we:
 
