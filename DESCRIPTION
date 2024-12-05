@@ -1,14 +1,15 @@
 Package: OAR
 Title: Heterogeneity Scoring on scRNA Sequencing Data Based on Missingness
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R: 
   c(
-    person("David", "Sanin", , "david.sanin@jhu.edu", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID")), 
-    person(),
-    person()
-           )
-Description: What the package does (one paragraph).
+  person("David", "Sanin", , "david.sanin@jhu.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-0188-7267")),
+  person("Ruizhe", "Chen", , "rzchen@jhu.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3924-3328")),
+  person("Hannah", "Moore", , "hmoore14@jhmi.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0006-8245-5368")),
+  person("Dmitrijs", "Lvovs", , "dlvovs1@jh.edu", role = c("aut", "cre"), comment = c(ORCID = "0009-0003-2152-6853")),
+  person("Paul", "Gueguen", , "paul.gueguen@fgcz.ethz.ch", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-2930-6073")),
+  )
+Description: OAR (observed at random) score is a measure of heterogeneity among cells, allowing cell prioritization for downstream applications. For best results, test a group of similar cells where you expect some heterogeneity - i.e. one cell type across various biological samples or conditions.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -41,3 +42,5 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+URL: https://github.com/davidsanin/OARscRNA
+BugReports: https://github.com/davidsanin/OARscRNA/issues
