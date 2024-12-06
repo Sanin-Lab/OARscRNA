@@ -30,6 +30,7 @@ Imports:
     parallelly,
     reshape2,
     rlang,
+    scran,
     Seurat,
     SeuratObject,
     splines,

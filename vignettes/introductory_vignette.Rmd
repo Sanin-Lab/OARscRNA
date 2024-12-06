@@ -107,7 +107,7 @@ Additionally, genes are annotated by which missing data patterns (mdp) they have
 OARscores are typically more powerful when distinguishing among cells as the same type, as heterogeneity in gene patterns are likely from a biological phenomenon other than cell type. When working with a dataset with diverse cell types, it can be helpful to run the function by cluster.
 
 ```{r run oar by cluster, output.lines=5, eval = FALSE}
-oar_obj_bycluster <- oar_by_cluster(data_obj, cores =  parallelly::availableCores()-2)
+oar_obj_bycluster <- oar_by_cluster(data_obj, cores = parallelly::availableCores()-2)
 ```
 
 ### Visualize Results
@@ -170,7 +170,7 @@ Once you have data loaded, you can run the oar function. This function requires 
 ```{r run OAR on matrix, output.lines=5}
 oar_data<- oar(data, seurat_v5 = FALSE, 
                mismatch = TRUE, tolerance = TRUE, 
-               cores = 48)
+               cores = parallelly::availableCores()-2)
 oar_data
 ```
 
