@@ -1,8 +1,8 @@
 ---
-title: "Step-by-step guide to running OAR"
+title: "Gene Expression Analysis based on OAR scores"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{detailed_tutorial}
+  %\VignetteIndexEntry{Gene Expression Analysis based on OAR scores}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -34,6 +34,21 @@ knit_hooks$set(output = function(x, options) {
    x <- paste(c(x, ""), collapse = "\n")
    hook_output(x, options)
  })
+
+opts_chunk$set(eval=TRUE,
+   ## text results
+   echo=TRUE,
+   results=c('markup', 'asis', 'hold', 'hide')[1],
+   ## plots
+   fig.path=c('figure', 'figure/minimal-')[1],
+   fig.keep=c('high', 'none', 'all', 'first', 'last')[1],
+   fig.align=c('center', 'left', 'right', 'default')[1],
+   fig.show=c('hold', 'asis', 'animate', 'hide')[1],
+   dev=c('pdf', 'png', 'tikz')[2],
+   fig.width=5, fig.height=5, #inches
+   fig.env=c('figure', 'marginfigure')[1],
+   fig.pos=c('', 'h', 't', 'b', 'p', 'H')[1]
+   )
 ```
 
 ```{r setup}
@@ -41,137 +56,115 @@ library(OAR)
 ```
 
 ```{r include=F, echo=F}
-#path_to_file_1 <- system.file("extdata", "pdcs.rds", package="OAR")
-#path_to_file_2 <- system.file("extdata", "pdcs_matrix.rds", package="OAR")
-path_to_file_1 <- "/Users/repository/Git/OARscore/inst/extdata/pdcs.rds"
-path_to_file_2 <- "/Users/repository/Git/OARscore/inst/extdata/pdcs_matrix.rds"
+#path_to_file <- system.file("extdata", "pdcs.rds", package="OAR")
+path_to_file <- "/Users/repository/Git/OARscore/inst/extdata/pdcs.rds"
 ```
 
 # Overview
 
-In this vignette we will walk you through the very basic steps of generating and analyzing OARscores from your single cell dataset.
+In this vignette we will explore what genes are associated with increased OAR scores. We will use our toy plasmacytoid dendritic cell dataset that you can download from our [github](https://github.com/davidsanin/OARscRNA/tree/main/inst/extdata).
 
-There are two possible starting points: 1. Seurat v5 Object 2. Gene Expression Matrix
+## 1. Calculating OAR scores
 
-Here we will walk you through steps of the analysis, beginning with a gene expression matrix from plasmacytoid dendritic cell dataset that you can download from our [github](https://github.com/davidsanin/OARscRNA/tree/main/inst/extdata).
+We can run our calculation with a single line of code. We recommend you follow out introductory tutorials for a full description of this function. The result is the Seurat object with the `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `pct.missing` values in the `meta.data` slot.
 
-## Starting from v5 Seurat Object
-
-### Analysis
-
-We can directly input a Seurat object to examine heterogeneity.
-
-```{r load seurat object}
-data_obj <- readRDS(file = path_to_file_1)
-data_obj
+```{r oar wrapper, output.lines=5}
+library(Seurat)
+sc.data <- oar(data = readRDS(file = path_to_file), 
+               seurat_v5 = T, count.filter = 1,
+               blacklisted.genes = NULL, suffix = "",
+               mismatch = T, tolerance = 0.04,
+               cores = parallelly::availableCores()-2)
 ```
 
-Once you have the seurat verwion 5 object loaded, you can run the oar function. This function requires the input data, as well as some information on the number of cores (which is set to 1 by **DEFAULT**).
+To explore which cells/clusters have the most heterogeneity, we can visualize the results as in a UMAP projection.
 
-To determine your computers capacity, you can run parallelly::availableCores(). Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommened as it will go much faster in the identification of the patterns.
-
-```{r run basic oar, output.lines=5}
-oar_obj <- oar(data_obj, cores = 48)
+```{r featureplot score deg, out.width="50%", fig.cap="Feature plot of OAR score"}
+library(Seurat)
+p1 <- FeaturePlot(
+  sc.data, features = "OARscore", order = T, pt.size = 0.5, 
+  min.cutoff = "q40", max.cutoff = "q90")
+p1
 ```
 
-We deliberately left most parameters as defaults, however we recommend you explore each to familiarize yourself with their impact on the result. Some critical parameters to consider include:
+Notice that cells with a High OAR score in this dataset cluster together.
 
--   `seurat_v5`: which confirms the type of data being used. Defaults to `TRUE`.
--   `mismatch`: whcih controld whether or not to allow for flexibility in pattern matching. Defaults to `TRUE`.
--   `tolerance`: controls whether the missmatch treshold should be determined automatically (between 0.01 and 0.05 hamming distances) or if a user supplied threshold should be used. Defaults to `TRUE`, and can take `TRUE` or a numeric value smaller than 1.
--   `count.filter`: controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
--   `blacklisted.genes`: Allows you to provide a vector of uninformative gene names (i.e. non-conding genes) to exclude from the analysis. Defaults to `NULL`.
+## 2. Identify genes associated with OAR scores
 
-The result is the Seurat object with additional metadata. To the cells metadata (found in [oar_obj\@meta.data](mailto:oar_obj@meta.data){.email}) there will be the following additional columns:
+In a typical scRNAseq analysis workflow, differential gene expression is calculated based on averaged counts across identified clusters. Although highly informative, this approach fundamentally looses the single cell resolution achieved through this technology. As an alternative to using cluster labels to model gene expression, which invites biases associated with identifying clusters, we propose to model gene expression based exclusively on the value of the OAR score. We implement this approach using glmGamPoi[^1], which has superior performance to other differential gene expression methods in terms of both speed and scaling factor calculation.
 
--   `OARscore`: a metric of heterogeneity in the data, with a higher OAR score highlighting cells with gene expression patterns dissimilar from all others tested.
--   `KW.pvalue`: P-value generated by Kruskal-Wallis test.
--   `KW.BH.pvalue`: Benjamini-Hochberg corrected p-value.
--   `pct.missing`: the percent of missing genes in each cell as a fraction of all genes expressed by all cells in the dataset.
+[^1]: glmGapPoi: Fit Gamma-Poisson Generalized Linear Models Reliably. [git](https://github.com/const-ae/glmGamPoi)
 
-Additionally, genes are annotated by which missing data patterns (mdp) they have been included in. This mdp matrix has been added to the assay metadata (found in [oar_obj\@assays](mailto:oar_obj@assays){.email}\$[RNA\@meta.data](mailto:RNA@meta.data){.email}).
-
-### Analysis by Cluster
-
-OARscores are typically more powerful when distinguishing amongst cells as the same type, as heterogeneity in gene patterns are likely from a biological phenomenon other than cell type. When working with a dataset with diverse cell types, it can be helpful to run the function by cluster.
-
-```{r run oar by cluster, output.lines=5}
-oar_obj_bycluster <- oar_by_cluster(data_obj, cores = 48)
+```{r Calculate gene expression}
+oar_deg <- oar_deg(
+    data = sc.data, seurat_v5 = T, score.name = "OARscore", 
+    score = NULL, count.filter = 1,
+    blacklisted.genes = NULL,
+    splines = TRUE, degrees.freedom = 5,
+    auto.threshold = TRUE, custom.tr = NULL)
+  
 ```
 
-### Visualize Results
+A brief explanation of these parameters is presented here:
 
-There are several way to visualize your resulting seurat object:
+-   `data` may be an raw matrix of counts or a fully processed seurat object with an OAR score calculated, as indicated by the `seurat_v5` parameter. The name of the score should be indicated in the `score.name` parameter.
+-   `score` only needs to be provided if starting from a count matrix and should be a vector of the calculated OAR scores in the same order as the columns of the count matrix.
+-   `count.filter` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
+-   `blacklisted.genes`, Allows you to provide a vector of uninformative gene names (i.e. non-coding genes) to exclude from the analysis. **This analysis automatically excludes all ribosomal genes**. Defaults to `NULL`.
+-   `splines` and `degrees.freedom`, control whether splines should be fit across the OAR score (and how many, as set by `degrees.freedom`) to capture non-linear associations between OAR and gene expression. We recommend setting `splines` to `TRUE` and `degrees.freedom` between 3-5. If `splines` is set to `FALSE`, only monotonic associations will be retrieved.
+-   `auto.threshold` and `custom.tr` control the false discovery rate (**FDR**) threshold to consider a gene significantly associated with the OAR score. `auto.threshold` set to `TRUE` (**recommended**) estimates this threshold based on the number of cells tested. Typically, given the high number of observations, p values calculated based on individual cells tend to be highly significant, even where little association is observed between gene expression and the predictive variable. If `auto.threshold` set to `FALSE`, then a custom p value threshold should be provided with `custom.tr`. Setting this value to typical ranges (i.e. 0.05-0.01) will likely result in spurious associations.
 
-#### OARscore v Percent Missing Scatter Plot
+The results of the anslysis is a matrix with the regulated and filtered genes:
 
-```{r create scatter plot, out.width="100%", fig.cap="Scatter Plots"}
+```{r result overview, output.lines=10}
+oar_deg
+```
+
+For a full description of each column, visit the `glmGamPoi` documentation. For our purposes, the `name` and `adj_pval` columns (corresponding to genes and FDR, respectively) are the most important results.
+
+## 3. Visualize results
+
+Overall, this analysis identifies 135 genes significantly associated with OAR scores. If we plot the top 9 most significant genes alongside our previously calculated OAR scores, we can observe that we identified several candidates for further analysis:
+
+```{r featureplot comparison, out.width="100%", fig.cap="Genes associated with OAR score"}
+library(Seurat)
 library(patchwork)
 library(ggplot2)
-p1 <- scatter_score_missing(oar_obj)+theme(legend.position = "bottom")
-p2 <- scatter_score_missing(oar_obj,group.by = "condition")+theme(legend.position = "bottom")
-p1+p2
+
+p1 <- FeaturePlot(
+  sc.data, features = "OARscore", order = T, pt.size = 1, 
+  min.cutoff = "q40", max.cutoff = "q90") + 
+  labs(title = "OAR score") +
+  theme(
+      aspect.ratio = 1,
+      legend.position = "none",
+      axis.title = element_blank(),
+      axis.text = element_blank(),
+      axis.ticks = element_blank(),
+      axis.line = element_blank(),
+      plot.title = element_text(size = 8, face = "plain"))
+
+p2 <- FeaturePlot(
+  object = sc.data, pt.size = 0.5,
+  slot = "counts",
+  min.cutoff = "q40", max.cutoff = "q90",
+  features = oar_deg$name[1:9], combine = F)
+
+p2 <- lapply(p2, function(x){
+  x +
+    theme(
+      aspect.ratio = 1,
+      axis.title = element_blank(),
+      axis.text = element_blank(),
+      axis.ticks = element_blank(),
+      axis.line = element_blank(),
+      plot.title = element_text(
+        size = 8, face = "italic")
+    ) +
+    NoLegend()
+})
+
+p1|wrap_plots(p2, ncol = 3)
 ```
 
-These plot reveals which clusters have the highest OAR scores, as well as how the OARscore relates to the percent of missing genes. Adjust the group.by metric to examine other variables.
-
-#### Graphic of Missing Data Patterns
-
-Visualize patterns found by OAR:
-
-```{r create visual of patterns found, out.width="100%", fig.cap="Missing Data Pattern Plot"}
-oar_missing_data_plot(oar_obj)
-```
-
-In this case we have a combination of all unique patterns, and 3 patterns found across cells, with the assigned indices of 9102, 6, and 3. Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell. For example, in pattern 9102, about half the cells have some of these 13 genes expressed.
-
-To get a list of the highly variable genes withing each pattern, use:
-
-```{r get list of genes involved in patterns"}
-mdp <- get_missing_pattern_genes(oar_obj)
-```
-
-#### Seurat Feature Plot
-
-To visualize which cells/clusters have the most heterogeneity:
-
-```{r Examine at OAR score in featureplot, fig.cap="Feature plot of results"}
-library(Seurat)
-FeaturePlot(
-  oar_obj, features = "OARscore", order = T, pt.size = 0.5, 
-  min.cutoff = "q40", max.cutoff = "q90")
-```
-
-## Starting from a Gene Expression Matrix
-
-The steps to analyse a gene count matrix, with cell as columns and genes as rows, are very similar to what we saw above.
-
-```{r load matrix}
-data <- readRDS(file = path_to_file_2)
-```
-
-### Analysis
-
-Once you have data loaded, you can run the oar function. This function requires the input data, as well as to be informed whether or not it is a v5 Seurat object.
-
-```{r run OAR on matrix, output.lines=5}
-oar_data<- oar(data, seurat_v5 = FALSE, 
-               mismatch = TRUE, tolerance = TRUE, 
-               cores = 48)
-oar_data
-```
-
-This results in a table with the following columns:
-
--   `OARscore`: a metric of heterogeneity in the data, with a higher OAR score highlighting cells with gene expression patterns dissimilar from all others tested.
--   `KW.pvalue`: P-value generated by Kruskal-Wallis test.
--   `KW.BH.pvalue`: Benjamini-Hochberg corrected p-value.
--   `pct.missing`: the percent of missing genes in each cell as a fraction of all genes expressed by all cells in the dataset.
-
-### Visualize Results
-
-We can visualize these OARscores via scatter plot against the percent missing genes.
-
-```{r Scatter plot, out.width="50%", fig.cap="Scatter plot of results"}
-scatter_score_missing(oar_data, seurat_v5 = F)
-```
+Here we can see several features associated with high OAR scoring cells (i.e. *PPP1R15A, HSPB1, EIF1, UBC, NMI, DNAJC7, PMAIP1, SAR1A*) as well as one (*B2M*) which is associated with low OAR scoring cells.

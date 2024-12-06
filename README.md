@@ -77,7 +77,7 @@ Follow our [step-by-step tutorial](https://oar.readthedocs.io/detailed_tutorial)
 
 ### Remove sources of variation from scRNAseq data analysis
 
-Discover distinct clusters of disease associated immune cells in a Breast Cancer atlas after [regressing patient-driven high OAR scores](https://oar.readthedocs.io/signal_regression).
+Regress out OAR scores calculated on raw counts and found to be associated with unwanted sources of variation (batches, low quality cells, individual samples) to remove confounding factors.
 
 ## References
 
