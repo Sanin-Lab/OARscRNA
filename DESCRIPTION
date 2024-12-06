@@ -33,13 +33,13 @@ Imports:
     SeuratObject,
     splines,
     stats,
-    tibble
+    tibble,
+    utils
 Suggests: 
     knitr,
     patchwork,
     rmarkdown,
     testthat (>= 3.0.0),
-    utils,
     waldo
 Config/testthat/edition: 3
 VignetteBuilder: knitr
