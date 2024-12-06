@@ -137,11 +137,13 @@ p3
 
 In this case we have a combination of all unique patterns, and 3 patterns found across cells, with the assigned indices of 9102, 6, and 3. Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell. For example, in pattern 9102, about a third of cells express 13 specific genes, which are conversely absent in all other cells.
 
-To get a list of the genes within each pattern, use:
+To get a data.frame of the genes within each pattern, use:
 
 ```{r get list of genes involved in patterns, eval = FALSE}
 mdp <- get_missing_pattern_genes(oar_obj)
 ```
+
+It is also possible to retrieve missing data patterns when `oar_by_cluster` is applied. Please see the documentation for `oar_missing_data_plot` and `get_missing_pattern_genes`
 
 #### Seurat Feature Plot
 

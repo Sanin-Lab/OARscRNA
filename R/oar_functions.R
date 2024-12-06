@@ -188,5 +188,13 @@ oar_by_cluster <- function (data, seurat_v5 = TRUE, count.filter = 1,
   oar_combine <- do.call(rbind,oar_combine)
   data <- SeuratObject::AddMetaData(data, metadata = oar_combine)
   
+  mdp_combine <- lapply(data_oar, function(x){
+    rn = c("mdp")
+    names(rn) = paste0("mdp_cl_",levels(Seurat::Idents(x)))
+    x[["RNA"]]@meta.data %>% dplyr::select(any_of(rn))})
+  mdp_combine <- do.call(cbind,mdp_combine)
+  
+  data[["RNA"]] <- SeuratObject::AddMetaData(data[["RNA"]], mdp_combine)
+  
   return(data)
 }

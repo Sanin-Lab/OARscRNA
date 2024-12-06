@@ -89,7 +89,7 @@ oar_missing_data_patterns <- function (data, tolerance = TRUE, cores = 1) {
 #'
 #' @param data a Seurat object that has had oar() run on it previously. 
 #'
-#' @return Dataframe of variable genes and the missing data pattern they participate in. 
+#' @return data.frame of genes annotated with missing data pattern they participate in (globally or by cluster). 
 #' @export
 #'
 #' @examples 
@@ -100,11 +100,10 @@ get_missing_pattern_genes <- function (data) {
   mdp <- data@assays$RNA@meta.data
   
   mdp <- mdp %>% 
-    dplyr::select(var.features, mdp) %>% 
-    dplyr::filter(mdp != "unique")
+    dplyr::select(contains("mdp")) %>%
+    dplyr::mutate(gene_id = rownames(data))
   
-  mdp <- na.omit(mdp[1:2])
-  mdp_list <- split(mdp[-2], mdp[2])
+  mdp[is.na(mdp)] <- "Filtered"
   
-  return(mdp_list)
+  return(mdp)
   }

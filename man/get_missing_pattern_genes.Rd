@@ -10,7 +10,7 @@ get_missing_pattern_genes(data)
 \item{data}{a Seurat object that has had oar() run on it previously.}
 }
 \value{
-Dataframe of variable genes and the missing data pattern they participate in.
+data.frame of genes annotated with missing data pattern they participate in (globally or by cluster).
 }
 \description{
 Create list of which genes partipate in each pattern.
