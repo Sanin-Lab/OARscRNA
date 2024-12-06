@@ -36,7 +36,7 @@ To calculate the OAR score we:
 
 1.  Estimate [Hamming distances](https://en.wikipedia.org/wiki/Hamming_distance) between binarized vectors of gene expression.
 2.  Group genes across missing data patterns defined as those with small (0-0.05) Hamming distance. Genes with unique patterns *- i.e. with no "neighbors"*, are grouped together.
-3.  Compare the distribution of gene expression in across identified patterns for *each cell* with a [Kruskal-Wallis](https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test) test.
+3.  Compare the distribution of gene expression across identified patterns for *each cell* with a [Kruskal-Wallis](https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test) test.
 4.  Scale the resulting *corrected p value* distributions *across all cells* to obtain the **OAR score**.
 
 ## Installation
