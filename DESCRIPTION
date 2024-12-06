@@ -20,11 +20,9 @@ Imports:
     dplyr,
     foreach,
     ggplot2,
-    ggrastr,
     glmGamPoi,
     igraph,
     Matrix,
-    methods,
     naniar,
     parallelDist,
     parallelly,
@@ -35,12 +33,14 @@ Imports:
     SeuratObject,
     splines,
     stats,
-    tibble,
-    waldo
+    tibble
 Suggests: 
     knitr,
+    patchwork,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    utils,
+    waldo
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 URL: https://github.com/davidsanin/OARscRNA

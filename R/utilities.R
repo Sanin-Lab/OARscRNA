@@ -32,8 +32,7 @@ oar_preprocess_data <- function(data, tr = 0.01, seurat_v5 = TRUE, blacklisted.g
     
     data <- data[Matrix::rowSums(data > 0) > data@Dim[[2]]*tr,]
   }else{
-    data <- data %>%
-      methods::as("dgCMatrix")
+    data <- Matrix::Matrix(data, sparse = T)
     data <- data[Matrix::rowSums(data > 0) > data@Dim[[2]]*tr,]
   }
   

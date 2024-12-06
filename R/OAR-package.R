@@ -1,6 +1,8 @@
 #' @keywords internal
 "_PACKAGE"
 
+utils::globalVariables(c(".","Var2","adj_pval","count","gene_id","group","na.omit","value","var.features","x"))
+
 ## usethis namespace: start
 #' @importFrom data.table %chin%
 #' @importFrom dplyr %>%
@@ -24,6 +26,7 @@
 #' @importFrom stats kruskal.test
 #' @importFrom stats median
 #' @importFrom stats model.matrix
+#' @importFrom stats na.omit
 #' @importFrom stats p.adjust
 #' @importFrom stats runif
 #' @importFrom stats sd

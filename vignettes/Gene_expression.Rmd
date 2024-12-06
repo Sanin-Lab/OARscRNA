@@ -86,7 +86,7 @@ Notice that cells with a High OAR score in this dataset cluster together.
 
 ## 2. Identify genes associated with OAR scores
 
-In a typical scRNAseq analysis workflow, differential gene expression is calculated based on averaged counts across identified clusters. Although highly informative, this approach fundamentally looses the single cell resolution achieved through this technology. As an alternative to using cluster labels to model gene expression, which invites biases associated with identifying clusters, we propose to model gene expression based exclusively on the value of the OAR score. We implement this approach using glmGamPoi[^1], which has superior performance to other differential gene expression methods in terms of both speed and scaling factor calculation.
+In a typical scRNAseq analysis workflow, differential gene expression is calculated based on averaged counts across identified clusters. Although highly informative, this approach fundamentally looses the single cell resolution achieved through this technology. As an alternative to using cluster labels to model gene expression, which invites biases associated with identifying clusters, we propose to model gene expression based exclusively on the value of the OAR score. We implement this approach using glmGamPoi[^1], which has superior performance to other differential gene expression methods in terms of speed and accuracy. Scaling factors are calculated using `scran::calculateSumFactors, which can benefit from parallel computing.
 
 [^1]: glmGapPoi: Fit Gamma-Poisson Generalized Linear Models Reliably. [git](https://github.com/const-ae/glmGamPoi)
 

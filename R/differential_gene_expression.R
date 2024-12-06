@@ -132,11 +132,13 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   }
   
   #Run differential analysis####
+  sf <- scran::calculateSumFactors(dt %>% as.matrix())
+  
   fit <- glmGamPoi::glm_gp(
     data = dt %>% as.matrix(),
     design = mm,
     col_data = df,
-    size_factors = "deconvolution",
+    size_factors = sf,
     on_disk = F)
   
   out <- glmGamPoi::test_de(
