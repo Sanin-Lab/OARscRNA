@@ -43,7 +43,7 @@ To calculate the OAR score we:
 
 To install the latest version of our package, run:
 
-`devtools::install_github("davidsanin/OARscRNA")`
+`devtools::install_github("davidsanin/OARscRNA", build_vignettes = TRUE)`
 
 ## Usage
 
@@ -59,7 +59,7 @@ This will automatically filter low expression genes, identify a suitable toleran
 
 -   If a Seurat object is supplied, the results are added as columns in the `meta.data` slot.
 
-For full details on all parameters, including a step by step breakdown of the process, please visit our [documentation](https://oar.readthedocs.io) or view our vignette with `browseVignettes(package = "oar")`.
+For full details on all parameters, including a step by step breakdown of the process, please visit our [documentation](https://oar.readthedocs.io) or view our vignette with `browseVignettes(package = "OAR")`.
 
 ## Tutorials and Applications
 
