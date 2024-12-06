@@ -55,13 +55,6 @@ opts_chunk$set(eval=TRUE,
 library(OAR)
 ```
 
-```{r include=F, echo=F}
-#path_to_file_1 <- system.file("extdata", "pdcs.rds", package="OAR")
-#path_to_file_2 <- system.file("extdata", "pdcs_matrix.rds", package="OAR")
-path_to_file_1 <- "/Users/repository/Git/OARscore/inst/extdata/pdcs.rds"
-path_to_file_2 <- "/Users/repository/Git/OARscore/inst/extdata/pdcs_matrix.rds"
-```
-
 # Overview
 
 In this vignette we will walk you through the very basic steps of generating and analyzing OAR scores from your single cell dataset.
@@ -71,7 +64,7 @@ There are two possible starting points:
 1.  Seurat v5 Object
 2.  Gene Expression Matrix
 
-Here we will walk you through steps of the analysis, beginning with a gene expression matrix from plasmacytoid dendritic cell dataset that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/inst/extdata).
+Here we will walk you through steps of the analysis, beginning with a gene expression matrix from plasmacytoid dendritic cell dataset that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/vignettes).
 
 ## Starting from v5 Seurat Object
 
@@ -80,7 +73,7 @@ Here we will walk you through steps of the analysis, beginning with a gene expre
 We can directly input a Seurat object to examine heterogeneity.
 
 ```{r load seurat object}
-data_obj <- readRDS(file = path_to_file_1)
+data_obj <- readRDS(file = "pdcs.rds")
 data_obj
 ```
 
@@ -167,7 +160,7 @@ p4
 The steps to analyse a gene count matrix, with cell as columns and genes as rows, are very similar to what we saw above.
 
 ```{r load matrix}
-data <- readRDS(file = path_to_file_2)
+data <- readRDS(file = "pdcs_matrix.rds")
 ```
 
 ### Analysis

@@ -55,14 +55,9 @@ opts_chunk$set(eval=TRUE,
 library(OAR)
 ```
 
-```{r include=F, echo=F}
-#path_to_file <- system.file("extdata", "pdcs.rds", package="OAR")
-path_to_file <- "/Users/repository/Git/OARscore/inst/extdata/pdcs.rds"
-```
-
 # Overview
 
-In this tutorial we will walk you through all the steps of generating and analyzing OAR scores from your single cell dataset. We will begin with a seurat object with plasmacytoid dendritic cells that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/inst/extdata).
+In this tutorial we will walk you through all the steps of generating and analyzing OAR scores from your single cell dataset. We will begin with a seurat object with plasmacytoid dendritic cells that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/vignettes).
 
 The process starting from a gene expression matrix is very similar and you should be able to adapt this workflow to that input. Skip a few lines down to the data pre-processing step to run the tutorial that way.
 
@@ -73,7 +68,7 @@ At the end, we provide an alternative single line wrapper function that runs the
 First, we load a Seurat object that we wish examine and store the cell barcodes so we can later assign them to our output.
 
 ```{r load seurat object}
-sc.data <- readRDS(file = path_to_file)
+sc.data <- readRDS(file = "pdcs.rds")
 cells = colnames(sc.data)
 sc.data
 ```
