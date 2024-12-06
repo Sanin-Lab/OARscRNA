@@ -55,10 +55,9 @@ scatter_score_missing <- function(
 ##===================================================================
 #' Plot identified missing data patterns
 #'
-#' @param data A gene-cell expression matrix with NA values in place of 0s and 1s everywhere else or a Seurat Object to which `oar` or `oar_by_cluster` has been applied to.
+#' @param data A gene-cell expression matrix with NA values in place of 0s and 1s everywhere else or a Seurat Object to which `oar` has been applied to.
 #' @param mdp A vector indicating the pattern to which each gene belongs. Default is NULL.
 #' @param seurat_v5 A Boolean to indicate where or not the input data is a Seurat object. Default is TRUE. 
-#' @param cluster A string indicating which missing data patterns to be extracted. If `oar` was applied then this should be "all" (Default). If `oar_by_cluster` was applied, then the name of a single cluster should be provided. 
 #'
 #' @return Plot of missing data patterns. 
 #' 
@@ -67,21 +66,15 @@ scatter_score_missing <- function(
 #' @examples
 #' \dontrun{
 #' #Starting from a Seurat Object analysed jointly
-#' output <- oar_missing_data_plot(data, seurat_v5 = TRUE, cluster = "all")
-#' 
-#' #Starting from a Seurat Object analysed by cluster to retrieve cluster 5
-#' output <- oar_missing_data_plot(data, seurat_v5 = TRUE, cluster = "5")
+#' output <- oar_missing_data_plot(data, seurat_v5 = TRUE)
 #' 
 #' #Starting from filtered and binarized expression matrix
 #' output <- oar_missing_data_plot(data, mdp, seurat_v5 = FALSE)
 #' }
-oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE, cluster = "all") {
+oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
   if(seurat_v5){
-    if(cluster == "all"){
-      f = "mdp"}else{f = paste0("mdp_cl_",cluster)}
-    names(f) = "mdp"
     mdp <- get_missing_pattern_genes(data) %>% 
-      dplyr::select(all_of(f)) %>% 
+      dplyr::select(all_of("mdp")) %>% 
       dplyr::filter(!mdp == "Filtered") %>% 
       .$mdp
     

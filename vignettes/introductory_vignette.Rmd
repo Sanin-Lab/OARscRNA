@@ -143,7 +143,7 @@ To get a data.frame of the genes within each pattern, use:
 mdp <- get_missing_pattern_genes(oar_obj)
 ```
 
-It is also possible to retrieve missing data patterns when `oar_by_cluster` is applied. Please see the documentation for `oar_missing_data_plot` and `get_missing_pattern_genes`
+It is also possible to retrieve missing data patterns when `oar_by_cluster` is applied. Please see the documentation for `get_missing_pattern_genes` for more details. Currently, the `oar_missing_data_plot` is not supported when `oar_by_cluster` is executed.
 
 #### Seurat Feature Plot
 
