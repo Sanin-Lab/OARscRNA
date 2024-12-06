@@ -2,18 +2,18 @@
 % Please edit documentation in R/identify_patterns.R
 \name{get_missing_pattern_genes}
 \alias{get_missing_pattern_genes}
-\title{Create list of which genes partipate in each pattern.}
+\title{Create list of which genes participate in each pattern.}
 \usage{
 get_missing_pattern_genes(data)
 }
 \arguments{
-\item{data}{a Seurat object that has had oar() run on it previously.}
+\item{data}{a Seurat object that has had \code{oar()} or \code{oar_by_cluster()} run on it previously.}
 }
 \value{
 data.frame of genes annotated with missing data pattern they participate in (globally or by cluster).
 }
 \description{
-Create list of which genes partipate in each pattern.
+Create list of which genes participate in each pattern.
 }
 \examples{
 \dontrun{

@@ -7,7 +7,7 @@
 oar_missing_data_plot(data, mdp = NULL, seurat_v5 = TRUE)
 }
 \arguments{
-\item{data}{A gene-cell expression matrix with NA values in place of 0s and 1s everywhere else or a Seurat Object to which \code{oar} or \code{oar_by_cluster} has been applied to.}
+\item{data}{A gene-cell expression matrix with NA values in place of 0s and 1s everywhere else or a Seurat Object to which \code{oar} has been applied to.}
 
 \item{mdp}{A vector indicating the pattern to which each gene belongs. Default is NULL.}
 
@@ -21,10 +21,10 @@ Plot identified missing data patterns
 }
 \examples{
 \dontrun{
-#Starting from a Seurat Object analysed jointly
-output <- oar_missing_data_plot(data, seurat_v5 = TRUE, cluster = "all")
+##Starting from a Seurat Object analysed jointly
+output <- oar_missing_data_plot(data, seurat_v5 = TRUE)
 
-#Starting from filtered and binarized expression matrix
+##Starting from filtered and binarized expression matrix
 output <- oar_missing_data_plot(data, mdp, seurat_v5 = FALSE)
 }
 }

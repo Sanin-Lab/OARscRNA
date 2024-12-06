@@ -3,7 +3,7 @@
 ##===============================================
 #' Create scatter plot of OAR score vs percent missing
 #'
-#' @param data A seurat v5 object that has oar score in meta data.
+#' @param data A seurat v5 object that has OAR score in meta data, or a data.frame with the OAR score results.
 #' @param group.by meta data category to color data by. Default is seurat_clusters. 
 #' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
 #' @param suffix A string that was previously appended to the output variables. Default is empty.
@@ -14,7 +14,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' pmbcs_oar <- scatter_score_missing(pmbcs_oar)
+#' ##Starting from a Seurat object
+#' output <- scatter_score_missing(pmbcs_oar)
+#' 
+#' ##Starting from a oar results data.frame
+#' output <- scatter_score_missing(oar, seurat_v5 = F)
 #' }
 scatter_score_missing <- function(
     data, group.by = 'seurat_clusters', seurat_v5 = TRUE, suffix = "",
@@ -65,16 +69,16 @@ scatter_score_missing <- function(
 #'
 #' @examples
 #' \dontrun{
-#' #Starting from a Seurat Object analysed jointly
+#' ##Starting from a Seurat Object analysed jointly
 #' output <- oar_missing_data_plot(data, seurat_v5 = TRUE)
 #' 
-#' #Starting from filtered and binarized expression matrix
+#' ##Starting from filtered and binarized expression matrix
 #' output <- oar_missing_data_plot(data, mdp, seurat_v5 = FALSE)
 #' }
 oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
   if(seurat_v5){
     mdp <- get_missing_pattern_genes(data) %>% 
-      dplyr::select(all_of("mdp")) %>% 
+      dplyr::select(dplyr::all_of("mdp")) %>% 
       dplyr::filter(!mdp == "Filtered") %>% 
       .$mdp
     

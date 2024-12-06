@@ -13,7 +13,7 @@ scatter_score_missing(
 )
 }
 \arguments{
-\item{data}{A seurat v5 object that has oar score in meta data.}
+\item{data}{A seurat v5 object that has OAR score in meta data, or a data.frame with the OAR score results.}
 
 \item{group.by}{meta data category to color data by. Default is seurat_clusters.}
 
@@ -31,6 +31,10 @@ Create scatter plot of OAR score vs percent missing
 }
 \examples{
 \dontrun{
-pmbcs_oar <- scatter_score_missing(pmbcs_oar)
+##Starting from a Seurat object
+output <- scatter_score_missing(pmbcs_oar)
+
+##Starting from a oar results data.frame
+output <- scatter_score_missing(oar, seurat_v5 = F)
 }
 }

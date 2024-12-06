@@ -20,11 +20,11 @@ oar_deg(
 \arguments{
 \item{data}{A Seurat (v5) object or a data.frame with cell barcodes as column names and genes as row names. Seurat object must have a column in metadata with OARscore.}
 
-\item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is \code{TRUE}. If \code{FALSE}, user must supply a  score vector.}
+\item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is \code{TRUE}. If \code{FALSE}, user must supply a score vector.}
 
-\item{score}{A named numeric vector with OARscores to be used in the model if provided a dataframe instead of Seurat object. Names should be cell barcodes. Ignored if Seurat object is supplied.}
+\item{score}{A named numeric vector with OARscores to be used in the model. Names should be cell barcodes. Ignored if Seurat object is supplied.}
 
-\item{count.filter}{A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.}
+\item{count.filter}{A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.}
 
 \item{splines}{A Boolean to indicate if splines should be used to fit model, default is TRUE}
 

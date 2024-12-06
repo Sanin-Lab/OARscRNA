@@ -97,14 +97,14 @@ oar_missing_data_graph <- function (dm, tol = 0.05) {
 #' Kruskal-Wallis test to generate a per cell p-value based on missing data patterns
 #'
 #' @param x Item from list of cell gene expression vectors
-#' @param mdp Matrix with counts per pattern
+#' @param mdp Matrix with gene participation per pattern
 #'
 #' @return list with a p-value for each cell
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' pvalue.list.KW <- unlist(lapply(cl, FUN = missing_pattern_pval_kw, mdp = mdp))
+#' pvalue <- missing_pattern_pval_kw(x, mdp)
 #' }
 #' 
 missing_pattern_pval_kw = function(x, mdp){

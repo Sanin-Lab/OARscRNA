@@ -9,7 +9,7 @@ missing_pattern_pval_kw(x, mdp)
 \arguments{
 \item{x}{Item from list of cell gene expression vectors}
 
-\item{mdp}{Matrix with counts per pattern}
+\item{mdp}{Matrix with gene participation per pattern}
 }
 \value{
 list with a p-value for each cell
@@ -19,7 +19,7 @@ Kruskal-Wallis test to generate a per cell p-value based on missing data pattern
 }
 \examples{
 \dontrun{
-pvalue.list.KW <- unlist(lapply(cl, FUN = missing_pattern_pval_kw, mdp = mdp))
+pvalue <- missing_pattern_pval_kw(x, mdp)
 }
 
 }
