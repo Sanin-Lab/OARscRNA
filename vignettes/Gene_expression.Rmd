@@ -74,7 +74,7 @@ sc.data <- oar(data = readRDS(file = "pdcs.rds"),
 
 To explore which cells/clusters have the most heterogeneity, we can visualize the results as in a UMAP projection.
 
-```{r featureplot score deg, out.width="50%", fig.cap="Feature plot of OAR score"}
+```{r featureplot_score_deg, out.width="50%", fig.cap="Feature plot of OAR score"}
 library(Seurat)
 p1 <- FeaturePlot(
   sc.data, features = "OARscore", order = T, pt.size = 0.5, 
@@ -121,7 +121,7 @@ For a full description of each column, visit the `glmGamPoi` documentation. For 
 
 Overall, this analysis identifies 135 genes significantly associated with OAR scores. If we plot the top 9 most significant genes alongside our previously calculated OAR scores, we can observe that we identified several candidates for further analysis:
 
-```{r featureplot comparison, out.width="100%", fig.cap="Genes associated with OAR score"}
+```{r featureplot_comparison, out.width="100%", fig.cap="Genes associated with OAR score"}
 library(Seurat)
 library(patchwork)
 library(ggplot2)

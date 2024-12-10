@@ -1,4 +1,4 @@
-# OARscRNA
+# OARscRNA <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
 ## Heterogeneity scoring on scRNAseq data based on missingness
 
@@ -30,7 +30,7 @@ Sparsity has been used to:
 
 At the core of the OAR score is the identification of missing data patterns, followed by comparing the distribution of genes expressed in the identified patterns in each cell individually.
 
-![Base Test](images/Test_OV.png)
+![Base Test](man/figures/Test_OV.png)
 
 To calculate the OAR score we:
 
@@ -42,6 +42,10 @@ To calculate the OAR score we:
 ## Installation
 
 To install the latest version of our package, run:
+
+`devtools::install_github("davidsanin/OARscRNA")`
+
+If you want to install our vignettes (takes a few minutes!), try:
 
 `devtools::install_github("davidsanin/OARscRNA", build_vignettes = TRUE)`
 
@@ -59,21 +63,21 @@ This will automatically filter low expression genes, identify a suitable toleran
 
 -   If a Seurat object is supplied, the results are added as columns in the `meta.data` slot.
 
-For full details on all parameters, including a step by step breakdown of the process, please visit our [documentation](https://oar.readthedocs.io) or view our vignette with `browseVignettes(package = "OAR")`.
+For full details on all parameters, including a step by step breakdown of the process, please visit our [documentation](https://davidsanin.github.io/OARscRNA/) or view our vignettes with `browseVignettes(package = "OAR")`.
 
 ## Tutorials and Applications
 
 ### Quick overview
 
-Follow our [quick guide](https://oar.readthedocs.io/introdoctury_vignette) on running the analysis with a single line.
+Follow our quick guide on running the analysis with a single line: `vignette("introductory_vignette")`
 
 ### Cell prioritization for downstream analysis
 
-Follow our [step-by-step tutorial](https://oar.readthedocs.io/detailed_tutorial) on exploring how we can identify highly activated plasmacytoid dendritic cells based on a high OAR score.
+Follow our step-by-step tutorial on exploring how we can identify highly activated plasmacytoid dendritic cells based on a high OAR score: `vignette("detailed_tutorial")`
 
 ### Model gene expression data at the single cell level
 
-[Identify genes](https://oar.readthedocs.io/Gene_expression) responsible for high OAR scoring cells at a single cell resolution.
+Identify genes responsible for high OAR scoring cells at a single cell resolution: `vignette("Gene_expression")`
 
 ### Remove sources of variation from scRNAseq data analysis
 
