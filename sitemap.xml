@@ -1,0 +1,25 @@
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://davidsanin.github.io/OARscRNA/404.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/LICENSE.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/articles/Gene_expression.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/articles/detailed_tutorial.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/articles/index.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/articles/introductory_vignette.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/authors.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/index.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/OAR-package.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/get_missing_pattern_genes.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/index.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/missing_pattern_pval_kw.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/oar.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/oar_base.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/oar_by_cluster.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/oar_deg.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/oar_exact_missing_data_patterns.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/oar_missing_data_graph.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/oar_missing_data_patterns.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/oar_missing_data_plot.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/oar_preprocess_data.html</loc></url>
+<url><loc>https://davidsanin.github.io/OARscRNA/reference/scatter_score_missing.html</loc></url>
+</urlset>
+
