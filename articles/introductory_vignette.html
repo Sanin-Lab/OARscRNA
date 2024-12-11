@@ -115,17 +115,17 @@ function. This function requires the input data, as well as some
 information on the number of cores (which is set to 1 by
 <strong>DEFAULT</strong>).</p>
 <p>To determine your computers capacity, you can run
-<code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
+<code><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
 available for other processes running in your computer to prevent
 crashing. Using multiple cores is recommended as it will go much faster
 in the identification of the patterns.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">oar_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">oar_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data_obj, cores = parallelly::availableCores() - 2): Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-10 00:38:51 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2024-12-11 20:50:41 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We deliberately left most parameters as defaults, however we
@@ -185,7 +185,7 @@ biological phenomenon other than cell type. When working with a dataset
 with diverse cell types, it can be helpful to run the function by
 cluster.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">oar_obj_bycluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_by_cluster.html">oar_by_cluster</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">oar_obj_bycluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_by_cluster.html">oar_by_cluster</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="visualize-results">Visualize Results<a class="anchor" aria-label="anchor" href="#visualize-results"></a>
@@ -282,11 +282,11 @@ not it is a v5 Seurat object.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oar_data</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>               mismatch <span class="op">=</span> <span class="cn">TRUE</span>, tolerance <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>               cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<span>               cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data, seurat_v5 = FALSE, mismatch = TRUE, tolerance = TRUE, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-10 00:43:10 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2024-12-11 20:54:55 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="va">...</span></span>
