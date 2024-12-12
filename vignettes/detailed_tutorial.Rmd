@@ -236,7 +236,7 @@ To explore which cells/clusters have the most heterogeneity, we can project the 
 library(Seurat)
 p1 <- FeaturePlot(
   sc.data, features = c("OARscore","IFNA1"), order = T, pt.size = 0.5, 
-  min.cutoff = "q40", max.cutoff = "q90")
+  min.cutoff = "q40", max.cutoff = "q90", slot = "counts")
 p1
 ```
 
