@@ -1,20 +1,19 @@
-# OARscRNA [![R build status](https://github.com/davidsanin/OARscRNA/workflows/build-check/badge.svg)](https://github.com/davidsanin/OARscRNA/actions?workflow=build-check)
-<img src="man/figures/logo.png" align="right" height="139" alt="" />
+# OARscRNA [![R build status](https://github.com/davidsanin/OARscRNA/workflows/build-check/badge.svg)](https://github.com/davidsanin/OARscRNA/actions?workflow=build-check) <img src="man/figures/logo.png" align="right" height="139"/>
 
 ## Heterogeneity scoring on scRNAseq data based on missingness
 
-The OAR (observed at random) score reveals cellular heterogeneity, allowing **cell prioritization** for downstream applications. The results of this test will highlight distinct cells within a dataset (cells with a high OAR score) for further exploration. For best results, test a group of similar cells where you expect some heterogeneity - *i.e. one cell type across various biological samples or conditions*. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:
+The OAR (observed at random) score reveals cellular heterogeneity, allowing **cell prioritization** for downstream applications. For best results, apply the test to group of similar cells where you expect some heterogeneity - *i.e. one cell type across various biological samples or conditions*. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:
 
 -   Technologies
 -   Technical batches/library preparations
 -   Organisms
 -   Sampling
 
-A **positive OAR score** within a dataset examined, highlights a cell with gene expression that appears more homogenous than other cells in the mixture and is consequently highly distinct cell. **OAR score is a measure of heterogeneity among cells**.
+**OAR score is a measure of heterogeneity among cells**. A cell with a **positive** OAR score is one where a set of genes appears to be expressed more homogenously than in other cells tested, and is consequently a highly distinct cell.
 
 ## Motivation
 
-scRNAseq data is very sparse (50-90% of expression values are 0). Sparsity is *generally* attributed to technical limitations associated with capturing RNA molecules from individual cells. **Some 0s are expected**, and are a consequence of the Gamma-Poisson distribution of count data[^readme-1], whereas “Drop-out” (when 0 occurs where a positve count is expected) is a problem associated with specific technologies (UMI- vs. nonUMI-based)[^readme-2].
+scRNAseq data is very sparse (50-90% of expression values are 0). Sparsity is *generally* attributed to technical limitations associated with capturing RNA molecules from individual cells. **Some 0s are expected**, and are a consequence of the Gamma-Poisson distribution of count data[^readme-1], whereas “Drop-out” (when 0s occur where positive counts are expected) is a problem associated with specific technologies (UMI- vs. nonUMI-based)[^readme-2].
 
 [^readme-1]: Svensson, V. (2020). Droplet scRNA-seq is not zero-inflated [DOI: 10.1038/s41587-019-0379-5](https://www.nature.com/articles/s41587-019-0379-5)
 
@@ -36,7 +35,7 @@ At the core of the OAR score is the identification of missing data patterns, fol
 To calculate the OAR score we:
 
 1.  Estimate [Hamming distances](https://en.wikipedia.org/wiki/Hamming_distance) between binarized vectors of gene expression.
-2.  Group genes across missing data patterns defined as those with small (0-0.05) Hamming distance. Genes with unique patterns *- i.e. with no "neighbors"*, are grouped together.
+2.  Group genes across missing data patterns defined as those with a small (0-0.05) hamming distance between them. Genes with unique patterns *- i.e. with no "neighbors"*, are grouped together.
 3.  Compare the distribution of gene expression across identified patterns for *each cell* with a [Kruskal-Wallis](https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test) test.
 4.  Scale the resulting *corrected p value* distributions *across all cells* to obtain the **OAR score**.
 
@@ -52,19 +51,19 @@ If you want to install our vignettes (takes a few minutes!), try:
 
 ## Usage
 
-To calculate an OAR score from a Seurat with **default** parameters run:
+To calculate an OAR score from a Seurat object with **default** parameters run:
 
 `oar(data = seurat.obj)`
 
-Or from a matrix of unnormalized read counts, run:
+Or from a matrix of **unnormalized** read counts, run:
 
 `oar(data = read.counts, seurat_v5 = F)`
 
-This will automatically filter low expression genes, identify a suitable tolerance for the hamming distance, and return the OAR score, corrected and uncorrected p values and percentage of missing data for each cell (column) in the supplied object.
+This will automatically filter genes with low expression, identify a suitable tolerance for the hamming distance, and return a OAR score, corrected and uncorrected p values and percentage of missing data for each cell (column) in the supplied object.
 
 -   If a Seurat object is supplied, the results are added as columns in the `meta.data` slot.
 
-For full details on all parameters, including a step by step breakdown of the process, please visit our [documentation](https://davidsanin.github.io/OARscRNA/) or view our vignettes with `browseVignettes(package = "OAR")`.
+For full details on all parameters, including a step-by-step breakdown of the process, please visit our [documentation](https://davidsanin.github.io/OARscRNA/) or view our vignettes with `browseVignettes(package = "OAR")`.
 
 ## Tutorials and Applications
 
@@ -89,3 +88,5 @@ Regress out OAR scores calculated on raw counts and found to be associated with 
 *scRNAseq implementation:* Chen, R., Moore, H., Gueguen, PM., Kelly, B., Fertig, EJ., Sanin, DE., (2025). Scoring Cellular Heterogeneity by interrogating Missingness in single-cell RNA-seq Data. *In press*
 
 *Statistical proof:* Chen, R., Chung, YC., Basu, S., Shi, Q., (2024). Diagnostic Test for Realized Missingness in Mixed-type Data. Sankhya B, 86(1), 109-138. DOI: 10.1007/s13571-023-00317-5
+
+*Copyright 2025 - The Johns Hopkins University*

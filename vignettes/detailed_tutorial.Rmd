@@ -57,11 +57,11 @@ library(OAR)
 
 # Overview
 
-In this tutorial we will walk you through all the steps of generating and analyzing OAR scores from your single cell dataset. We will begin with a seurat object with plasmacytoid dendritic cells that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/vignettes).
+In this tutorial we will walk you through all the steps of generating and analyzing OAR scores from your single cell dataset. We will begin with a Seurat object with plasmacytoid dendritic cells that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/vignettes).
 
-The process starting from a gene expression matrix is very similar and you should be able to adapt this workflow to that input. Skip a few lines down to the data pre-processing step to run the tutorial that way.
+The process starting from a gene expression matrix is very similar and you should be able to adapt this workflow to that input. Skip a few lines down to the **data pre-processing step** to run the tutorial that way.
 
-At the end, we provide an alternative single line wrapper function that runs the whole process, and adds the results to the `meta.data` slot of a seurat object. If starting from a dataset with multiple cell types, we recommend running this process cluster by cluster, and similarly provide a wrapper function that accomplishes that.
+At the end, we provide an alternative single line [wrapper function](wrapper-functions-and-result-interpretation) that runs the whole process, and adds the results to the `meta.data` slot of a Seurat object. If starting from a dataset with multiple cell types, we recommend running this process cluster by cluster, and similarly provide a wrapper function that accomplishes that.
 
 ## 1. Loading and pre-processing your data
 
@@ -73,13 +73,17 @@ cells = colnames(sc.data)
 sc.data
 ```
 
-Now lets set a count threshold where we only analyze genes expressed in at least 1% of cells. We do not recommend using thresholds higher than 2%, as information will be lost. *Filtering genes, can reduce the time it takes to run the analysis.*
+Now lets set a count threshold where we only analyze genes expressed in at least 1% of cells[^1]. We do not recommend using thresholds higher than 2%, as information will be lost.
+
+[^1]: *Filtering genes may reduce the time it takes to run the analysis.*
 
 ```{r set count threshold}
-tr = 0.01
+tr = 1
 ```
 
-Next, we retrieve the un-normalized count data from the seurat object, filter low abundance genes and remove genes that are uninformative. The output of this function is a list with the first element being the processed matrix and the second the list of included genes. We will skip the later for this tutorial. Missing values in the processed matrix of gene counts are denoted as `NA`.
+Next, we retrieve the un-normalized count data from the Seurat object, filter low abundance genes and remove genes that are uninformative[^2]. The output of this function is a list with the first element being the processed matrix and the second the list of genes in that matrix after filtering. We will skip the later for this tutorial. Missing values in the processed matrix of gene counts are denoted as `NA`.
+
+[^2]: *Filtering genes may reduce the time it takes to run the analysis.*
 
 ```{r preprocess data, output.lines=5}
 oar_data <- oar_preprocess_data(
@@ -98,7 +102,7 @@ For a full description of each parameter consult the documentation. Briefly:
 
 Our scoring relies on identifying co-expressed genes patterns (which we call missing data patterns) which is a computationally intensive process. We can do this in two ways:
 
-1.  We can look only for exact matches, which is fast, but this rarely works as most cells differ by one or more genes.
+First, we can look only for exact matches, which is fast, but this rarely works as most cells differ by one or more genes.
 
 ```{r extact matches, output.lines=5}
 mdp_exact <- oar_exact_missing_data_patterns(oar_data[[1]])
@@ -107,13 +111,13 @@ table(mdp_exact)
 
 Notice that there are still a considerable number of unique patterns, and few genes are captured in the repeated patterns.
 
-2.  Alternatively, we can identify genes with minimal mismatch between them, but for this we need to first enable R to run in parallel. To determine your computers capacity, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as it will go much faster in the identification of the patterns.
+Alternatively, we can identify genes with minimal mismatch between them, but for this we need to first enable R to run in parallel. To determine your computers capacity, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as it will go much faster in the identification of the patterns.
 
 ```{r parallel cores, output.lines=5}
 parallelly::availableCores()
 ```
 
-Now we can select an appropriate number to set up parallel processing for this R session. To identify the missing data patterns allowing for missmatch, we calculate the hamming distance between all gene expression vectors. Internally, the gene vectors are converted to 0 (missing) and 1 (observed) values. This function needs to have the number of cores specified explicitly. We set `tolerance` to `TRUE`, so the function searches for a tolerance value between 0.01 and 0.05 that maximizes for the number of patterns detected. This tolerance value is the fraction of mismatch between gene vectors that we allow to consider genes as part of the same pattern.
+Now we can select an appropriate number to set up parallel processing for this R session. To identify the missing data patterns allowing for missmatch, we calculate the hamming distance between all pairs of gene expression vectors. Internally, the gene vectors are converted to 0 (missing) and 1 (observed) values. This function needs to have the number of cores specified explicitly. We set `tolerance` to `TRUE` to search for a tolerance value between 0.01 and 0.05 that maximizes for the number of patterns detected. This tolerance value is the fraction of mismatch between gene vectors that we allow to consider genes as part of the same pattern.
 
 ```{r mdp with automatic tolerance, output.lines=5}
 mdp_auto_tol <- oar_missing_data_patterns(
@@ -121,15 +125,13 @@ mdp_auto_tol <- oar_missing_data_patterns(
 table(mdp_auto_tol)
 ```
 
-Alternatively, we can choose our own tolerance and pass it to the function, which will be faster, but may not capture as many patterns. Values greater than 0 and lower than 0.1 are recommended.
+If we have previously run the analysis or we wish to tune the tolerance to a value outside the automatic range, we can choose our own tolerance and pass it to the function, which will be faster, but may not capture as many patterns. Values greater than 0 and lower than 0.1 are recommended.
 
 ```{r mdp with specific tolerance, output.lines=5, eval = FALSE}
 oar_missing_data_patterns(oar_data[[1]], tolerance = 0.1, cores = parallelly::availableCores()-2)
 ```
 
-In this dataset a tolerance of 0.04 resulted in greater number of non-unique missing data patterns, with 3 patterns distinct patters found across cells (plus the combination of all genes with non-unique patterns)
-
-We can visualize these results like this:
+In this dataset a tolerance of 0.04 resulted in greater number of non-unique missing data patterns, with 3 distinct patters found across cells (plus the combination of all genes with non-unique patterns). We can visualize these results like this:
 
 ```{r patterns_found_mdp, out.width="100%", fig.cap="Missing Data Pattern Plot"}
 p3 <- oar_missing_data_plot(data = oar_data[[1]], mdp = mdp_auto_tol, seurat_v5 = FALSE)
@@ -140,7 +142,7 @@ Each slice of the bar represents a cell, and it is colored based on what percent
 
 ## 3. Calculate OAR scores
 
-Now we are ready to do a cell-wise estimation of the overlap between the gene expression distributions in each detected pattern. When these distributions are distinct, we find that the data is not missing at random (NOAR), with highly significant p value and an OAR score of less than 2. Alternatively, when these distributions overlap, gene expression appears more randomly distributed (OAR), has a larger p value and an OAR score greater than 2. Critically, our test incorporates both the gene expression values and the missing data patterns.
+Now we are ready to do a cell-wise estimation of the overlap between the gene expression distributions in each detected pattern. When these distributions are distinct, we find that the data is not missing at random (NOAR), with highly significant p values and an OAR score of less than 2. Alternatively, when these distributions overlap, gene expression appears more randomly distributed (OAR), and cells have a larger p value and an OAR score greater than 2. Critically, our test incorporates both the gene expression values and the missing data patterns.
 
 ```{r oar base, output.lines=5}
 output <- oar_base(data = oar_data[[1]], mdp = mdp_auto_tol)
@@ -159,7 +161,7 @@ We can now proceed to visualize these results to identify which cells are most h
 
 ## 4. Visualize results
 
-A higher OAR score is a way to prioritize genes for further analysis. Greater scores indicate distinct cell expression signatures, where high scoring cells have different gene co-expression patterns compared to all other cells in the test. In this example, we observe that cells with a high degree of sparsity, also have a high OAR score
+A higher OAR score is a way to prioritize cells for further analysis. Greater scores indicate distinct cell expression signatures, where high scoring cells have different gene co-expression patterns compared to all other cells in the test. In this example, we observe that cells with a high degree of sparsity, also have a high OAR score
 
 ```{r create_scatter_plot, out.width="100%", fig.cap="Scatter Plots"}
 library(ggplot2)
@@ -203,7 +205,7 @@ You may recreate this plot using `scatter_score_missing()`.
 
 In order to fully understand the features in the dataset driving the high OAR score in some cells, it will be necessary to annotate these with their biological context. This is more easily achieved within a Seurat object with the additional experimental details.
 
-## 5. Wrapper function and result interpretation
+## 5. Wrapper functions and result interpretation
 
 We can run this entire process with a single line. The result is the Seurat object with the `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `pct.missing` values in the `meta.data` slot. Additionally, genes are annotated by which missing data patterns (mdp) they have been included in `sc.data@assays$RNA@meta.data`.
 
@@ -219,33 +221,23 @@ We set these parameters based on our earlier results and adjusted to the data pr
 
 -   `seurat_v5` confirms the type of data being used. Defaults to `TRUE`.
 -   `mismatch` controls whether or not to allow for flexibility in pattern matching. Defaults to `TRUE`.
--   `tolerance` controls whether the missmatch threshold should be determined automatically (between 0.01 and 0.05 hamming distances) or if a user supplied threshold should be used. Defaults to `TRUE`, and can take `TRUE` or a numeric value smaller than 1. Here we set it to 0.04 based on our results above.
+-   `tolerance` controls whether the mismatch threshold should be determined automatically (between 0.01 and 0.05 hamming distances) or if a user supplied threshold should be used. Defaults to `TRUE`, and can take `TRUE` or a numeric value smaller than 1. Here we set it to 0.04 based on our results above.
 -   `count.filter` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
 -   `blacklisted.genes` Allows you to provide a vector of uninformative gene names (i.e. non-conding genes) to exclude from the analysis. Defaults to `NULL`.
--   `suffix` Allows you to provide a character string to avoid overwritting previous OAR calculations. Defaults to `NULL`.
+-   `suffix` Allows you to provide a character string to avoid overwriting previous OAR calculations. Defaults to `NULL`.
 
-**You can use a similar approach to analyse the data cluster by cluster - recommended when you have multiple cell types**. In that case, use `oar_by_cluster()`.
+You can use a similar approach to analyse the data cluster by cluster - recommended when you have multiple cell types. In that case, use `oar_by_cluster()`.
 
 #### Interpreting high OAR scores
 
-To explore which cells/clusters have the most heterogeneity, we can visualize the results as in a UMAP projection.
+To explore which cells/clusters have the most heterogeneity, we can project the scores to our UMAP using `Seurat::FeaturePlot()`. Notice that cells with a high OAR score in this dataset cluster together. In fact, in this case, high OAR scoring cells represent the most activated cells in the experiment, as can be seen when we examine *IFNA1*, which is expressed in activated plasmacytoid dendritic cells.
 
-```{r featureplot_score, out.width="50%", fig.cap="Feature plot of OAR score"}
+```{r featureplot_score, out.width="100%", fig.cap="Feature plot of OAR score"}
 library(Seurat)
 p1 <- FeaturePlot(
-  sc.data, features = "OARscore", order = T, pt.size = 0.5, 
+  sc.data, features = c("OARscore","IFNA1"), order = T, pt.size = 0.5, 
   min.cutoff = "q40", max.cutoff = "q90")
 p1
 ```
 
-Notice that cells with a High OAR score in this dataset cluster together. In fact, in this case, high OAR scoring cells represent the most activated cells in the experiment, as can be seen when we examine the expression of a marker gene:
-
-```{r featureplot_genes, out.width="50%", fig.cap="Feature plot of results"}
-library(Seurat)
-p2 <- FeaturePlot(
-  sc.data, features = "IFNA1", order = T, pt.size = 0.5, 
-  min.cutoff = "q40", max.cutoff = "q90", slot = "counts")
-p2
-```
-
-Thus, in this dataset we are able to identify highly activated cells with a cluster agnostic approach. We provide additional tutorials to identify genes associated with a high OAR score. We also provide examples of datasets where high scores are associated with biological variation that may be removed from the analysis to glean additional insights into the populations of cells studied.
+Thus, in this dataset we are able to identify highly activated cells with a cluster agnostic approach. We provide additional tutorials to identify genes associated with a high OAR score (see: `vignette("Gene_expression")`). We have also seen datasets where high scores are associated with biological variation that may be removed from the analysis to glean additional insights into the populations of cells studied. These can be achieved by passing `OARscore` to `vars.to.regress` in `Seurat::SCTransform()`. 
