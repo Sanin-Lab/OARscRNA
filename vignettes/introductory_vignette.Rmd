@@ -135,7 +135,7 @@ p3 <- oar_missing_data_plot(oar_obj)
 p3
 ```
 
-For this dataset, we identified 4 sets of genes. At the top we have a combination of all genes with unique patterns. Below that, we have 3 patterns found across cells, with the assigned indices of 9102, 6, and 3. Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell. For example, in pattern 9102, about a third of cells express 13 specific genes, which are conversely absent in all other cells.
+For this dataset, we identified 4 sets of genes: 3 relatively conserved patterns allowing for some mismatch, and a fourth which is a combination of all genes with unique patterns. Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell. For example, a pattern of 13 genes is expressed in about a third of cells.
 
 To get a data.frame of the genes within each pattern, use:
 

@@ -90,58 +90,41 @@ oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
     mdp <- mdp
   }
   
-  freq.mdp <- table(mdp)
-  p <- names(freq.mdp)
-  
-  gr = c()
-  for(i in p){
-    gr = c(gr,
-           rep(i,times=freq.mdp[i]))}
-  
-  dout <- +(!is.na(data)) %>% 
+  m <- +(!is.na(data)) %>% 
     reshape2::melt() %>% 
     dplyr::mutate(
       x = as.factor(Var2),
       group = as.factor(
-        rep(mdp[mdp %in% p],
+        rep(mdp,
             times = length(unique(Var2))))) %>% 
     dplyr::group_by(group, x) %>% 
     dplyr::summarise(p = sum(value)/n(),
-                     count = n())
+                     count = n()) %>% 
+    dplyr::mutate(group = paste0(group,": ",count," genes")) %>% 
+    reshape2::acast(formula = group ~ x, value.var = "p")
   
   print("Generating plots...")
-  pp <- ggplot2::ggplot(
-    data = dout,
-    aes(x = x, y = group, fill = p)) +
-    ggplot2::geom_tile(height = 0.5) +
-    ggplot2::scale_fill_gradient(
-      low = "white", high = "black",
-      limits = c(0,1),
-      breaks = c(0,1),
-      labels = c("Missing","Observed"),
-      guide = guide_colorbar(
-        title = NULL,
-        frame.colour = "black",
-        ticks.colour = "black")) +
-    ggplot2::geom_label(
-      data = dout %>% 
-        dplyr::distinct(group,count) %>% 
-        dplyr::mutate(count = paste0("Genes in pattern ",group,": ",count)), 
-      aes(x = 1, y = group, label = count),
-      inherit.aes = F, size.unit = "mm", size =3,
-      nudge_y = 0.5, nudge_x = 150) +
-    ggplot2::theme_minimal() +
-    ggplot2::coord_cartesian(clip = "off") +
-    theme(
-      panel.spacing = unit(0,"mm"),
-      legend.position = "right",
-      axis.title = element_blank(),
-      axis.text = element_blank(),
-      panel.background = element_blank(),
-      panel.grid = element_blank(),
-      legend.key.size = unit(2,"mm")
-    )
+  ht <- ComplexHeatmap::Heatmap(
+    matrix = m, 
+    name = NULL, heatmap_legend_param = list(
+      title = NULL, at = c(0, 1), 
+      labels = c("Missing", "Observed"),
+      legend_height = unit(1, "cm"),
+      grid_width = unit(2, "mm"),
+      labels_gp = grid::gpar(fontsize = 8),
+      border = "black"),
+    col = circlize::colorRamp2(
+      c(0,0.5,1), colors = c("white","grey","black"),
+      transparency = 0),
+    border = T, show_row_dend = F, show_column_dend = F,
+    show_column_names = F, show_row_names = T,
+    cluster_rows = F, cluster_columns = T,
+    row_labels = paste0(rownames(m)," genes"),
+    row_names_side = "left", row_names_gp = grid::gpar(fontsize = 8),
+    column_title = "Cells", column_title_side = "top",
+    column_title_gp = grid::gpar(fontsize = 8),
+    width = unit(ncol(m)*0.25, "mm"), height = unit(3*nrow(m), "mm"))
   
   # Output #
-  return(pp)
+  return(ht)
 }

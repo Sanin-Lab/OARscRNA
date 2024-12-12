@@ -15,12 +15,14 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
+    ComplexHeatmap,
     data.table,
     digest,
     dplyr,
     foreach,
     ggplot2,
     glmGamPoi,
+    grid,
     igraph,
     Matrix,
     naniar,

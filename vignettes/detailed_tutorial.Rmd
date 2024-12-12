@@ -138,7 +138,7 @@ p3 <- oar_missing_data_plot(data = oar_data[[1]], mdp = mdp_auto_tol, seurat_v5 
 p3
 ```
 
-Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell. For example, the 13 genes in pattern 9102 are expressed in roughly one third of the cells in the data.
+Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell. For example, a pattern of 13 genes is expressed in about a third of cells.
 
 ## 3. Calculate OAR scores
 
