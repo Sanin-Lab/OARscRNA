@@ -24,10 +24,16 @@ oar_exact_missing_data_patterns <- function (data) {
   if (length(un.p) < dim(freq.mdp)[1L]) {mdp[mdp %in% un.p] <- "unique"}# Combine patterns that occurred once
   if (length(unique(mdp)) == 1) {stop("All missing data patterns were unique.\nConsider allowing for mismatch")}
   
+  map <- data.frame(
+    "on" = names(table(mdp)),
+    "rn" = c(paste0("Pattern ",1:(length(names(table(mdp)))-1)),"Unique patterns"))
+  idx <- match(mdp,map$on)
+  mdp <- map$rn[idx]
+  
   print(paste0(
     "Identified ",
     length(unique(mdp))-1," non-unique missing data patterns, encompassing ",
-    sum(table(mdp)) - sum(table(mdp)["unique"]), " genes"))
+    sum(table(mdp)) - sum(table(mdp)["Unique patterns"]), " genes"))
   
   return(mdp)
 }
@@ -70,12 +76,12 @@ oar_missing_data_patterns <- function (data, tolerance = TRUE, cores = 1) {
     mdp = mdp.f
     print(paste0("Identified ",p-1," non-unique missing data patterns"))
     print(paste0("Tolerance set to ",tol))
-    print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["unique"])," genes captured in non-unique patterns"))
+    print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["Unique patterns"])," genes captured in non-unique patterns"))
   } else if(is.numeric(tolerance)){
     mdp <- oar_missing_data_graph(dm, tol = tolerance)
     print(paste0("Identified ",length(unique(mdp))-1," non-unique missing data patterns"))
     print(paste0("Tolerance set to ",tolerance))
-    print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["unique"])," genes captured in non-unique patterns"))
+    print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["Unique patterns"])," genes captured in non-unique patterns"))
   }else{
     stop("Tolerance must be TRUE or a mumerical value less than 1")
   }

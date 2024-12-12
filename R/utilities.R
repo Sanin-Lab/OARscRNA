@@ -91,6 +91,11 @@ oar_missing_data_graph <- function (dm, tol = 0.05) {
     n=1+n
   }
   mdp[as.numeric(unp)] <- "unique"
+  map <- data.frame(
+    "on" = names(table(mdp)),
+    "rn" = c(paste0("Pattern ",1:(length(names(table(mdp)))-1)),"Unique patterns"))
+  idx <- match(mdp,map$on)
+  mdp <- map$rn[idx]
   return(mdp)
 }
 
