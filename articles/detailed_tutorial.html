@@ -170,8 +170,8 @@ rarely works as most cells differ by one or more genes.</p>
 <span><span class="co">#&gt; [1] "Identified 2 non-unique missing data patterns, encompassing 38 genes"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mdp_exact</span><span class="op">)</span></span>
 <span><span class="co">#&gt; mdp_exact</span></span>
-<span><span class="co">#&gt;   5244   5482 unique </span></span>
-<span><span class="co">#&gt;     31      7  11668</span></span></code></pre></div>
+<span><span class="co">#&gt;       Pattern 1       Pattern 2 Unique patterns </span></span>
+<span><span class="co">#&gt;              31               7           11668</span></span></code></pre></div>
 <p>Notice that there are still a considerable number of unique patterns,
 and few genes are captured in the repeated patterns.</p>
 <p>Alternatively, we can identify genes with minimal mismatch between
@@ -206,8 +206,8 @@ consider genes as part of the same pattern.</p>
 <span><span class="va">...</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mdp_auto_tol</span><span class="op">)</span></span>
 <span><span class="co">#&gt; mdp_auto_tol</span></span>
-<span><span class="co">#&gt;      3      6   9102 unique </span></span>
-<span><span class="co">#&gt;   2422    154     13   9117</span></span></code></pre></div>
+<span><span class="co">#&gt;       Pattern 1       Pattern 2       Pattern 3 Unique patterns </span></span>
+<span><span class="co">#&gt;            2422             154              13            9117</span></span></code></pre></div>
 <p>If we have previously run the analysis or we wish to tune the
 tolerance to a value outside the automatic range, we can choose our own
 tolerance and pass it to the function, which will be faster, but may not
@@ -230,8 +230,8 @@ Missing Data Pattern Plot
 </div>
 <p>Each slice of the bar represents a cell, and it is colored based on
 what percentage of genes from that pattern are expressed in each cell.
-For example, the 13 genes in pattern 9102 are expressed in roughly one
-third of the cells in the data.</p>
+For example, a pattern of 13 genes is expressed in about a third of
+cells.</p>
 </div>
 <div class="section level3">
 <h3 id="calculate-oar-scores">3. Calculate OAR scores<a class="anchor" aria-label="anchor" href="#calculate-oar-scores"></a>
@@ -349,7 +349,7 @@ missing data patterns (mdp) they have been included in
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-12 20:12:47 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2024-12-12 23:11:10 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We set these parameters based on our earlier results and adjusted to
