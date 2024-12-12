@@ -3,10 +3,10 @@
 ##===================================================================
 #' Prepare data for oar fold functions
 #'
-#' @param data Seurat object or gene expression matrix
-#' @param tr Filtering threshold. Default is 0.01.
-#' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
-#' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
+#' @param data a seurat object or gene expression matrix
+#' @param tr a filtering threshold. Default is 1.
+#' @param seurat_v5 a boolean to indicate if supplied data is a Seurat object, default is TRUE
+#' @param blacklisted.genes a character vector with gene names to be excluded from the analysis. Default is empty.
 #'
 #' @return Data matrix with blacklisted genes removed
 #' @export
@@ -15,7 +15,10 @@
 #' \dontrun{
 #' data <- oar_preprocess_data(data)
 #' }
-oar_preprocess_data <- function(data, tr = 0.01, seurat_v5 = TRUE, blacklisted.genes = NULL) {
+oar_preprocess_data <- function(data, tr = 1, seurat_v5 = TRUE, blacklisted.genes = NULL) {
+  #Set filtering threshold
+  tr = tr/100
+  
   #read in Seurat object
   if(seurat_v5){
     layersList <- lapply(data@assays$RNA@layers,function(x){dim(x)}) #Identify empty layers

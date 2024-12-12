@@ -6,12 +6,15 @@
 \alias{OAR-package}
 \title{OAR: Heterogeneity Scoring on scRNA Sequencing Data Based on Missingness}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 OAR (observed at random) score is a measure of heterogeneity among cells, allowing cell prioritization for downstream applications. For best results, test a group of similar cells where you expect some heterogeneity - i.e. one cell type across various biological samples or conditions.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://github.com/davidsanin/OARscRNA}
+  \item \url{https://davidsanin.github.io/OARscRNA/}
   \item Report bugs at \url{https://github.com/davidsanin/OARscRNA/issues}
 }
 

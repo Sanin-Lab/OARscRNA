@@ -18,28 +18,28 @@ oar_deg(
 )
 }
 \arguments{
-\item{data}{A Seurat (v5) object or a data.frame with cell barcodes as column names and genes as row names. Seurat object must have a column in metadata with OARscore.}
+\item{data}{a Seurat (v5) object or a data.frame with cell barcodes as column names and genes as row names. Seurat object must have a column in metadata with OARscore.}
 
-\item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is \code{TRUE}. If \code{FALSE}, user must supply a score vector.}
+\item{seurat_v5}{a boolean to indicate if supplied data is a Seurat object, default is \code{TRUE}. If \code{FALSE}, user must supply a score vector.}
 
-\item{score}{A named numeric vector with OARscores to be used in the model. Names should be cell barcodes. Ignored if Seurat object is supplied.}
+\item{score}{a named numeric vector with OARscores to be used in the model. Names should be cell barcodes. Ignored if Seurat object is supplied.}
 
-\item{count.filter}{A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.}
+\item{count.filter}{a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.}
 
-\item{splines}{A Boolean to indicate if splines should be used to fit model, default is TRUE}
+\item{splines}{a boolean to indicate if splines should be used to fit model, default is TRUE}
 
-\item{degrees.freedom}{A numeric value indicating the degrees of freedom to calculate splines. Default is 5. Values between 3 and 5 are recommended.}
+\item{degrees.freedom}{a numeric value indicating the degrees of freedom to calculate splines. Default is 5. Values between 3 and 5 are recommended.}
 
-\item{blacklisted.genes}{A character vector with gene names to be excluded from the analysis. Default is empty.}
+\item{blacklisted.genes}{a character vector with gene names to be excluded from the analysis. Default is empty.}
 
-\item{auto.threshold}{A Boolean to indicate if FDR threshold should be calculated from the data, default is TRUE}
+\item{auto.threshold}{a boolean to indicate if FDR threshold should be calculated from the data, default is TRUE}
 
-\item{custom.tr}{A numeric value to use as an FDR threshold. Ignored if \code{auto.threshold} is set to TRUE.}
+\item{custom.tr}{a numeric value to use as an FDR threshold. Ignored if \code{auto.threshold} is set to TRUE.}
 
-\item{score.name}{Name of OAR score in dataset, default is "OARscore". If suffix used on previous functions, would need to include full new name here.}
+\item{score.name}{name of OAR score in dataset, default is "OARscore". If suffix used on previous functions, would need to include full new name here.}
 }
 \value{
-A dataframe with p-values for genes that significantly contribute to OAR score.
+A data.frame with p-values for genes that significantly contribute to OAR score.
 }
 \description{
 Generate DEGs based on OAR score

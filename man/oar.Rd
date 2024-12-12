@@ -18,19 +18,19 @@ oar(
 \arguments{
 \item{data}{a Seurat (v5) object or a matrix with cell barcodes as column names and genes as row names.}
 
-\item{seurat_v5}{a Boolean to indicate if supplied data is a Seurat object, default is TRUE}
+\item{seurat_v5}{a boolean to indicate if supplied data is a Seurat object, default is TRUE}
 
 \item{count.filter}{a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.}
 
 \item{blacklisted.genes}{a character vector with gene names to be excluded from the analysis. Default is empty.}
 
-\item{suffix}{is a string to append to the output variables. Default is empty}
+\item{suffix}{a string to append to the output variables. Default is empty}
 
 \item{mismatch}{a boolean to determine to allow minimal mismatch in missing data pattern identification. Default \code{TRUE}}
 
-\item{tolerance}{A logical or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
+\item{tolerance}{a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
 
-\item{cores}{A numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities. Default is 1.}
+\item{cores}{a numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities. Default is 1.}
 }
 \value{
 A Seurat object with OAR stats added into meta data, or a matrix with OAR stats.

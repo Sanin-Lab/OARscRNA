@@ -38,8 +38,8 @@ oar_exact_missing_data_patterns <- function (data) {
 #' Identify missing data patterns allowing for mismatch
 #'
 #' @param data a minimal dataset ready for processing.
-#' @param tolerance A logical or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
-#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities.
+#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
+#' @param cores a numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities.
 #'
 #' @return Matrix of gene vector hamming distances
 #' @export

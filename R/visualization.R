@@ -3,11 +3,11 @@
 ##===============================================
 #' Create scatter plot of OAR score vs percent missing
 #'
-#' @param data A seurat v5 object that has OAR score in meta data, or a data.frame with the OAR score results.
-#' @param group.by meta data category to color data by. Default is seurat_clusters. 
-#' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
-#' @param suffix A string that was previously appended to the output variables. Default is empty.
-#' @param pt.size A numerical value for the size of points to be passed to the size argument in `geom_point`. Default is 0.5.
+#' @param data a seurat v5 object that has OAR score in meta data, or a data.frame with the OAR score results.
+#' @param group.by a meta data category to color data by. Default is seurat_clusters. 
+#' @param seurat_v5 a boolean to indicate if supplied data is a Seurat object, default is TRUE
+#' @param suffix a string that was previously appended to the output variables. Default is empty.
+#' @param pt.size a numerical value for the size of points to be passed to the size argument in `geom_point`. Default is 0.5.
 #' 
 #' @return Scatter plot of OAR score vs percent missing, colored by grouping of choice. 
 #' @export
@@ -59,9 +59,9 @@ scatter_score_missing <- function(
 ##===================================================================
 #' Plot identified missing data patterns
 #'
-#' @param data A gene-cell expression matrix with NA values in place of 0s and 1s everywhere else or a Seurat Object to which `oar` has been applied to.
-#' @param mdp A vector indicating the pattern to which each gene belongs. Default is NULL.
-#' @param seurat_v5 A Boolean to indicate where or not the input data is a Seurat object. Default is TRUE. 
+#' @param data a gene-cell expression matrix with NA values in place of 0s and 1s everywhere else or a Seurat Object to which `oar` has been applied to.
+#' @param mdp a vector indicating the pattern to which each gene belongs. Default is NULL.
+#' @param seurat_v5 a boolean to indicate where or not the input data is a Seurat object. Default is TRUE. 
 #'
 #' @return Plot of missing data patterns. 
 #' 

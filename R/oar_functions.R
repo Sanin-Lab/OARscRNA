@@ -37,13 +37,13 @@ oar_base <- function (data, mdp) {
 #' Single line pipeline to run complete analysis
 #'
 #' @param data a Seurat (v5) object or a matrix with cell barcodes as column names and genes as row names.
-#' @param seurat_v5 a Boolean to indicate if supplied data is a Seurat object, default is TRUE
+#' @param seurat_v5 a boolean to indicate if supplied data is a Seurat object, default is TRUE
 #' @param count.filter a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.
 #' @param blacklisted.genes a character vector with gene names to be excluded from the analysis. Default is empty.
-#' @param suffix is a string to append to the output variables. Default is empty
+#' @param suffix a string to append to the output variables. Default is empty
 #' @param mismatch a boolean to determine to allow minimal mismatch in missing data pattern identification. Default `TRUE`
-#' @param tolerance A logical or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
-#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities. Default is 1.
+#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
+#' @param cores a numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities. Default is 1.
 #'
 #' @return A Seurat object with OAR stats added into meta data, or a matrix with OAR stats. 
 #' @export
@@ -56,9 +56,6 @@ oar_base <- function (data, mdp) {
 oar <- function (data, seurat_v5 = TRUE, count.filter = 1, 
                  blacklisted.genes = NULL, suffix = "", 
                  mismatch = TRUE, tolerance = TRUE, cores = 1) {
-  
-  #Set filtering threshold
-  tr = count.filter/100
   
   #Check parameters were correctly supplied
   if(!is.numeric(count.filter)){stop("count.filter must be numeric\n")}
@@ -98,7 +95,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   
   #read in Seurat object & remove blacklisted genes
   print("Extracting data...")
-  output <- oar_preprocess_data(data, tr, seurat_v5, blacklisted.genes)
+  output <- oar_preprocess_data(data, tr = count.filter, seurat_v5, blacklisted.genes)
   data <- output[[1]]
   gene_names <- output[[2]]
   
@@ -149,28 +146,25 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
 ##===================================================================
 #' Generate OAR score within each cluster and add them to full objects metadata
 #'
-#' @param data A Seurat (v5) object or a matrix with cell barcodes as column names and genes as row names, with cluster as ActiveIdent.
-#' @param seurat_v5 A Boolean to indicate if supplied data is a Seurat object, default is TRUE
-#' @param count.filter A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.
-#' @param blacklisted.genes A character vector with gene names to be excluded from the analysis. Default is empty.
-#' @param suffix A string to append to the output variables. Default is empty
+#' @param data a clustered Seurat (v5) object.
+#' @param count.filter a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.
+#' @param blacklisted.genes a character vector with gene names to be excluded from the analysis. Default is empty.
+#' @param suffix a string to append to the output variables. Default is empty
 #' @param mismatch a boolean to determine to allow minimal mismatch in missing data pattern identification. Default `TRUE`
-#' @param tolerance A logical or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
-#' @param cores A numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities.
+#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
+#' @param cores a numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities.
 #'
-#' @return A Seurat object with OAR stats added into meta data
+#' @return a Seurat object with OAR stats added into meta data
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' pmbcs <- oar_by_cluster(pmbcs)
 #' }
-oar_by_cluster <- function (data, seurat_v5 = TRUE, count.filter = 1,
+oar_by_cluster <- function (data, count.filter = 1,
                             blacklisted.genes = NULL, suffix = "",
                             mismatch = TRUE, tolerance = TRUE,
                             cores = 1) {
-  
-  if(!seurat_v5){stop("Must be a seurat object\n")}
   
   print("Splitting data by cluster...")
   

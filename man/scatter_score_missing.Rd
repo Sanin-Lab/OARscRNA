@@ -13,15 +13,15 @@ scatter_score_missing(
 )
 }
 \arguments{
-\item{data}{A seurat v5 object that has OAR score in meta data, or a data.frame with the OAR score results.}
+\item{data}{a seurat v5 object that has OAR score in meta data, or a data.frame with the OAR score results.}
 
-\item{group.by}{meta data category to color data by. Default is seurat_clusters.}
+\item{group.by}{a meta data category to color data by. Default is seurat_clusters.}
 
-\item{seurat_v5}{A Boolean to indicate if supplied data is a Seurat object, default is TRUE}
+\item{seurat_v5}{a boolean to indicate if supplied data is a Seurat object, default is TRUE}
 
-\item{suffix}{A string that was previously appended to the output variables. Default is empty.}
+\item{suffix}{a string that was previously appended to the output variables. Default is empty.}
 
-\item{pt.size}{A numerical value for the size of points to be passed to the size argument in \code{geom_point}. Default is 0.5.}
+\item{pt.size}{a numerical value for the size of points to be passed to the size argument in \code{geom_point}. Default is 0.5.}
 }
 \value{
 Scatter plot of OAR score vs percent missing, colored by grouping of choice.
