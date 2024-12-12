@@ -115,17 +115,17 @@ function. This function requires the input data, as well as some
 information on the number of cores (which is set to 1 by
 <strong>DEFAULT</strong>).</p>
 <p>To determine your computers capacity, you can run
-<code><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
+<code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
 available for other processes running in your computer to prevent
 crashing. Using multiple cores is recommended as it will go much faster
 in the identification of the patterns.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">oar_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">oar_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data_obj, cores = parallelly::availableCores() - 2): Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-11 20:50:41 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2024-12-12 20:26:41 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We deliberately left most parameters as defaults, however we
@@ -139,7 +139,7 @@ Defaults to <code>TRUE</code>.</li>
 <code>mismatch</code> controls whether or not to allow for
 flexibility in pattern matching. Defaults to <code>TRUE</code>.</li>
 <li>
-<code>tolerance</code> controls whether the missmatch threshold
+<code>tolerance</code> controls whether the mismatch threshold
 should be determined automatically (between 0.01 and 0.05 hamming
 distances) or if a user supplied threshold should be used. Defaults to
 <code>TRUE</code>, and can take <code>TRUE</code> or a numeric value
@@ -153,9 +153,8 @@ Defaults to 1.</li>
 uninformative gene names (i.e. non-coding genes) to exclude from the
 analysis. Defaults to <code>NULL</code>.</li>
 </ul>
-<p>The result is the Seurat object with additional metadata. To the
-cells metadata (found in <a href="mailto:oar_obj@meta.data" class="email">oar_obj@meta.data</a>) there will be the following
-additional columns:</p>
+<p>The result is a Seurat object with these additional metadata
+columns:</p>
 <ul>
 <li>
 <code>OARscore</code> is a metric of heterogeneity in the data, with
@@ -179,18 +178,17 @@ assay metadata (found in <a href="mailto:oar_obj@assays" class="email">oar_obj@a
 <div class="section level4">
 <h4 id="analysis-by-cluster">Analysis by Cluster<a class="anchor" aria-label="anchor" href="#analysis-by-cluster"></a>
 </h4>
-<p>OARscores are typically more powerful when distinguishing among cells
-as the same type, as heterogeneity in gene patterns are likely from a
-biological phenomenon other than cell type. When working with a dataset
-with diverse cell types, it can be helpful to run the function by
-cluster.</p>
+<p>OAR scores are typically more informative when distinguishing among
+cells of the same type. When working with a dataset with diverse cell
+types, it can be helpful to run the function by cluster.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">oar_obj_bycluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_by_cluster.html">oar_by_cluster</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">oar_obj_bycluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_by_cluster.html">oar_by_cluster</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="visualize-results">Visualize Results<a class="anchor" aria-label="anchor" href="#visualize-results"></a>
 </h4>
-<p>There are several way to visualize your resulting seurat object:</p>
+<p>Below are a few examples of how you might explore the results of this
+analysis.</p>
 <div class="section level5">
 <h5 id="oarscore-v-percent-missing-scatter-plot">OARscore v Percent Missing Scatter Plot<a class="anchor" aria-label="anchor" href="#oarscore-v-percent-missing-scatter-plot"></a>
 </h5>
@@ -206,13 +204,16 @@ Scatter Plots
 </p>
 </div>
 <p>These plot reveals which clusters have the highest OAR scores, as
-well as how the OARscore relates to the percent of missing genes. Adjust
-the group.by metric to examine other variables.</p>
+well as how the score relates to the percent of missing genes. Adjust
+the <code>group.by</code> metric to examine other variables.</p>
 </div>
 <div class="section level5">
-<h5 id="graphic-of-missing-data-patterns">Graphic of Missing Data Patterns<a class="anchor" aria-label="anchor" href="#graphic-of-missing-data-patterns"></a>
+<h5 id="missing-data-patterns">Missing Data Patterns<a class="anchor" aria-label="anchor" href="#missing-data-patterns"></a>
 </h5>
-<p>Visualize patterns found by OAR:</p>
+<p>In some cases, you might want to explore the patterns that were
+identified during the analysis to understand what the co-expression gene
+modules are telling you. First, you can visualize missing data patterns
+like this:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_plot.html">oar_missing_data_plot</a></span><span class="op">(</span><span class="va">oar_obj</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
@@ -223,7 +224,8 @@ the group.by metric to examine other variables.</p>
 Missing Data Pattern Plot
 </p>
 </div>
-<p>In this case we have a combination of all unique patterns, and 3
+<p>For this dataset, we identified 4 sets of genes. At the top we have a
+combination of all genes with unique patterns. Below that, we have 3
 patterns found across cells, with the assigned indices of 9102, 6, and
 3. Each slice of the bar represents a cell, and it is colored based on
 what percentage of genes from that pattern are expressed in each cell.
@@ -239,9 +241,14 @@ Currently, the <code><a href="../reference/oar_missing_data_plot.html">oar_missi
 when <code><a href="../reference/oar_by_cluster.html">oar_by_cluster()</a></code> is executed.</p>
 </div>
 <div class="section level5">
-<h5 id="seurat-feature-plot">Seurat Feature Plot<a class="anchor" aria-label="anchor" href="#seurat-feature-plot"></a>
+<h5 id="score-projection-with-seurat-featureplot">Score projection with Seurat FeaturePlot<a class="anchor" aria-label="anchor" href="#score-projection-with-seurat-featureplot"></a>
 </h5>
-<p>To visualize which cells/clusters have the most heterogeneity:</p>
+<p>As the scores, p values and sparsity have been added as columns to
+the <code>meta.data</code> of the Seurat object, you can use all the
+native functions from that package to visualize your results.
+<code><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">Seurat::FeaturePlot()</a></code> in particular, is a good starting
+point to get an overview of how the score is distributed among cells and
+clusters.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: SeuratObject</span></span>
@@ -259,7 +266,7 @@ when <code><a href="../reference/oar_by_cluster.html">oar_by_cluster()</a></code
 <span>  min.cutoff <span class="op">=</span> <span class="st">"q40"</span>, max.cutoff <span class="op">=</span> <span class="st">"q90"</span><span class="op">)</span></span>
 <span><span class="va">p4</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figureOAR_featureplot-1.png" alt="Feature plot of results" width="50%"><p class="caption">
+<img src="figureOAR_featureplot-1.png" alt="Feature plot of results" width="100%"><p class="caption">
 Feature plot of results
 </p>
 </div>
@@ -269,24 +276,24 @@ Feature plot of results
 <div class="section level3">
 <h3 id="starting-from-a-gene-expression-matrix">Starting from a Gene Expression Matrix<a class="anchor" aria-label="anchor" href="#starting-from-a-gene-expression-matrix"></a>
 </h3>
-<p>The steps to analyse a gene count matrix, with cell as columns and
+<p>The steps to analyse a gene count matrix, with cells as columns and
 genes as rows, are very similar to what we saw above.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"pdcs_matrix.rds"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="analysis-1">Analysis<a class="anchor" aria-label="anchor" href="#analysis-1"></a>
 </h4>
-<p>Once you have data loaded, you can run the oar function. This
-function requires the input data, as well as to be informed whether or
-not it is a v5 Seurat object.</p>
+<p>Once you have data loaded, you can run the oar function. In addition
+to the input data we must specify that we are not starting with a Seurat
+object by setting <code>seurat_v5</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oar_data</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>               mismatch <span class="op">=</span> <span class="cn">TRUE</span>, tolerance <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>               cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<span>               cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data, seurat_v5 = FALSE, mismatch = TRUE, tolerance = TRUE, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-11 20:54:55 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2024-12-12 20:31:06 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="va">...</span></span>
@@ -304,7 +311,7 @@ not it is a v5 Seurat object.</p>
 a higher OAR score highlighting cells with gene expression patterns
 dissimilar from all others tested.</li>
 <li>
-<code>KW.pvalue</code> is the P-value generated by Kruskal-Wallis
+<code>KW.pvalue</code> is the p-value generated by Kruskal-Wallis
 test.</li>
 <li>
 <code>KW.BH.pvalue</code> is the Benjamini-Hochberg corrected
@@ -318,13 +325,13 @@ dataset.</li>
 <div class="section level4">
 <h4 id="visualize-results-1">Visualize Results<a class="anchor" aria-label="anchor" href="#visualize-results-1"></a>
 </h4>
-<p>We can visualize these OAR scores via scatter plot against the
+<p>We can visualize these OAR scores with a scatter plot against the
 percent missing genes.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scatter_score_missing.html">scatter_score_missing</a></span><span class="op">(</span><span class="va">oar_data</span>, seurat_v5 <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
 <span><span class="va">p5</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figureOAR_scatter-1.png" alt="Scatter plot of results" width="50%"><p class="caption">
+<img src="figureOAR_scatter-1.png" alt="Scatter plot of results" width="100%"><p class="caption">
 Scatter plot of results
 </p>
 </div>

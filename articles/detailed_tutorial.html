@@ -86,16 +86,16 @@
 </h2>
 <p>In this tutorial we will walk you through all the steps of generating
 and analyzing OAR scores from your single cell dataset. We will begin
-with a seurat object with plasmacytoid dendritic cells that you can
+with a Seurat object with plasmacytoid dendritic cells that you can
 download from our <a href="https://github.com/davidsanin/OARscRNA/tree/main/vignettes" class="external-link">github
 repository</a>.</p>
 <p>The process starting from a gene expression matrix is very similar
 and you should be able to adapt this workflow to that input. Skip a few
-lines down to the data pre-processing step to run the tutorial that
-way.</p>
-<p>At the end, we provide an alternative single line wrapper function
+lines down to the <strong>data pre-processing step</strong> to run the
+tutorial that way.</p>
+<p>At the end, we provide an alternative single line <a href="wrapper-functions-and-result-interpretation">wrapper function</a>
 that runs the whole process, and adds the results to the
-<code>meta.data</code> slot of a seurat object. If starting from a
+<code>meta.data</code> slot of a Seurat object. If starting from a
 dataset with multiple cell types, we recommend running this process
 cluster by cluster, and similarly provide a wrapper function that
 accomplishes that.</p>
@@ -114,17 +114,19 @@ cell barcodes so we can later assign them to our output.</p>
 <span><span class="co">#&gt;  1 layer present: counts</span></span>
 <span><span class="co">#&gt;  2 dimensional reductions calculated: pca, umap</span></span></code></pre></div>
 <p>Now lets set a count threshold where we only analyze genes expressed
-in at least 1% of cells. We do not recommend using thresholds higher
-than 2%, as information will be lost. <em>Filtering genes, can reduce
-the time it takes to run the analysis.</em></p>
+in at least 1% of cells<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;&lt;em&gt;Filtering genes may reduce the time it takes to run
+the analysis.&lt;/em&gt;&lt;/p&gt;"><sup>1</sup></a>. We do not recommend using thresholds
+higher than 2%, as information will be lost.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tr</span> <span class="op">=</span> <span class="fl">0.01</span></span></code></pre></div>
-<p>Next, we retrieve the un-normalized count data from the seurat
+<code class="sourceCode R"><span><span class="va">tr</span> <span class="op">=</span> <span class="fl">1</span></span></code></pre></div>
+<p>Next, we retrieve the un-normalized count data from the Seurat
 object, filter low abundance genes and remove genes that are
-uninformative. The output of this function is a list with the first
-element being the processed matrix and the second the list of included
-genes. We will skip the later for this tutorial. Missing values in the
-processed matrix of gene counts are denoted as <code>NA</code>.</p>
+uninformative<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;&lt;em&gt;Filtering genes may reduce the time it takes to run
+the analysis.&lt;/em&gt;&lt;/p&gt;"><sup>2</sup></a>. The output of this function is a list with
+the first element being the processed matrix and the second the list of
+genes in that matrix after filtering. We will skip the later for this
+tutorial. Missing values in the processed matrix of gene counts are
+denoted as <code>NA</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oar_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_preprocess_data.html">oar_preprocess_data</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">sc.data</span>, tr <span class="op">=</span> <span class="va">tr</span>, </span>
@@ -161,10 +163,8 @@ analysis. Defaults to <code>NULL</code>.</li>
 <p>Our scoring relies on identifying co-expressed genes patterns (which
 we call missing data patterns) which is a computationally intensive
 process. We can do this in two ways:</p>
-<ol style="list-style-type: decimal">
-<li>We can look only for exact matches, which is fast, but this rarely
-works as most cells differ by one or more genes.</li>
-</ol>
+<p>First, we can look only for exact matches, which is fast, but this
+rarely works as most cells differ by one or more genes.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mdp_exact</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_exact_missing_data_patterns.html">oar_exact_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Identified 2 non-unique missing data patterns, encompassing 38 genes"</span></span>
@@ -174,32 +174,30 @@ works as most cells differ by one or more genes.</li>
 <span><span class="co">#&gt;     31      7  11668</span></span></code></pre></div>
 <p>Notice that there are still a considerable number of unique patterns,
 and few genes are captured in the repeated patterns.</p>
-<ol start="2" style="list-style-type: decimal">
-<li>Alternatively, we can identify genes with minimal mismatch between
+<p>Alternatively, we can identify genes with minimal mismatch between
 them, but for this we need to first enable R to run in parallel. To
 determine your computers capacity, you can run
-<code><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
+<code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
 available for other processes running in your computer to prevent
 crashing. Using multiple cores is recommended as it will go much faster
-in the identification of the patterns.</li>
-</ol>
+in the identification of the patterns.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; system </span></span>
 <span><span class="co">#&gt;      2</span></span></code></pre></div>
 <p>Now we can select an appropriate number to set up parallel processing
 for this R session. To identify the missing data patterns allowing for
-missmatch, we calculate the hamming distance between all gene expression
-vectors. Internally, the gene vectors are converted to 0 (missing) and 1
-(observed) values. This function needs to have the number of cores
-specified explicitly. We set <code>tolerance</code> to
-<code>TRUE</code>, so the function searches for a tolerance value
-between 0.01 and 0.05 that maximizes for the number of patterns
-detected. This tolerance value is the fraction of mismatch between gene
-vectors that we allow to consider genes as part of the same pattern.</p>
+missmatch, we calculate the hamming distance between all pairs of gene
+expression vectors. Internally, the gene vectors are converted to 0
+(missing) and 1 (observed) values. This function needs to have the
+number of cores specified explicitly. We set <code>tolerance</code> to
+<code>TRUE</code> to search for a tolerance value between 0.01 and 0.05
+that maximizes for the number of patterns detected. This tolerance value
+is the fraction of mismatch between gene vectors that we allow to
+consider genes as part of the same pattern.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mdp_auto_tol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span></span>
-<span>  <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, tolerance <span class="op">=</span> <span class="cn">T</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, tolerance <span class="op">=</span> <span class="cn">T</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="co">#&gt; [1] "This operation may take several minutes"</span></span>
 <span><span class="co">#&gt; [1] "Scanning for optimal tolerance..."</span></span>
@@ -210,16 +208,17 @@ vectors that we allow to consider genes as part of the same pattern.</p>
 <span><span class="co">#&gt; mdp_auto_tol</span></span>
 <span><span class="co">#&gt;      3      6   9102 unique </span></span>
 <span><span class="co">#&gt;   2422    154     13   9117</span></span></code></pre></div>
-<p>Alternatively, we can choose our own tolerance and pass it to the
-function, which will be faster, but may not capture as many patterns.
-Values greater than 0 and lower than 0.1 are recommended.</p>
+<p>If we have previously run the analysis or we wish to tune the
+tolerance to a value outside the automatic range, we can choose our own
+tolerance and pass it to the function, which will be faster, but may not
+capture as many patterns. Values greater than 0 and lower than 0.1 are
+recommended.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, tolerance <span class="op">=</span> <span class="fl">0.1</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, tolerance <span class="op">=</span> <span class="fl">0.1</span>, cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p>In this dataset a tolerance of 0.04 resulted in greater number of
-non-unique missing data patterns, with 3 patterns distinct patters found
-across cells (plus the combination of all genes with non-unique
-patterns)</p>
-<p>We can visualize these results like this:</p>
+non-unique missing data patterns, with 3 distinct patters found across
+cells (plus the combination of all genes with non-unique patterns). We
+can visualize these results like this:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_plot.html">oar_missing_data_plot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp_auto_tol</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Generating plots..."</span></span>
@@ -240,11 +239,11 @@ third of the cells in the data.</p>
 <p>Now we are ready to do a cell-wise estimation of the overlap between
 the gene expression distributions in each detected pattern. When these
 distributions are distinct, we find that the data is not missing at
-random (NOAR), with highly significant p value and an OAR score of less
+random (NOAR), with highly significant p values and an OAR score of less
 than 2. Alternatively, when these distributions overlap, gene expression
-appears more randomly distributed (OAR), has a larger p value and an OAR
-score greater than 2. Critically, our test incorporates both the gene
-expression values and the missing data patterns.</p>
+appears more randomly distributed (OAR), and cells have a larger p value
+and an OAR score greater than 2. Critically, our test incorporates both
+the gene expression values and the missing data patterns.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_base.html">oar_base</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp_auto_tol</span><span class="op">)</span></span>
 <span><span class="va">output</span><span class="op">$</span><span class="va">barcodes</span> <span class="op">=</span> <span class="va">cells</span> <span class="co">#add back our barcodes</span></span>
@@ -278,7 +277,7 @@ are most heterogeneous.</p>
 <div class="section level3">
 <h3 id="visualize-results">4. Visualize results<a class="anchor" aria-label="anchor" href="#visualize-results"></a>
 </h3>
-<p>A higher OAR score is a way to prioritize genes for further analysis.
+<p>A higher OAR score is a way to prioritize cells for further analysis.
 Greater scores indicate distinct cell expression signatures, where high
 scoring cells have different gene co-expression patterns compared to all
 other cells in the test. In this example, we observe that cells with a
@@ -332,7 +331,7 @@ with their biological context. This is more easily achieved within a
 Seurat object with the additional experimental details.</p>
 </div>
 <div class="section level3">
-<h3 id="wrapper-function-and-result-interpretation">5. Wrapper function and result interpretation<a class="anchor" aria-label="anchor" href="#wrapper-function-and-result-interpretation"></a>
+<h3 id="wrapper-functions-and-result-interpretation">5. Wrapper functions and result interpretation<a class="anchor" aria-label="anchor" href="#wrapper-functions-and-result-interpretation"></a>
 </h3>
 <p>We can run this entire process with a single line. The result is the
 Seurat object with the <code>OARscore</code>, <code>KW.pvalue</code>,
@@ -345,12 +344,12 @@ missing data patterns (mdp) they have been included in
 <span>               seurat_v5 <span class="op">=</span> <span class="cn">T</span>, count.filter <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>               blacklisted.genes <span class="op">=</span> <span class="cn">NULL</span>, suffix <span class="op">=</span> <span class="st">""</span>,</span>
 <span>               mismatch <span class="op">=</span> <span class="cn">T</span>, tolerance <span class="op">=</span> <span class="fl">0.04</span>,</span>
-<span>               cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/parallelly/man/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
+<span>               cores <span class="op">=</span> <span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span><span class="op">-</span><span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data = sc.data, seurat_v5 = T, count.filter = 1, blacklisted.genes = NULL, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-11 20:41:35 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2024-12-12 20:12:47 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We set these parameters based on our earlier results and adjusted to
@@ -363,7 +362,7 @@ Defaults to <code>TRUE</code>.</li>
 <code>mismatch</code> controls whether or not to allow for
 flexibility in pattern matching. Defaults to <code>TRUE</code>.</li>
 <li>
-<code>tolerance</code> controls whether the missmatch threshold
+<code>tolerance</code> controls whether the mismatch threshold
 should be determined automatically (between 0.01 and 0.05 hamming
 distances) or if a user supplied threshold should be used. Defaults to
 <code>TRUE</code>, and can take <code>TRUE</code> or a numeric value
@@ -378,17 +377,22 @@ uninformative gene names (i.e. non-conding genes) to exclude from the
 analysis. Defaults to <code>NULL</code>.</li>
 <li>
 <code>suffix</code> Allows you to provide a character string to
-avoid overwritting previous OAR calculations. Defaults to
+avoid overwriting previous OAR calculations. Defaults to
 <code>NULL</code>.</li>
 </ul>
-<p><strong>You can use a similar approach to analyse the data cluster by
-cluster - recommended when you have multiple cell types</strong>. In
-that case, use <code><a href="../reference/oar_by_cluster.html">oar_by_cluster()</a></code>.</p>
+<p>You can use a similar approach to analyse the data cluster by cluster
+- recommended when you have multiple cell types. In that case, use
+<code><a href="../reference/oar_by_cluster.html">oar_by_cluster()</a></code>.</p>
 <div class="section level5">
 <h5 id="interpreting-high-oar-scores">Interpreting high OAR scores<a class="anchor" aria-label="anchor" href="#interpreting-high-oar-scores"></a>
 </h5>
 <p>To explore which cells/clusters have the most heterogeneity, we can
-visualize the results as in a UMAP projection.</p>
+project the scores to our UMAP using <code><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">Seurat::FeaturePlot()</a></code>.
+Notice that cells with a high OAR score in this dataset cluster
+together. In fact, in this case, high OAR scoring cells represent the
+most activated cells in the experiment, as can be seen when we examine
+<em>IFNA1</em>, which is expressed in activated plasmacytoid dendritic
+cells.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: SeuratObject</span></span>
@@ -402,38 +406,27 @@ visualize the results as in a UMAP projection.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     intersect, t</span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">FeaturePlot</a></span><span class="op">(</span></span>
-<span>  <span class="va">sc.data</span>, features <span class="op">=</span> <span class="st">"OARscore"</span>, order <span class="op">=</span> <span class="cn">T</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span>, </span>
-<span>  min.cutoff <span class="op">=</span> <span class="st">"q40"</span>, max.cutoff <span class="op">=</span> <span class="st">"q90"</span><span class="op">)</span></span>
+<span>  <span class="va">sc.data</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OARscore"</span>,<span class="st">"IFNA1"</span><span class="op">)</span>, order <span class="op">=</span> <span class="cn">T</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span>, </span>
+<span>  min.cutoff <span class="op">=</span> <span class="st">"q40"</span>, max.cutoff <span class="op">=</span> <span class="st">"q90"</span>, slot <span class="op">=</span> <span class="st">"counts"</span><span class="op">)</span></span>
 <span><span class="va">p1</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figurefeatureplot_score-1.png" alt="Feature plot of OAR score" width="50%"><p class="caption">
+<img src="figurefeatureplot_score-1.png" alt="Feature plot of OAR score" width="100%"><p class="caption">
 Feature plot of OAR score
-</p>
-</div>
-<p>Notice that cells with a High OAR score in this dataset cluster
-together. In fact, in this case, high OAR scoring cells represent the
-most activated cells in the experiment, as can be seen when we examine
-the expression of a marker gene:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">FeaturePlot</a></span><span class="op">(</span></span>
-<span>  <span class="va">sc.data</span>, features <span class="op">=</span> <span class="st">"IFNA1"</span>, order <span class="op">=</span> <span class="cn">T</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span>, </span>
-<span>  min.cutoff <span class="op">=</span> <span class="st">"q40"</span>, max.cutoff <span class="op">=</span> <span class="st">"q90"</span>, slot <span class="op">=</span> <span class="st">"counts"</span><span class="op">)</span></span>
-<span><span class="va">p2</span></span></code></pre></div>
-<div class="figure" style="text-align: center">
-<img src="figurefeatureplot_genes-1.png" alt="Feature plot of results" width="50%"><p class="caption">
-Feature plot of results
 </p>
 </div>
 <p>Thus, in this dataset we are able to identify highly activated cells
 with a cluster agnostic approach. We provide additional tutorials to
-identify genes associated with a high OAR score. We also provide
-examples of datasets where high scores are associated with biological
-variation that may be removed from the analysis to glean additional
-insights into the populations of cells studied.</p>
+identify genes associated with a high OAR score (see:
+<code><a href="../articles/Gene_expression.html">vignette("Gene_expression")</a></code>). We have also seen datasets
+where high scores are associated with biological variation that may be
+removed from the analysis to glean additional insights into the
+populations of cells studied. These can be achieved by passing
+<code>OARscore</code> to <code>vars.to.regress</code> in
+<code><a href="https://satijalab.org/seurat/reference/SCTransform.html" class="external-link">Seurat::SCTransform()</a></code>.</p>
 </div>
 </div>
 </div>
+
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

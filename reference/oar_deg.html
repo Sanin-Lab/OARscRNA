@@ -68,48 +68,48 @@
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>A Seurat (v5) object or a data.frame with cell barcodes as column names and genes as row names. Seurat object must have a column in metadata with OARscore.</p></dd>
+<dd><p>a Seurat (v5) object or a data.frame with cell barcodes as column names and genes as row names. Seurat object must have a column in metadata with OARscore.</p></dd>
 
 
 <dt id="arg-seurat-v-">seurat_v5<a class="anchor" aria-label="anchor" href="#arg-seurat-v-"></a></dt>
-<dd><p>A Boolean to indicate if supplied data is a Seurat object, default is <code>TRUE</code>. If <code>FALSE</code>, user must supply a score vector.</p></dd>
+<dd><p>a boolean to indicate if supplied data is a Seurat object, default is <code>TRUE</code>. If <code>FALSE</code>, user must supply a score vector.</p></dd>
 
 
 <dt id="arg-score">score<a class="anchor" aria-label="anchor" href="#arg-score"></a></dt>
-<dd><p>A named numeric vector with OARscores to be used in the model. Names should be cell barcodes. Ignored if Seurat object is supplied.</p></dd>
+<dd><p>a named numeric vector with OARscores to be used in the model. Names should be cell barcodes. Ignored if Seurat object is supplied.</p></dd>
 
 
 <dt id="arg-count-filter">count.filter<a class="anchor" aria-label="anchor" href="#arg-count-filter"></a></dt>
-<dd><p>A numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.</p></dd>
+<dd><p>a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.</p></dd>
 
 
 <dt id="arg-splines">splines<a class="anchor" aria-label="anchor" href="#arg-splines"></a></dt>
-<dd><p>A Boolean to indicate if splines should be used to fit model, default is TRUE</p></dd>
+<dd><p>a boolean to indicate if splines should be used to fit model, default is TRUE</p></dd>
 
 
 <dt id="arg-degrees-freedom">degrees.freedom<a class="anchor" aria-label="anchor" href="#arg-degrees-freedom"></a></dt>
-<dd><p>A numeric value indicating the degrees of freedom to calculate splines. Default is 5. Values between 3 and 5 are recommended.</p></dd>
+<dd><p>a numeric value indicating the degrees of freedom to calculate splines. Default is 5. Values between 3 and 5 are recommended.</p></dd>
 
 
 <dt id="arg-blacklisted-genes">blacklisted.genes<a class="anchor" aria-label="anchor" href="#arg-blacklisted-genes"></a></dt>
-<dd><p>A character vector with gene names to be excluded from the analysis. Default is empty.</p></dd>
+<dd><p>a character vector with gene names to be excluded from the analysis. Default is empty.</p></dd>
 
 
 <dt id="arg-auto-threshold">auto.threshold<a class="anchor" aria-label="anchor" href="#arg-auto-threshold"></a></dt>
-<dd><p>A Boolean to indicate if FDR threshold should be calculated from the data, default is TRUE</p></dd>
+<dd><p>a boolean to indicate if FDR threshold should be calculated from the data, default is TRUE</p></dd>
 
 
 <dt id="arg-custom-tr">custom.tr<a class="anchor" aria-label="anchor" href="#arg-custom-tr"></a></dt>
-<dd><p>A numeric value to use as an FDR threshold. Ignored if <code>auto.threshold</code> is set to TRUE.</p></dd>
+<dd><p>a numeric value to use as an FDR threshold. Ignored if <code>auto.threshold</code> is set to TRUE.</p></dd>
 
 
 <dt id="arg-score-name">score.name<a class="anchor" aria-label="anchor" href="#arg-score-name"></a></dt>
-<dd><p>Name of OAR score in dataset, default is "OARscore". If suffix used on previous functions, would need to include full new name here.</p></dd>
+<dd><p>name of OAR score in dataset, default is "OARscore". If suffix used on previous functions, would need to include full new name here.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A dataframe with p-values for genes that significantly contribute to OAR score.</p>
+    <p>A data.frame with p-values for genes that significantly contribute to OAR score.</p>
     </div>
 
     <div class="section level2">
