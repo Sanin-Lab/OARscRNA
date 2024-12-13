@@ -123,7 +123,7 @@ oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
     row_names_side = "left", row_names_gp = grid::gpar(fontsize = 8),
     column_title = "Cells", column_title_side = "top",
     column_title_gp = grid::gpar(fontsize = 8),
-    width = unit(ncol(m)*0.25, "mm"), height = unit(3*nrow(m), "mm"))
+    width = unit(ncol(m)*0.05, "mm"), height = unit(3*nrow(m), "mm"))
   
   # Output #
   return(ht)
