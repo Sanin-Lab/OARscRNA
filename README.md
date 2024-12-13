@@ -63,7 +63,7 @@ This will automatically filter genes with low expression, identify a suitable to
 
 -   If a Seurat object is supplied, the results are added as columns in the `meta.data` slot.
 
-For full details on all parameters, including a step-by-step breakdown of the process, please visit our [documentation](https://davidsanin.github.io/OARscRNA/) or view our vignettes with `browseVignettes(package = "OAR")`.
+For full details on all parameters, including a step-by-step breakdown of the process, please visit our [documentation](https://sanin-lab.github.io/OARscRNA/) or view our vignettes with `browseVignettes(package = "OAR")`.
 
 ## Tutorials and Applications
 
