@@ -125,7 +125,7 @@ in the identification of the patterns.</p>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-12 23:19:54 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2024-12-13 19:25:31 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We deliberately left most parameters as defaults, however we
@@ -220,7 +220,7 @@ like this:</p>
 <span><span class="co">#&gt; [1] "Generating plots..."</span></span>
 <span><span class="va">p3</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figurepatterns_found-1.png" alt="Missing Data Pattern Plot" width="100%"><p class="caption">
+<img src="figurepatterns_found-1.png" alt="Missing Data Pattern Plot" width="50%"><p class="caption">
 Missing Data Pattern Plot
 </p>
 </div>
@@ -229,7 +229,7 @@ conserved patterns allowing for some mismatch, and a fourth which is a
 combination of all genes with unique patterns. Each slice of the bar
 represents a cell, and it is colored based on what percentage of genes
 from that pattern are expressed in each cell. For example, a pattern of
-13 genes is expressed in about a third of cells.</p>
+13 genes is expressed in only about a 10% of cells.</p>
 <p>To get a data.frame of the genes within each pattern, use:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mdp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_missing_pattern_genes.html">get_missing_pattern_genes</a></span><span class="op">(</span><span class="va">oar_obj</span><span class="op">)</span></span></code></pre></div>
@@ -292,7 +292,7 @@ object by setting <code>seurat_v5</code> to <code>FALSE</code>.</p>
 <span><span class="co">#&gt; Warning in oar(data, seurat_v5 = FALSE, mismatch = TRUE, tolerance = TRUE, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-12 23:24:23 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2024-12-13 19:30:01 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="va">...</span></span>
