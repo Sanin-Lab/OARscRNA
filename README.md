@@ -43,11 +43,11 @@ To calculate the OAR score we:
 
 To install the latest version of our package, run:
 
-`devtools::install_github("davidsanin/OARscRNA")`
+`devtools::install_github("Sanin-Lab/OARscRNA")`
 
 If you want to install our vignettes (takes a few minutes!), try:
 
-`devtools::install_github("davidsanin/OARscRNA", build_vignettes = TRUE)`
+`devtools::install_github("Sanin-Lab/OARscRNA", build_vignettes = TRUE)`
 
 ## Usage
 
