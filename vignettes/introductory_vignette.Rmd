@@ -82,7 +82,7 @@ Once you have the seurat version 5 object loaded, you can run the oar function. 
 To determine your computers capacity, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as it will go much faster in the identification of the patterns.
 
 ```{r run basic oar, output.lines=5}
-oar_obj <- oar(data_obj, cores = parallelly::availableCores()-2)
+oar_obj <- oar(data_obj, cores = 1)
 ```
 
 We deliberately left most parameters as defaults, however we recommend you explore each to familiarize yourself with their impact on the result. Some critical parameters to consider include:
@@ -107,7 +107,7 @@ Additionally, genes are annotated by which missing data patterns (mdp) they have
 OAR scores are typically more informative when distinguishing among cells of the same type. When working with a dataset with diverse cell types, it can be helpful to run the function by cluster.
 
 ```{r run oar by cluster, output.lines=5, eval = FALSE}
-oar_obj_bycluster <- oar_by_cluster(data_obj, cores = parallelly::availableCores()-2)
+oar_obj_bycluster <- oar_by_cluster(data_obj, cores = 1)
 ```
 
 ### Visualize Results
@@ -172,7 +172,7 @@ Once you have data loaded, you can run the oar function. In addition to the inpu
 ```{r run OAR on matrix, output.lines=5}
 oar_data<- oar(data, seurat_v5 = FALSE, 
                mismatch = TRUE, tolerance = TRUE, 
-               cores = parallelly::availableCores()-2)
+               cores = 1)
 oar_data
 ```
 

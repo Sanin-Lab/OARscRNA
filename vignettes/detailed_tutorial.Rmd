@@ -121,14 +121,14 @@ Now we can select an appropriate number to set up parallel processing for this R
 
 ```{r mdp with automatic tolerance, output.lines=5}
 mdp_auto_tol <- oar_missing_data_patterns(
-  oar_data[[1]], tolerance = T, cores = parallelly::availableCores()-2)
+  oar_data[[1]], tolerance = T, cores = 1)
 table(mdp_auto_tol)
 ```
 
 If we have previously run the analysis or we wish to tune the tolerance to a value outside the automatic range, we can choose our own tolerance and pass it to the function, which will be faster, but may not capture as many patterns. Values greater than 0 and lower than 0.1 are recommended.
 
 ```{r mdp with specific tolerance, output.lines=5, eval = FALSE}
-oar_missing_data_patterns(oar_data[[1]], tolerance = 0.1, cores = parallelly::availableCores()-2)
+oar_missing_data_patterns(oar_data[[1]], tolerance = 0.1, cores = 1)
 ```
 
 In this dataset a tolerance of 0.04 resulted in greater number of non-unique missing data patterns, with 3 distinct patters found across cells (plus the combination of all genes with non-unique patterns). We can visualize these results like this:
@@ -214,7 +214,7 @@ sc.data <- oar(data = sc.data,
                seurat_v5 = T, count.filter = 1,
                blacklisted.genes = NULL, suffix = "",
                mismatch = T, tolerance = 0.04,
-               cores = parallelly::availableCores()-2)
+               cores = 1)
 ```
 
 We set these parameters based on our earlier results and adjusted to the data provided:
