@@ -124,7 +124,8 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   print("Collecting results")
   colnames(output)[-ncol(output)] <- paste0(colnames(output)[-ncol(output)],suffix)
   
-  print(paste0("Analysis completed succesully in ", round((Sys.time()-ot)/60,2)," min!"))
+  print("Analysis completed succesully!")
+  print(round((Sys.time()-ot),2))
   
   #output
   if(seurat_v5){
