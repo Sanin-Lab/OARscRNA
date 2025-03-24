@@ -35,10 +35,10 @@ oar_missing_data_patterns <- function (data, tolerance = TRUE, cores = 1) {
     while(test){
       mdp.out <- mdp
       mdp <- oar_missing_data_graph(dm, tol = i)
-      lm.out <- OAR::oar_base(data, mdp) %>% 
-        select("x"="pct.missing","y"="KW.BH.pvalue") %>% 
-        mutate(y = -log10(y)) %>% 
-        lm(formula = y~x) %>% 
+      lm.out <- oar_base(data, mdp) %>% 
+        dplyr::select("x"="pct.missing","y"="KW.BH.pvalue") %>% 
+        dplyr::mutate(y = -log10(y)) %>% 
+        stats::lm(formula = y~x) %>% 
         summary()
       test <- lm.out$coefficients[2,4] > 0.1
       if(!test && i == 0.01){mdp.out <- mdp}

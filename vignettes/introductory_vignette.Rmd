@@ -169,8 +169,8 @@ data <- readRDS(file = "pdcs_matrix.rds")
 Once you have data loaded, you can run the oar function. In addition to the input data we must specify that we are not starting with a Seurat object by setting `seurat_v5` to `FALSE`.
 
 ```{r run OAR on matrix, output.lines=5}
-oar_data<- oar(data, seurat_v5 = FALSE, 
-               mismatch = TRUE, tolerance = TRUE, 
+oar_data<- oar(data, seurat_v5 = FALSE,
+               tolerance = TRUE, 
                cores = 1)
 oar_data
 ```

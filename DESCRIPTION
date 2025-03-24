@@ -46,5 +46,5 @@ Suggests:
     waldo
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-URL: https://github.com/Sanin-Lab/OARscRNA, https://Sanin-Lab.github.io/OARscRNA/
+URL: https://github.com/Sanin-Lab/OARscRNA, https://Sanin-Lab.github.io/OARscRNA/, https://sanin-lab.github.io/OARscRNA/
 BugReports: https://github.com/Sanin-Lab/OARscRNA/issues
