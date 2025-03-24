@@ -57,7 +57,7 @@ library(OAR)
 
 # Overview
 
-In this tutorial we will walk you through all the steps of generating and analyzing OAR scores from your single cell dataset. We will begin with a Seurat object with plasmacytoid dendritic cells that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/vignettes).
+In this tutorial we will walk you through all the steps of generating and analyzing OAR scores from your single cell dataset. We will begin with a Seurat object with plasmacytoid dendritic cells that you can download from our [github repository](https://github.com/Sanin-Lab/OARscRNA/tree/main/vignettes).
 
 The process starting from a gene expression matrix is very similar and you should be able to adapt this workflow to that input. Skip a few lines down to the **data pre-processing step** to run the tutorial that way.
 

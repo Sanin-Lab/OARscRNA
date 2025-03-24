@@ -1,4 +1,4 @@
-# OARscRNA [![R build status](https://github.com/davidsanin/OARscRNA/workflows/build-check/badge.svg)](https://github.com/davidsanin/OARscRNA/actions?workflow=build-check) <img src="man/figures/logo.png" align="right" height="139"/>
+# OARscRNA [![R build status](https://github.com/Sanin-Lab/OARscRNA/workflows/build-check/badge.svg)](https://github.com/Sanin-Lab/OARscRNA/actions?workflow=build-check) <img src="man/figures/logo.png" align="right" height="139"/>
 
 ## Heterogeneity scoring on scRNAseq data based on missingness
 

@@ -13,11 +13,11 @@ The OAR (observed at random) score reveals cellular heterogeneity, allowing **ce
 
 ## Motivation
 
-scRNAseq data is very sparse (50-90% of expression values are 0). Sparsity is *generally* attributed to technical limitations associated with capturing RNA molecules from individual cells. **Some 0s are expected**, and are a consequence of the Gamma-Poisson distribution of count data[^readme-1], whereas “Drop-out” (when 0s occur where positive counts are expected) is a problem associated with specific technologies (UMI- vs. nonUMI-based)[^readme-2].
+scRNAseq data is very sparse (50-90% of expression values are 0). Sparsity is *generally* attributed to technical limitations associated with capturing RNA molecules from individual cells. **Some 0s are expected**, and are a consequence of the Gamma-Poisson distribution of count data[^index-1], whereas “Drop-out” (when 0s occur where positive counts are expected) is a problem associated with specific technologies (UMI- vs. nonUMI-based)[^index-2].
 
-[^readme-1]: Svensson, V. (2020). Droplet scRNA-seq is not zero-inflated [DOI: 10.1038/s41587-019-0379-5](https://www.nature.com/articles/s41587-019-0379-5)
+[^index-1]: Svensson, V. (2020). Droplet scRNA-seq is not zero-inflated [DOI: 10.1038/s41587-019-0379-5](https://www.nature.com/articles/s41587-019-0379-5)
 
-[^readme-2]: Cao, Y. *et. al.* (2021). UMI or not UMI, that is the question for scRNA-seq zero-inflation [DOI: 10.1038/s41587-020-00810-6](https://www.nature.com/articles/s41587-020-00810-6)
+[^index-2]: Cao, Y. *et. al.* (2021). UMI or not UMI, that is the question for scRNA-seq zero-inflation [DOI: 10.1038/s41587-020-00810-6](https://www.nature.com/articles/s41587-020-00810-6)
 
 Sparsity has been used to:
 

@@ -64,7 +64,7 @@ There are two possible starting points:
 1.  Seurat v5 Object
 2.  Gene Expression Matrix
 
-Here we will walk you through steps of the analysis, beginning with a gene expression matrix from plasmacytoid dendritic cell dataset that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/vignettes).
+Here we will walk you through steps of the analysis, beginning with a gene expression matrix from plasmacytoid dendritic cell dataset that you can download from our [github repository](https://github.com/Sanin-Lab/OARscRNA/tree/main/vignettes).
 
 ## Starting from v5 Seurat Object
 

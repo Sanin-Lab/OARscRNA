@@ -57,7 +57,7 @@ library(OAR)
 
 # Overview
 
-In this vignette we will explore what genes are associated with increased OAR scores. We will use our toy plasmacytoid dendritic cell dataset that you can download from our [github repository](https://github.com/davidsanin/OARscRNA/tree/main/vignettes).
+In this vignette we will explore what genes are associated with increased OAR scores. We will use our toy plasmacytoid dendritic cell dataset that you can download from our [github repository](https://github.com/Sanin-Lab/OARscRNA/tree/main/vignettes).
 
 ## 1. Calculating OAR scores
 
