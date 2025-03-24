@@ -9,7 +9,7 @@ oar_missing_data_patterns(data, tolerance = TRUE, cores = 1)
 \arguments{
 \item{data}{a minimal dataset ready for processing.}
 
-\item{tolerance}{a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
+\item{tolerance}{a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
 
 \item{cores}{a numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities.}
 }
@@ -25,6 +25,6 @@ Identify missing data patterns allowing for mismatch
 mdp <- oar_missing_data_patterns(data, tolerance = T)
 
 ##User defined
-mdp <- oar_missing_data_patterns(data, tolerance = 0.05)
+mdp <- oar_missing_data_patterns(data, tolerance = 0.01)
 }
 }

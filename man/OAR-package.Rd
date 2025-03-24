@@ -13,9 +13,9 @@ OAR (observed at random) score is a measure of heterogeneity among cells, allowi
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/davidsanin/OARscRNA}
-  \item \url{https://davidsanin.github.io/OARscRNA/}
-  \item Report bugs at \url{https://github.com/davidsanin/OARscRNA/issues}
+  \item \url{https://github.com/Sanin-Lab/OARscRNA}
+  \item \url{https://Sanin-Lab.github.io/OARscRNA/}
+  \item Report bugs at \url{https://github.com/Sanin-Lab/OARscRNA/issues}
 }
 
 }

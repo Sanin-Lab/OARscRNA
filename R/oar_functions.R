@@ -41,8 +41,7 @@ oar_base <- function (data, mdp) {
 #' @param count.filter a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.
 #' @param blacklisted.genes a character vector with gene names to be excluded from the analysis. Default is empty.
 #' @param suffix a string to append to the output variables. Default is empty
-#' @param mismatch a boolean to determine to allow minimal mismatch in missing data pattern identification. Default `TRUE`
-#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
+#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
 #' @param cores a numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities. Default is 1.
 #'
 #' @return A Seurat object with OAR stats added into meta data, or a matrix with OAR stats. 
@@ -54,14 +53,13 @@ oar_base <- function (data, mdp) {
 #' }
 #' 
 oar <- function (data, seurat_v5 = TRUE, count.filter = 1, 
-                 blacklisted.genes = NULL, suffix = "", 
-                 mismatch = TRUE, tolerance = TRUE, cores = 1) {
+                 blacklisted.genes = NULL, suffix = "",
+                 tolerance = TRUE, cores = 1) {
   
   #Check parameters were correctly supplied
   if(!is.numeric(count.filter)){stop("count.filter must be numeric\n")}
   if(!is.character(suffix)){stop("suffix must be a string\n")}
   if(!is.logical(tolerance)){if(!is.numeric(tolerance))stop("tolerance must be logical or numeric\n")}
-  if(!is.logical(mismatch)){stop("mismatch must be TRUE or FALSE\n")}
   if(!is.logical(seurat_v5)){stop("seurat_v5 must be TRUE or FALSE\n")}
   if(!is.null(blacklisted.genes)){if(!is.character(blacklisted.genes))stop("Supplied blacklisted genes are not characters\n")}
   
@@ -72,7 +70,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
     warning("Minimum fraction of cells expressing any given gene should be greater than 0\n")
   }
   if(is.numeric(tolerance)){
-    if (mismatch && tolerance == 0) {
+    if (tolerance == 0) {
       warning("Tolerance should be greater than 0\n")
     }else if(tolerance >= 0.1) {
       warning("Tolerances greater than 0.10 are not recommended\n")
@@ -105,12 +103,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   
   #Identify missing data patterns
   print("Identifying missing data patterns...")
-  if(mismatch){
-    mdp <- oar_missing_data_patterns(data = data, cores = cores, tolerance = tolerance)
-  }else{
-    mdp <- oar_exact_missing_data_patterns(data = data)
-  }
-  
+  mdp <- oar_missing_data_patterns(data = data, cores = cores, tolerance = tolerance)
   
   #Run missingness test
   print("Calculating scores")
@@ -151,8 +144,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
 #' @param count.filter a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.
 #' @param blacklisted.genes a character vector with gene names to be excluded from the analysis. Default is empty.
 #' @param suffix a string to append to the output variables. Default is empty
-#' @param mismatch a boolean to determine to allow minimal mismatch in missing data pattern identification. Default `TRUE`
-#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
+#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
 #' @param cores a numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities.
 #'
 #' @return a Seurat object with OAR stats added into meta data
@@ -164,7 +156,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
 #' }
 oar_by_cluster <- function (data, count.filter = 1,
                             blacklisted.genes = NULL, suffix = "",
-                            mismatch = TRUE, tolerance = TRUE,
+                            tolerance = TRUE,
                             cores = 1) {
   
   print("Splitting data by cluster...")
@@ -174,7 +166,7 @@ oar_by_cluster <- function (data, count.filter = 1,
   #run oar on each object
   data_oar <- lapply(data_list, oar, count.filter = count.filter,
                      blacklisted.genes = blacklisted.genes, 
-                     suffix = suffix, mismatch = mismatch, 
+                     suffix = suffix, 
                      tolerance = tolerance, cores = cores)
   
   #combine objects back together

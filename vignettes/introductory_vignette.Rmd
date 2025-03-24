@@ -88,7 +88,6 @@ oar_obj <- oar(data_obj, cores = 1)
 We deliberately left most parameters as defaults, however we recommend you explore each to familiarize yourself with their impact on the result. Some critical parameters to consider include:
 
 -   `seurat_v5` confirms the type of data being used. Defaults to `TRUE`.
--   `mismatch` controls whether or not to allow for flexibility in pattern matching. Defaults to `TRUE`.
 -   `tolerance` controls whether the mismatch threshold should be determined automatically (between 0.01 and 0.05 hamming distances) or if a user supplied threshold should be used. Defaults to `TRUE`, and can take `TRUE` or a numeric value smaller than 1.
 -   `count.filter` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
 -   `blacklisted.genes` allows you to provide a vector of uninformative gene names (i.e. non-coding genes) to exclude from the analysis. Defaults to `NULL`.

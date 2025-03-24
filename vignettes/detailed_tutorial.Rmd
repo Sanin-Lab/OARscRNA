@@ -100,24 +100,13 @@ For a full description of each parameter consult the documentation. Briefly:
 
 ## 2. Identifying Missing Data Patterns
 
-Our scoring relies on identifying co-expressed genes patterns (which we call missing data patterns) which is a computationally intensive process. We can do this in two ways:
-
-First, we can look only for exact matches, which is fast, but this rarely works as most cells differ by one or more genes.
-
-```{r extact matches, output.lines=5}
-mdp_exact <- oar_exact_missing_data_patterns(oar_data[[1]])
-table(mdp_exact)
-```
-
-Notice that there are still a considerable number of unique patterns, and few genes are captured in the repeated patterns.
-
-Alternatively, we can identify genes with minimal mismatch between them, but for this we need to first enable R to run in parallel. To determine your computers capacity, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as it will go much faster in the identification of the patterns.
+Our scoring relies on identifying co-expressed genes patterns (which we call missing data patterns) which is a computationally intensive process. To do this, we can identify genes with minimal mismatch between them, but we need to first enable R to run in parallel. To determine your computers capacity, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as it will go much faster in the identification of the patterns.
 
 ```{r parallel cores, output.lines=5}
 parallelly::availableCores()
 ```
 
-Now we can select an appropriate number to set up parallel processing for this R session. To identify the missing data patterns allowing for missmatch, we calculate the hamming distance between all pairs of gene expression vectors. Internally, the gene vectors are converted to 0 (missing) and 1 (observed) values. This function needs to have the number of cores specified explicitly. We set `tolerance` to `TRUE` to search for a tolerance value between 0.01 and 0.05 that maximizes for the number of patterns detected. This tolerance value is the fraction of mismatch between gene vectors that we allow to consider genes as part of the same pattern.
+Now we can select an appropriate number to set up parallel processing for this R session. To identify the missing data patterns allowing for mismatch, we calculate the hamming distance between all pairs of gene expression vectors. Internally, the gene vectors are converted to 0 (missing) and 1 (observed) values. This function needs to have the number of cores specified explicitly. We set `tolerance` to `TRUE` to search for a tolerance value between 0.01 and 0.05. This function will search for a value that does not introduce biases in the pattern matching, which occurs with tolerance values greater than 0.05. This tolerance value is the fraction of mismatch between gene vectors that we allow to consider genes as part of the same pattern.
 
 ```{r mdp with automatic tolerance, output.lines=5}
 mdp_auto_tol <- oar_missing_data_patterns(
@@ -125,13 +114,13 @@ mdp_auto_tol <- oar_missing_data_patterns(
 table(mdp_auto_tol)
 ```
 
-If we have previously run the analysis or we wish to tune the tolerance to a value outside the automatic range, we can choose our own tolerance and pass it to the function, which will be faster, but may not capture as many patterns. Values greater than 0 and lower than 0.1 are recommended.
+If we have previously run the analysis or we wish to tune the tolerance to a value outside the automatic range, we can choose our own tolerance and pass it to the function, which will be faster, but may not capture as many patterns. Values greater than 0 and lower than 0.05 are recommended.
 
 ```{r mdp with specific tolerance, output.lines=5, eval = FALSE}
-oar_missing_data_patterns(oar_data[[1]], tolerance = 0.1, cores = 1)
+oar_missing_data_patterns(oar_data[[1]], tolerance = 0.05, cores = 1)
 ```
 
-In this dataset a tolerance of 0.04 resulted in greater number of non-unique missing data patterns, with 3 distinct patters found across cells (plus the combination of all genes with non-unique patterns). We can visualize these results like this:
+In this dataset a tolerance of 0.02 produced the best results, with 3 distinct patters found across cells (plus the combination of all genes with non-unique patterns). We can visualize these results like this:
 
 ```{r patterns_found_mdp, out.width="50%", fig.cap="Missing Data Pattern Plot"}
 p3 <- oar_missing_data_plot(data = oar_data[[1]], mdp = mdp_auto_tol, seurat_v5 = FALSE)
@@ -213,15 +202,14 @@ We can run this entire process with a single line. The result is the Seurat obje
 sc.data <- oar(data = sc.data, 
                seurat_v5 = T, count.filter = 1,
                blacklisted.genes = NULL, suffix = "",
-               mismatch = T, tolerance = 0.04,
+               tolerance = 0.02,
                cores = 1)
 ```
 
 We set these parameters based on our earlier results and adjusted to the data provided:
 
 -   `seurat_v5` confirms the type of data being used. Defaults to `TRUE`.
--   `mismatch` controls whether or not to allow for flexibility in pattern matching. Defaults to `TRUE`.
--   `tolerance` controls whether the mismatch threshold should be determined automatically (between 0.01 and 0.05 hamming distances) or if a user supplied threshold should be used. Defaults to `TRUE`, and can take `TRUE` or a numeric value smaller than 1. Here we set it to 0.04 based on our results above.
+-   `tolerance` controls whether the mismatch threshold should be determined automatically (between 0.01 and 0.05 hamming distances) or if a user supplied threshold should be used. Defaults to `TRUE`, and can take `TRUE` or a numeric value smaller than 1. Here we set it to 0.02 based on our results above.
 -   `count.filter` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
 -   `blacklisted.genes` Allows you to provide a vector of uninformative gene names (i.e. non-conding genes) to exclude from the analysis. Defaults to `NULL`.
 -   `suffix` Allows you to provide a character string to avoid overwriting previous OAR calculations. Defaults to `NULL`.
@@ -240,4 +228,4 @@ p1 <- FeaturePlot(
 p1
 ```
 
-Thus, in this dataset we are able to identify highly activated cells with a cluster agnostic approach. We provide additional tutorials to identify genes associated with a high OAR score (see: `vignette("Gene_expression")`). We have also seen datasets where high scores are associated with biological variation that may be removed from the analysis to glean additional insights into the populations of cells studied. These can be achieved by passing `OARscore` to `vars.to.regress` in `Seurat::SCTransform()`. 
+Thus, in this dataset we are able to identify highly activated cells with a cluster agnostic approach. We provide additional tutorials to identify genes associated with a high OAR score (see: `vignette("Gene_expression")`). We have also seen datasets where high scores are associated with biological variation that may be removed from the analysis to glean additional insights into the populations of cells studied. These can be achieved by passing `OARscore` to `vars.to.regress` in `Seurat::SCTransform()`.

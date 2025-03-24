@@ -9,7 +9,6 @@ oar_by_cluster(
   count.filter = 1,
   blacklisted.genes = NULL,
   suffix = "",
-  mismatch = TRUE,
   tolerance = TRUE,
   cores = 1
 )
@@ -23,9 +22,7 @@ oar_by_cluster(
 
 \item{suffix}{a string to append to the output variables. Default is empty}
 
-\item{mismatch}{a boolean to determine to allow minimal mismatch in missing data pattern identification. Default \code{TRUE}}
-
-\item{tolerance}{a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted to maximize pattern detection, while minimizing mismatch. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
+\item{tolerance}{a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
 
 \item{cores}{a numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities.}
 }
