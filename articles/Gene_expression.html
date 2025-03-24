@@ -80,15 +80,13 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Sanin-Lab/OARscRNA" class="external-link">OAR</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
-<span><span class="co">#&gt;   object 'type_sum.accel' not found</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Sanin-Lab/OARscRNA" class="external-link">OAR</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>In this vignette we will explore what genes are associated with
 increased OAR scores. We will use our toy plasmacytoid dendritic cell
-dataset that you can download from our <a href="https://github.com/davidsanin/OARscRNA/tree/main/vignettes" class="external-link">github
+dataset that you can download from our <a href="https://github.com/Sanin-Lab/OARscRNA/tree/main/vignettes" class="external-link">github
 repository</a>.</p>
 <div class="section level3">
 <h3 id="calculating-oar-scores">1. Calculating OAR scores<a class="anchor" aria-label="anchor" href="#calculating-oar-scores"></a>
@@ -103,8 +101,11 @@ function. The result is a Seurat object with <code>OARscore</code>,
 <span><span class="co">#&gt; Loading required package: SeuratObject</span></span>
 <span><span class="co">#&gt; Loading required package: sp</span></span>
 <span><span class="co">#&gt; 'SeuratObject' was built under R 4.4.0 but the current version is</span></span>
-<span><span class="co">#&gt; 4.4.2; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
+<span><span class="co">#&gt; 4.4.3; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
 <span><span class="co">#&gt; for R may have changed</span></span>
+<span><span class="co">#&gt; 'SeuratObject' was built with package 'Matrix' 1.7.1 but the current</span></span>
+<span><span class="co">#&gt; version is 1.7.2; it is recomended that you reinstall 'SeuratObject' as</span></span>
+<span><span class="co">#&gt; the ABI for 'Matrix' may have changed</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'SeuratObject'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
@@ -113,13 +114,13 @@ function. The result is a Seurat object with <code>OARscore</code>,
 <span><span class="va">sc.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"pdcs.rds"</span><span class="op">)</span>, </span>
 <span>               seurat_v5 <span class="op">=</span> <span class="cn">T</span>, count.filter <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>               blacklisted.genes <span class="op">=</span> <span class="cn">NULL</span>, suffix <span class="op">=</span> <span class="st">""</span>,</span>
-<span>               mismatch <span class="op">=</span> <span class="cn">T</span>, tolerance <span class="op">=</span> <span class="fl">0.04</span>,</span>
+<span>               tolerance <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data = readRDS(file = "pdcs.rds"), seurat_v5 = T, count.filter = 1, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-18 18:20:33 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-03-24 23:16:18 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>To explore which cells/clusters have the most heterogeneity, we can
@@ -162,13 +163,13 @@ computing.</p>
 <span>    splines <span class="op">=</span> <span class="cn">TRUE</span>, degrees.freedom <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>    auto.threshold <span class="op">=</span> <span class="cn">TRUE</span>, custom.tr <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-18 18:25:10 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-03-24 23:20:23 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "FDR threshold set to:"</span></span>
 <span><span class="co">#&gt; [1] 1e-20</span></span>
 <span><span class="co">#&gt; Warning in oar_deg(data = sc.data, seurat_v5 = T, score.name = "OARscore", : Using splines increases calculation time by 3-5x</span></span>
 <span><span class="co">#&gt; [1] "Analysis completed at:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-18 18:26:05 UTC"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "2025-03-24 23:21:14 UTC"</span></span></code></pre></div>
 <p>A brief explanation of these parameters is presented here:</p>
 <ul>
 <li>
@@ -217,15 +218,15 @@ filtered genes:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oar_deg</span></span>
 <span><span class="co">#&gt;              name          pval      adj_pval f_statistic df1      df2 lfc</span></span>
-<span><span class="co">#&gt; 1        PPP1R15A 1.709645e-124 1.993275e-120   149.13695   5 1260.445  NA</span></span>
-<span><span class="co">#&gt; 2           HSPB1  2.367341e-88  1.380041e-84    99.27716   5 1260.445  NA</span></span>
-<span><span class="co">#&gt; 3            EIF1  3.799916e-75  1.476774e-71    82.62000   5 1260.445  NA</span></span>
-<span><span class="co">#&gt; 4             UBC  2.705748e-73  7.886580e-70    80.34564   5 1260.445  NA</span></span>
-<span><span class="co">#&gt; 5             NMI  1.033700e-68  2.410381e-65    74.78421   5 1260.445  NA</span></span>
-<span><span class="co">#&gt; 6          DNAJC7  1.504859e-68  2.924191e-65    74.58791   5 1260.445  NA</span></span>
-<span><span class="co">#&gt; 7             B2M  2.871111e-62  4.782041e-59    67.11493   5 1260.445  NA</span></span>
-<span><span class="co">#&gt; 8          PMAIP1  2.172256e-61  3.165791e-58    66.08239   5 1260.445  NA</span></span>
-<span><span class="co">#&gt; 9           SAR1A  1.682092e-59  2.179057e-56    63.87394   5 1260.445  NA</span></span>
+<span><span class="co">#&gt; 1        PPP1R15A 8.704883e-205 1.014902e-200   285.31517   5 1271.604  NA</span></span>
+<span><span class="co">#&gt; 2             NMI 4.539949e-137 2.646563e-133   167.66935   5 1271.604  NA</span></span>
+<span><span class="co">#&gt; 3          PMAIP1 1.074546e-129 4.176045e-126   156.50825   5 1271.604  NA</span></span>
+<span><span class="co">#&gt; 4            OASL 3.000084e-124 8.744495e-121   148.45375   5 1271.604  NA</span></span>
+<span><span class="co">#&gt; 5          MAP3K8 2.792175e-112 6.510794e-109   131.29641   5 1271.604  NA</span></span>
+<span><span class="co">#&gt; 6          DNAJC7 7.296877e-103  1.417905e-99   118.30557   5 1271.604  NA</span></span>
+<span><span class="co">#&gt; 7           SAR1A  2.137626e-94  3.560368e-91   106.99409   5 1271.604  NA</span></span>
+<span><span class="co">#&gt; 8             UBC  2.916147e-92  4.249919e-89   104.19558   5 1271.604  NA</span></span>
+<span><span class="co">#&gt; 9           TGIF1  3.762956e-92  4.874701e-89   104.05102   5 1271.604  NA</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>For a full description of each column, visit the
 <code>glmGamPoi</code> documentation. For our purposes, the

@@ -80,16 +80,14 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Sanin-Lab/OARscRNA" class="external-link">OAR</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
-<span><span class="co">#&gt;   object 'type_sum.accel' not found</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Sanin-Lab/OARscRNA" class="external-link">OAR</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>In this tutorial we will walk you through all the steps of generating
 and analyzing OAR scores from your single cell dataset. We will begin
 with a Seurat object with plasmacytoid dendritic cells that you can
-download from our <a href="https://github.com/davidsanin/OARscRNA/tree/main/vignettes" class="external-link">github
+download from our <a href="https://github.com/Sanin-Lab/OARscRNA/tree/main/vignettes" class="external-link">github
 repository</a>.</p>
 <p>The process starting from a gene expression matrix is very similar
 and you should be able to adapt this workflow to that input. Skip a few
@@ -164,64 +162,52 @@ analysis. Defaults to <code>NULL</code>.</li>
 </h3>
 <p>Our scoring relies on identifying co-expressed genes patterns (which
 we call missing data patterns) which is a computationally intensive
-process. We can do this in two ways:</p>
-<p>First, we can look only for exact matches, which is fast, but this
-rarely works as most cells differ by one or more genes.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mdp_exact</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_exact_missing_data_patterns.html">oar_exact_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Identified 2 non-unique missing data patterns, encompassing 38 genes"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mdp_exact</span><span class="op">)</span></span>
-<span><span class="co">#&gt; mdp_exact</span></span>
-<span><span class="co">#&gt;       Pattern 1       Pattern 2 Unique patterns </span></span>
-<span><span class="co">#&gt;              31               7           11668</span></span></code></pre></div>
-<p>Notice that there are still a considerable number of unique patterns,
-and few genes are captured in the repeated patterns.</p>
-<p>Alternatively, we can identify genes with minimal mismatch between
-them, but for this we need to first enable R to run in parallel. To
-determine your computers capacity, you can run
+process. To do this, we can identify genes with minimal mismatch between
+them, but we need to first enable R to run in parallel. To determine
+your computers capacity, you can run
 <code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
 available for other processes running in your computer to prevent
 crashing. Using multiple cores is recommended as it will go much faster
 in the identification of the patterns.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; system </span></span>
 <span><span class="co">#&gt;      2</span></span></code></pre></div>
 <p>Now we can select an appropriate number to set up parallel processing
 for this R session. To identify the missing data patterns allowing for
-missmatch, we calculate the hamming distance between all pairs of gene
+mismatch, we calculate the hamming distance between all pairs of gene
 expression vectors. Internally, the gene vectors are converted to 0
 (missing) and 1 (observed) values. This function needs to have the
 number of cores specified explicitly. We set <code>tolerance</code> to
-<code>TRUE</code> to search for a tolerance value between 0.01 and 0.05
-that maximizes for the number of patterns detected. This tolerance value
-is the fraction of mismatch between gene vectors that we allow to
-consider genes as part of the same pattern.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code>TRUE</code> to search for a tolerance value between 0.01 and 0.05.
+This function will search for a value that does not introduce biases in
+the pattern matching, which occurs with tolerance values greater than
+0.05. This tolerance value is the fraction of mismatch between gene
+vectors that we allow to consider genes as part of the same pattern.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mdp_auto_tol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span></span>
 <span>  <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, tolerance <span class="op">=</span> <span class="cn">T</span>, cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="co">#&gt; [1] "This operation may take several minutes"</span></span>
 <span><span class="co">#&gt; [1] "Scanning for optimal tolerance..."</span></span>
-<span><span class="co">#&gt; [1] "Identified 3 non-unique missing data patterns"</span></span>
-<span><span class="co">#&gt; [1] "Tolerance set to 0.04"</span></span>
+<span><span class="co">#&gt; [1] "Tolerance set to 0.02"</span></span>
+<span><span class="co">#&gt; [1] "Identified 2 non-unique missing data patterns"</span></span>
 <span><span class="va">...</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mdp_auto_tol</span><span class="op">)</span></span>
 <span><span class="co">#&gt; mdp_auto_tol</span></span>
-<span><span class="co">#&gt;       Pattern 1       Pattern 2       Pattern 3 Unique patterns </span></span>
-<span><span class="co">#&gt;            2422             154              13            9117</span></span></code></pre></div>
+<span><span class="co">#&gt;       Pattern 1       Pattern 2 Unique patterns </span></span>
+<span><span class="co">#&gt;               2             108           11596</span></span></code></pre></div>
 <p>If we have previously run the analysis or we wish to tune the
 tolerance to a value outside the automatic range, we can choose our own
 tolerance and pass it to the function, which will be faster, but may not
-capture as many patterns. Values greater than 0 and lower than 0.1 are
+capture as many patterns. Values greater than 0 and lower than 0.05 are
 recommended.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, tolerance <span class="op">=</span> <span class="fl">0.05</span>, cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>In this dataset a tolerance of 0.02 produced the best results, with 3
+distinct patters found across cells (plus the combination of all genes
+with non-unique patterns). We can visualize these results like this:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, tolerance <span class="op">=</span> <span class="fl">0.1</span>, cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p>In this dataset a tolerance of 0.04 resulted in greater number of
-non-unique missing data patterns, with 3 distinct patters found across
-cells (plus the combination of all genes with non-unique patterns). We
-can visualize these results like this:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_plot.html">oar_missing_data_plot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp_auto_tol</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Generating plots..."</span></span>
 <span><span class="va">p3</span></span></code></pre></div>
@@ -246,15 +232,15 @@ than 2. Alternatively, when these distributions overlap, gene expression
 appears more randomly distributed (OAR), and cells have a larger p value
 and an OAR score greater than 2. Critically, our test incorporates both
 the gene expression values and the missing data patterns.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_base.html">oar_base</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp_auto_tol</span><span class="op">)</span></span>
 <span><span class="va">output</span><span class="op">$</span><span class="va">barcodes</span> <span class="op">=</span> <span class="va">cells</span> <span class="co">#add back our barcodes</span></span>
 <span><span class="va">output</span></span>
-<span><span class="co">#&gt;          OARscore     KW.pvalue  KW.BH.pvalue pct.missing             barcodes</span></span>
-<span><span class="co">#&gt; 1     0.282688134 8.168498e-107 1.091768e-106    79.46352 AAACCTGAGAACAATC-1_1</span></span>
-<span><span class="co">#&gt; 2     0.914667119  2.961274e-97  3.405055e-97    87.92927 AAACCTGAGGTGCTAG-1_1</span></span>
-<span><span class="co">#&gt; 3    -0.301502371 8.795812e-116 1.828293e-115    85.27251 AAACCTGGTAGCAAAT-1_1</span></span>
-<span><span class="co">#&gt; 4    -1.014834292 1.215944e-127 3.514926e-126    78.79720 AAACGGGGTACCCAAT-1_1</span></span>
+<span><span class="co">#&gt;           OARscore     KW.pvalue KW.BH.pvalue pct.missing             barcodes</span></span>
+<span><span class="co">#&gt; 1     0.1649214920  8.887958e-82 1.318345e-81    79.46352 AAACCTGAGAACAATC-1_1</span></span>
+<span><span class="co">#&gt; 2    -0.1359034105  1.753283e-84 3.262472e-84    87.92927 AAACCTGAGGTGCTAG-1_1</span></span>
+<span><span class="co">#&gt; 3    -1.0976845874  8.528426e-94 1.514405e-92    85.27251 AAACCTGGTAGCAAAT-1_1</span></span>
+<span><span class="co">#&gt; 4    -1.3087967701  5.958183e-96 2.244249e-94    78.79720 AAACGGGGTACCCAAT-1_1</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>The result is a matrix with these columns:</p>
 <ul>
@@ -284,7 +270,7 @@ Greater scores indicate distinct cell expression signatures, where high
 scoring cells have different gene co-expression patterns compared to all
 other cells in the test. In this example, we observe that cells with a
 high degree of sparsity, also have a high OAR score</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">output</span>,</span>
@@ -341,17 +327,17 @@ Seurat object with the <code>OARscore</code>, <code>KW.pvalue</code>,
 <code>meta.data</code> slot. Additionally, genes are annotated by which
 missing data patterns (mdp) they have been included in
 <code>sc.data@assays$RNA@meta.data</code>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sc.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">sc.data</span>, </span>
 <span>               seurat_v5 <span class="op">=</span> <span class="cn">T</span>, count.filter <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>               blacklisted.genes <span class="op">=</span> <span class="cn">NULL</span>, suffix <span class="op">=</span> <span class="st">""</span>,</span>
-<span>               mismatch <span class="op">=</span> <span class="cn">T</span>, tolerance <span class="op">=</span> <span class="fl">0.04</span>,</span>
+<span>               tolerance <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data = sc.data, seurat_v5 = T, count.filter = 1, blacklisted.genes = NULL, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-18 18:15:36 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-03-24 23:11:42 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We set these parameters based on our earlier results and adjusted to
@@ -361,14 +347,11 @@ the data provided:</p>
 <code>seurat_v5</code> confirms the type of data being used.
 Defaults to <code>TRUE</code>.</li>
 <li>
-<code>mismatch</code> controls whether or not to allow for
-flexibility in pattern matching. Defaults to <code>TRUE</code>.</li>
-<li>
 <code>tolerance</code> controls whether the mismatch threshold
 should be determined automatically (between 0.01 and 0.05 hamming
 distances) or if a user supplied threshold should be used. Defaults to
 <code>TRUE</code>, and can take <code>TRUE</code> or a numeric value
-smaller than 1. Here we set it to 0.04 based on our results above.</li>
+smaller than 1. Here we set it to 0.02 based on our results above.</li>
 <li>
 <code>count.filter</code> controls the minimum percentage of cells
 expressing any given gene for that gene to be retained in the analysis.
@@ -395,13 +378,16 @@ together. In fact, in this case, high OAR scoring cells represent the
 most activated cells in the experiment, as can be seen when we examine
 <em>IFNA1</em>, which is expressed in activated plasmacytoid dendritic
 cells.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: SeuratObject</span></span>
 <span><span class="co">#&gt; Loading required package: sp</span></span>
 <span><span class="co">#&gt; 'SeuratObject' was built under R 4.4.0 but the current version is</span></span>
-<span><span class="co">#&gt; 4.4.2; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
+<span><span class="co">#&gt; 4.4.3; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
 <span><span class="co">#&gt; for R may have changed</span></span>
+<span><span class="co">#&gt; 'SeuratObject' was built with package 'Matrix' 1.7.1 but the current</span></span>
+<span><span class="co">#&gt; version is 1.7.2; it is recomended that you reinstall 'SeuratObject' as</span></span>
+<span><span class="co">#&gt; the ABI for 'Matrix' may have changed</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'SeuratObject'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>

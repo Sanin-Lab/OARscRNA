@@ -80,9 +80,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Sanin-Lab/OARscRNA" class="external-link">OAR</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
-<span><span class="co">#&gt;   object 'type_sum.accel' not found</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Sanin-Lab/OARscRNA" class="external-link">OAR</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
@@ -95,7 +93,7 @@ generating and analyzing OAR scores from your single cell dataset.</p>
 </ol>
 <p>Here we will walk you through steps of the analysis, beginning with a
 gene expression matrix from plasmacytoid dendritic cell dataset that you
-can download from our <a href="https://github.com/davidsanin/OARscRNA/tree/main/vignettes" class="external-link">github
+can download from our <a href="https://github.com/Sanin-Lab/OARscRNA/tree/main/vignettes" class="external-link">github
 repository</a>.</p>
 <div class="section level3">
 <h3 id="starting-from-v5-seurat-object">Starting from v5 Seurat Object<a class="anchor" aria-label="anchor" href="#starting-from-v5-seurat-object"></a>
@@ -127,7 +125,7 @@ in the identification of the patterns.</p>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-18 18:26:20 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-03-24 23:21:28 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We deliberately left most parameters as defaults, however we
@@ -137,9 +135,6 @@ the result. Some critical parameters to consider include:</p>
 <li>
 <code>seurat_v5</code> confirms the type of data being used.
 Defaults to <code>TRUE</code>.</li>
-<li>
-<code>mismatch</code> controls whether or not to allow for
-flexibility in pattern matching. Defaults to <code>TRUE</code>.</li>
 <li>
 <code>tolerance</code> controls whether the mismatch threshold
 should be determined automatically (between 0.01 and 0.05 hamming
@@ -255,8 +250,11 @@ clusters.</p>
 <span><span class="co">#&gt; Loading required package: SeuratObject</span></span>
 <span><span class="co">#&gt; Loading required package: sp</span></span>
 <span><span class="co">#&gt; 'SeuratObject' was built under R 4.4.0 but the current version is</span></span>
-<span><span class="co">#&gt; 4.4.2; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
+<span><span class="co">#&gt; 4.4.3; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
 <span><span class="co">#&gt; for R may have changed</span></span>
+<span><span class="co">#&gt; 'SeuratObject' was built with package 'Matrix' 1.7.1 but the current</span></span>
+<span><span class="co">#&gt; version is 1.7.2; it is recomended that you reinstall 'SeuratObject' as</span></span>
+<span><span class="co">#&gt; the ABI for 'Matrix' may have changed</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'SeuratObject'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
@@ -288,22 +286,22 @@ genes as rows, are very similar to what we saw above.</p>
 to the input data we must specify that we are not starting with a Seurat
 object by setting <code>seurat_v5</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">oar_data</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>               mismatch <span class="op">=</span> <span class="cn">TRUE</span>, tolerance <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<code class="sourceCode R"><span><span class="va">oar_data</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>               tolerance <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in oar(data, seurat_v5 = FALSE, mismatch = TRUE, tolerance = TRUE, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
+<span><span class="co">#&gt; Warning in oar(data, seurat_v5 = FALSE, tolerance = TRUE, cores = 1): Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2024-12-18 18:31:28 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-03-24 23:25:54 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="va">...</span></span>
 <span><span class="va">oar_data</span></span>
-<span><span class="co">#&gt;          OARscore     KW.pvalue  KW.BH.pvalue pct.missing</span></span>
-<span><span class="co">#&gt; 1     0.282688134 8.168498e-107 1.091768e-106    79.46352</span></span>
-<span><span class="co">#&gt; 2     0.914667119  2.961274e-97  3.405055e-97    87.92927</span></span>
-<span><span class="co">#&gt; 3    -0.301502371 8.795812e-116 1.828293e-115    85.27251</span></span>
-<span><span class="co">#&gt; 4    -1.014834292 1.215944e-127 3.514926e-126    78.79720</span></span>
+<span><span class="co">#&gt;           OARscore     KW.pvalue KW.BH.pvalue pct.missing</span></span>
+<span><span class="co">#&gt; 1     0.1649214920  8.887958e-82 1.318345e-81    79.46352</span></span>
+<span><span class="co">#&gt; 2    -0.1359034105  1.753283e-84 3.262472e-84    87.92927</span></span>
+<span><span class="co">#&gt; 3    -1.0976845874  8.528426e-94 1.514405e-92    85.27251</span></span>
+<span><span class="co">#&gt; 4    -1.3087967701  5.958183e-96 2.244249e-94    78.79720</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>This results in a table with the following columns:</p>
 <ul>
