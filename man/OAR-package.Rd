@@ -15,6 +15,7 @@ Useful links:
 \itemize{
   \item \url{https://github.com/Sanin-Lab/OARscRNA}
   \item \url{https://Sanin-Lab.github.io/OARscRNA/}
+  \item \url{https://sanin-lab.github.io/OARscRNA/}
   \item Report bugs at \url{https://github.com/Sanin-Lab/OARscRNA/issues}
 }
 

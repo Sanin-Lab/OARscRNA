@@ -18,7 +18,6 @@ Imports:
     circlize,
     ComplexHeatmap,
     data.table,
-    digest,
     dplyr,
     foreach,
     ggplot2,
