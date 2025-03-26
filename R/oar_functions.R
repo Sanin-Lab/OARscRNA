@@ -117,7 +117,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   }else{
     dm <- oar_hamming_distance(data, cores = cores)
   }
-  mdp <- oar_missing_data_patterns(data = data, dm = dm1, tolerance = tolerance)
+  mdp <- oar_missing_data_patterns(data = data, dm = dm, tolerance = tolerance)
   
   #Run missingness test
   print("Calculating scores")
