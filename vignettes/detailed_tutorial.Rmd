@@ -108,7 +108,7 @@ parallelly::availableCores()
 
 Now we can select an appropriate number to set up parallel processing for this R session. To identify the missing data patterns allowing for mismatch, we calculate the hamming distance between all pairs of gene expression vectors. Internally, the gene vectors are converted to 0 (missing) and 1 (observed) values. This function needs to have the number of cores specified explicitly, and is the slowest portion of the analysis. 
 
-```{r mdp with automatic tolerance, output.lines=5}
+```{r hamming distance calculation, output.lines=5}
 dm <- oar_hamming_distance(
   oar_data[[1]], cores = 1)
 dm[1:5,1:5]
