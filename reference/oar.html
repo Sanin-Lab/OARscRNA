@@ -56,7 +56,8 @@
 <span>  blacklisted.genes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  tolerance <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  cores <span class="op">=</span> <span class="fl">1</span></span>
+<span>  cores <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  store.hamming <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -90,6 +91,10 @@
 
 <dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>
 <dd><p>a numeric value indicating the number of cores to use un parallel processing. Use <code><a href="https://rdrr.io/r/parallel/detectCores.html" class="external-link">parallel::detectCores()</a></code> or <code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code> to identify possibilities. Default is 1.</p></dd>
+
+
+<dt id="arg-store-hamming">store.hamming<a class="anchor" aria-label="anchor" href="#arg-store-hamming"></a></dt>
+<dd><p>a boolean to control if hamming distances should be stored in the Seurat object. Default set to <code>TRUE</code></p></dd>
 
 </dl></div>
     <div class="section level2">

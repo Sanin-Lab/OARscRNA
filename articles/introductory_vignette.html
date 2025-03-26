@@ -125,7 +125,7 @@ in the identification of the patterns.</p>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-03-25 17:33:55 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-03-26 18:49:00 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We deliberately left most parameters as defaults, however we
@@ -149,6 +149,12 @@ Defaults to 1.</li>
 <code>blacklisted.genes</code> allows you to provide a vector of
 uninformative gene names (i.e. non-coding genes) to exclude from the
 analysis. Defaults to <code>NULL</code>.</li>
+<li>
+<code>store.hamming</code> allows you to store the calculated
+hamming distances for pattern matching in your Seurat object for faster
+re-calculation of the scores if you need to alter other parameters later
+(found in <code>oar_obj[["RNA"]]@misc</code>). Defaults to
+<code>TRUE</code>.</li>
 </ul>
 <p>The result is a Seurat object with these additional metadata
 columns:</p>
@@ -180,6 +186,9 @@ cells of the same type. When working with a dataset with diverse cell
 types, it can be helpful to run the function by cluster.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oar_obj_bycluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_by_cluster.html">oar_by_cluster</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>This functions takes the same parameters as <code>oar</code>, but it
+will not store the calculated hamming distances in the resulting Seurat
+object.</p>
 </div>
 <div class="section level4">
 <h4 id="visualize-results">Visualize Results<a class="anchor" aria-label="anchor" href="#visualize-results"></a>
@@ -292,16 +301,16 @@ object by setting <code>seurat_v5</code> to <code>FALSE</code>.</p>
 <span><span class="co">#&gt; Warning in oar(data, seurat_v5 = FALSE, tolerance = TRUE, cores = 1): Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-03-25 17:38:30 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-03-26 18:53:55 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="va">...</span></span>
 <span><span class="va">oar_data</span></span>
-<span><span class="co">#&gt;           OARscore     KW.pvalue KW.BH.pvalue pct.missing</span></span>
-<span><span class="co">#&gt; 1     0.1649214920  8.887958e-82 1.318345e-81    79.46352</span></span>
-<span><span class="co">#&gt; 2    -0.1359034105  1.753283e-84 3.262472e-84    87.92927</span></span>
-<span><span class="co">#&gt; 3    -1.0976845874  8.528426e-94 1.514405e-92    85.27251</span></span>
-<span><span class="co">#&gt; 4    -1.3087967701  5.958183e-96 2.244249e-94    78.79720</span></span>
+<span><span class="co">#&gt;          OARscore     KW.pvalue  KW.BH.pvalue pct.missing</span></span>
+<span><span class="co">#&gt; 1     0.132887681  1.636314e-90  2.332498e-90    79.46352</span></span>
+<span><span class="co">#&gt; 2    -0.064545692  1.455368e-92  2.428218e-92    87.92927</span></span>
+<span><span class="co">#&gt; 3    -1.143204805 7.776601e-105 3.580117e-103    85.27251</span></span>
+<span><span class="co">#&gt; 4    -1.323046723 3.152359e-107 5.597688e-105    78.79720</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>This results in a table with the following columns:</p>
 <ul>
