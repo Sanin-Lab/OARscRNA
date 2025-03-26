@@ -91,6 +91,7 @@ We deliberately left most parameters as defaults, however we recommend you explo
 -   `tolerance` controls whether the mismatch threshold should be determined automatically (between 0.01 and 0.05 hamming distances) or if a user supplied threshold should be used. Defaults to `TRUE`, and can take `TRUE` or a numeric value smaller than 1.
 -   `count.filter` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
 -   `blacklisted.genes` allows you to provide a vector of uninformative gene names (i.e. non-coding genes) to exclude from the analysis. Defaults to `NULL`.
+-   `store.hamming` allows you to store the calculated hamming distances for pattern matching in your Seurat object for faster re-calculation of the scores if you need to alter other parameters later (found in `oar_obj[["RNA"]]@misc`). Defaults to `TRUE`.
 
 The result is a Seurat object with these additional metadata columns:
 
@@ -108,6 +109,8 @@ OAR scores are typically more informative when distinguishing among cells of the
 ```{r run oar by cluster, output.lines=5, eval = FALSE}
 oar_obj_bycluster <- oar_by_cluster(data_obj, cores = 1)
 ```
+
+This functions takes the same parameters as `oar`, but it will not store the calculated hamming distances in the resulting Seurat object.
 
 ### Visualize Results
 

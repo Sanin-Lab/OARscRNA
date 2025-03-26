@@ -22,6 +22,7 @@ reference:
     Run these in this order to achieve the same results as with the wrapper functions.
   contents:
   - oar_preprocess_data
+  - oar_hamming_distance
   - oar_missing_data_patterns
   - oar_base
 - title: Utility functions

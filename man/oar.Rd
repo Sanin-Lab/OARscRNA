@@ -11,7 +11,8 @@ oar(
   blacklisted.genes = NULL,
   suffix = "",
   tolerance = TRUE,
-  cores = 1
+  cores = 1,
+  store.hamming = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ oar(
 \item{tolerance}{a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
 
 \item{cores}{a numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities. Default is 1.}
+
+\item{store.hamming}{a boolean to control if hamming distances should be stored in the Seurat object. Default set to \code{TRUE}}
 }
 \value{
 A Seurat object with OAR stats added into meta data, or a matrix with OAR stats.

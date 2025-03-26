@@ -4,17 +4,17 @@
 \alias{oar_missing_data_patterns}
 \title{Identify missing data patterns allowing for mismatch}
 \usage{
-oar_missing_data_patterns(data, tolerance = TRUE, cores = 1)
+oar_missing_data_patterns(data, dm, tolerance = TRUE)
 }
 \arguments{
 \item{data}{a minimal dataset ready for processing.}
 
-\item{tolerance}{a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
+\item{dm}{a matrix of hamming distances between gene vectors.}
 
-\item{cores}{a numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities.}
+\item{tolerance}{a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to \code{TRUE}, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.}
 }
 \value{
-Matrix of gene vector hamming distances
+Vector of missing data patterns
 }
 \description{
 Identify missing data patterns allowing for mismatch
@@ -22,9 +22,9 @@ Identify missing data patterns allowing for mismatch
 \examples{
 \dontrun{
 ##Automatic tolerance setting
-mdp <- oar_missing_data_patterns(data, tolerance = T)
+mdp <- oar_missing_data_patterns(data, dm, tolerance = T)
 
 ##User defined
-mdp <- oar_missing_data_patterns(data, tolerance = 0.01)
+mdp <- oar_missing_data_patterns(data, dm, tolerance = 0.01)
 }
 }

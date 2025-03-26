@@ -95,7 +95,7 @@ oar_data[[1]][1:5,1:5]
 For a full description of each parameter consult the documentation. Briefly:
 
 -   `seurat_v5` confirms the type of data being used. Defaults to `TRUE`. If **starting from a data matrix**, set this to `FALSE` and continue with the rest of the tutorial.
--   `tr` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 0.01.
+-   `tr` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
 -   `blacklisted.genes` allows you to provide a vector of uninformative gene names (i.e. non-coding genes) to exclude from the analysis. Defaults to `NULL`.
 
 ## 2. Identifying Missing Data Patterns
@@ -106,28 +106,42 @@ Our scoring relies on identifying co-expressed genes patterns (which we call mis
 parallelly::availableCores()
 ```
 
-Now we can select an appropriate number to set up parallel processing for this R session. To identify the missing data patterns allowing for mismatch, we calculate the hamming distance between all pairs of gene expression vectors. Internally, the gene vectors are converted to 0 (missing) and 1 (observed) values. This function needs to have the number of cores specified explicitly. We set `tolerance` to `TRUE` to search for a tolerance value between 0.01 and 0.05. This function will search for a value that does not introduce biases in the pattern matching, which occurs with tolerance values greater than 0.05. This tolerance value is the fraction of mismatch between gene vectors that we allow to consider genes as part of the same pattern.
+Now we can select an appropriate number to set up parallel processing for this R session. To identify the missing data patterns allowing for mismatch, we calculate the hamming distance between all pairs of gene expression vectors. Internally, the gene vectors are converted to 0 (missing) and 1 (observed) values. This function needs to have the number of cores specified explicitly, and is the slowest portion of the analysis. 
+
+```{r mdp with automatic tolerance, output.lines=5}
+dm <- oar_hamming_distance(
+  oar_data[[1]], cores = 1)
+dm[1:5,1:5]
+```
+
+The output is a matrix where the hamming distance between each pair of gene expression vectors is calculated. In the wrapper function `oar` you have the possibility of storing this result in your Seurat object, so that future score calculations are completed faster. The wrapper function automatically detects a previously calculated hamming distance matrix and uses that for further analysis. **WARNING: If you use a different count filter value, or a different set of cells, these distances will no longer be appropriate. In that case, remove previously calculated distance matrix using** `oar_obj[["RNA"]]@misc <- list()`.
+
+Next, we want to group genes into co-expression patters based on a minimal hamming distance threshold, which we refer to as `tolerance`. This tolerance value is the fraction of mismatch between gene vectors that we allow to consider genes as part of the same pattern. To identify a suitable value between 0.01 and 0.05, we can set `tolerance` to `TRUE` in the `oar_missing_data_patterns` function. This function will search for a `tolerance` that does not introduce biases in the pattern matching. We have found that increasing `tolerance` can introduce an artificial relationship between the percentage of missing values and the significance test at the core of this approach. 
 
 ```{r mdp with automatic tolerance, output.lines=5}
 mdp_auto_tol <- oar_missing_data_patterns(
-  oar_data[[1]], tolerance = T, cores = 1)
+  oar_data[[1]], dm, tolerance = T)
 table(mdp_auto_tol)
 ```
 
-If we have previously run the analysis or we wish to tune the tolerance to a value outside the automatic range, we can choose our own tolerance and pass it to the function, which will be faster, but may not capture as many patterns. Values greater than 0 and lower than 0.05 are recommended.
+**A few considerantions on tolerance setting:**
+- Using a tolerance of 0 *(i.e. allowing only for exact matches)* results in very few, and often no, co-expressed gene patterns. This configuration generally fails and is not recommended.
+- The automatic tolerance setting selects the minimum tolerance above 0 where the percentage of missing values in a cell is not predictive of the *observed at random* test. If you choose your own tolerance, it is recommended you plot those two variables against each other (`KW.BH.pvalue` vs. `pct.missing`) and fit a linear model. If the slope of the model is significant and negative, the tolerance setting might not be appropriate.
+
+We can choose our own tolerance and pass it to the function, which will be faster. Values greater than 0 and lower than 0.05 are recommended.
 
 ```{r mdp with specific tolerance, output.lines=5, eval = FALSE}
-oar_missing_data_patterns(oar_data[[1]], tolerance = 0.05, cores = 1)
+oar_missing_data_patterns(oar_data[[1]], dm, tolerance = 0.05)
 ```
 
-In this dataset a tolerance of 0.02 produced the best results, with 3 distinct patters found across cells (plus the combination of all genes with non-unique patterns). We can visualize these results like this:
+In this dataset a tolerance of 0.02 produced the best results, with 2 distinct patters found across cells (plus the combination of all genes with non-unique patterns). We can visualize these results like this:
 
 ```{r patterns_found_mdp, out.width="50%", fig.cap="Missing Data Pattern Plot"}
 p3 <- oar_missing_data_plot(data = oar_data[[1]], mdp = mdp_auto_tol, seurat_v5 = FALSE)
 p3
 ```
 
-Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell. For example, a pattern of 13 genes is expressed in only about a 10% of cells.
+Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell.
 
 ## 3. Calculate OAR scores
 
@@ -202,7 +216,7 @@ We can run this entire process with a single line. The result is the Seurat obje
 sc.data <- oar(data = sc.data, 
                seurat_v5 = T, count.filter = 1,
                blacklisted.genes = NULL, suffix = "",
-               tolerance = 0.02,
+               tolerance = 0.02, store.hamming = T,
                cores = 1)
 ```
 
@@ -213,6 +227,7 @@ We set these parameters based on our earlier results and adjusted to the data pr
 -   `count.filter` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
 -   `blacklisted.genes` Allows you to provide a vector of uninformative gene names (i.e. non-conding genes) to exclude from the analysis. Defaults to `NULL`.
 -   `suffix` Allows you to provide a character string to avoid overwriting previous OAR calculations. Defaults to `NULL`.
+-   `store.hamming` allows you to store the calculated hamming distances for pattern matching in your Seurat object for faster re-calculation of the scores if you need to alter other parameters later (found in `oar_obj[["RNA"]]@misc`). Defaults to `TRUE`.
 
 You can use a similar approach to analyse the data cluster by cluster - recommended when you have multiple cell types. In that case, use `oar_by_cluster()`.
 

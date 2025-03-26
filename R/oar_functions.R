@@ -43,6 +43,7 @@ oar_base <- function (data, mdp) {
 #' @param suffix a string to append to the output variables. Default is empty
 #' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
 #' @param cores a numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities. Default is 1.
+#' @param store.hamming a boolean to control if hamming distances should be stored in the Seurat object. Default set to `TRUE`
 #'
 #' @return A Seurat object with OAR stats added into meta data, or a matrix with OAR stats. 
 #' @export
@@ -54,7 +55,7 @@ oar_base <- function (data, mdp) {
 #' 
 oar <- function (data, seurat_v5 = TRUE, count.filter = 1, 
                  blacklisted.genes = NULL, suffix = "",
-                 tolerance = TRUE, cores = 1) {
+                 tolerance = TRUE, cores = 1, store.hamming = TRUE) {
   
   #Check parameters were correctly supplied
   if(!is.numeric(count.filter)){stop("count.filter must be numeric\n")}
@@ -62,6 +63,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   if(!is.logical(tolerance)){if(!is.numeric(tolerance))stop("tolerance must be logical or numeric\n")}
   if(!is.logical(seurat_v5)){stop("seurat_v5 must be TRUE or FALSE\n")}
   if(!is.null(blacklisted.genes)){if(!is.character(blacklisted.genes))stop("Supplied blacklisted genes are not characters\n")}
+  if(seurat_v5){if(!is.logical(store.hamming)){stop("store.hamming must be TRUE or FALSE\n")}}
   
   #Value range warnings
   if (count.filter > 2) {
@@ -103,7 +105,19 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   
   #Identify missing data patterns
   print("Identifying missing data patterns...")
-  mdp <- oar_missing_data_patterns(data = data, cores = cores, tolerance = tolerance)
+  if(seurat_v5){
+    if("hamming" %in% names(sc.data[["RNA"]]@misc)){
+      dm <- sc.data[["RNA"]]@misc[["hamming"]]
+    }else{
+      dm <- oar_hamming_distance(data, cores = cores)
+      if(store.hamming){
+        sc.data[["RNA"]]@misc[["hamming"]] <- dm
+      }
+    }
+  }else{
+    dm <- oar_hamming_distance(data, cores = cores)
+  }
+  mdp <- oar_missing_data_patterns(data = data, dm = dm1, tolerance = tolerance)
   
   #Run missingness test
   print("Calculating scores")
@@ -141,7 +155,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
 #' Generate OAR score within each cluster and add them to full objects metadata
 #'
 #' @param data a clustered Seurat (v5) object.
-#' @param count.filter a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.
+#' @param count.filter a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.
 #' @param blacklisted.genes a character vector with gene names to be excluded from the analysis. Default is empty.
 #' @param suffix a string to append to the output variables. Default is empty
 #' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
@@ -162,11 +176,17 @@ oar_by_cluster <- function (data, count.filter = 1,
   print("Splitting data by cluster...")
   
   data_list <- Seurat::SplitObject(data) #split into list of objects by active ident
+  if("hamming" %in% names(data[["RNA"]]@misc)){
+    data_list <- lapply(data_list,function(x){
+      x[["RNA"]]@misc <- list()
+      return(x)})
+    warning("Previously calculated hamming distances will not be used/stored when estimating OAR score by cluster")
+  }
   
   #run oar on each object
   data_oar <- lapply(data_list, oar, count.filter = count.filter,
                      blacklisted.genes = blacklisted.genes, 
-                     suffix = suffix, 
+                     suffix = suffix, store.hamming = FALSE,
                      tolerance = tolerance, cores = cores)
   
   #combine objects back together

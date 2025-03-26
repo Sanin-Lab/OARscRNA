@@ -16,7 +16,7 @@ oar_by_cluster(
 \arguments{
 \item{data}{a clustered Seurat (v5) object.}
 
-\item{count.filter}{a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 0.01. Values between 0.005 and 0.02 are recommended.}
+\item{count.filter}{a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.}
 
 \item{blacklisted.genes}{a character vector with gene names to be excluded from the analysis. Default is empty.}
 
