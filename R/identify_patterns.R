@@ -51,6 +51,7 @@ oar_missing_data_patterns <- function (data, dm, tolerance = TRUE) {
   
   if(is.logical(tolerance) && tolerance){
     print("Scanning for optimal tolerance...")
+    data = data[,sample(1:ncol(data), size = ifelse(ncol(data)>=1000,1000,ncol(data)))]
     i = 0.01
     test = TRUE
     mdp <- NULL
@@ -66,11 +67,11 @@ oar_missing_data_patterns <- function (data, dm, tolerance = TRUE) {
       test <- ((lm.out$coefficients[2,4] > 0.01) + (lm.out$coefficients[2,1] > 0)) >= 1
       if(!test && i == 0.01){
         mdp.out <- mdp
+        print("Tolerance set to 0.01")
         break}
       if(!test){print(paste0("Tolerance set to ",i-0.01))}
       i = i + 0.01
       if(i == 0.06){warning("Setting tolerances avobe 0.05 is not recommended")}
-      if(i == 0.1){stop("Setting tolerances avobe 0.1 is not recommended")}
     }
     mdp = mdp.out
     print(paste0("Identified ",length(unique(mdp))-1," non-unique missing data patterns"))
