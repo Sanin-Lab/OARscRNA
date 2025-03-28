@@ -20,7 +20,7 @@ oar_base <- function (data, mdp) {
   pvalue.KW.BH = p.adjust(pvalue.list.KW, method = "BH") # Benjamini & Hochberg correction ("BH" or its alias "fdr")
   
   #transform and scale adjusted pvalues
-  score = scale(-log10(pvalue.KW.BH), center = T, scale = T)*-1
+  score = scale(-log10(pvalue.KW.BH+1e-320), center = T, scale = T)*-1
   
   #calculate missing values
   sp = unlist(lapply(cl, naniar::pct_miss))
