@@ -12,7 +12,7 @@ oar_hamming_distance(data, cores = 1)
 \item{cores}{a numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities.}
 }
 \value{
-Matrix of hamming distances
+A list of matrices of hamming distances across gene bins
 }
 \description{
 Calculate hamming distances between genes
