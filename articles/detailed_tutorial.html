@@ -185,23 +185,25 @@ analysis.</p>
 <span>  <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="co">#&gt; [1] "This operation may take several minutes"</span></span>
-<span><span class="va">dm</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
-<span><span class="co">#&gt;           1         2          3          4         5</span></span>
-<span><span class="co">#&gt; 1 0.0000000 0.2815768 0.25100563 0.25261464 0.3282381</span></span>
-<span><span class="co">#&gt; 2 0.2815768 0.0000000 0.13032985 0.12067578 0.2670957</span></span>
-<span><span class="co">#&gt; 3 0.2510056 0.1303298 0.00000000 0.05953339 0.2445696</span></span>
-<span><span class="co">#&gt; 4 0.2526146 0.1206758 0.05953339 0.00000000 0.2349155</span></span>
+<span><span class="va">dm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
+<span><span class="co">#&gt;            1          2          3          4          5</span></span>
+<span><span class="co">#&gt; 1 0.00000000 0.02976669 0.02976669 0.02815768 0.02976669</span></span>
+<span><span class="co">#&gt; 2 0.02976669 0.00000000 0.03218021 0.02896219 0.03378922</span></span>
+<span><span class="co">#&gt; 3 0.02976669 0.03218021 0.00000000 0.02735318 0.03218021</span></span>
+<span><span class="co">#&gt; 4 0.02815768 0.02896219 0.02735318 0.00000000 0.02896219</span></span>
 <span><span class="va">...</span></span></code></pre></div>
-<p>The output is a matrix where the hamming distance between each pair
-of gene expression vectors is calculated. In the wrapper function
-<code>oar</code> you have the possibility of storing this result in your
-Seurat object, so that future score calculations are completed faster.
-The wrapper function automatically detects a previously calculated
-hamming distance matrix and uses that for further analysis.
-<strong>WARNING: If you use a different count filter value, or a
-different set of cells, these distances will no longer be appropriate.
-In that case, remove previously calculated distance matrix
-using</strong> <code>oar_obj[["RNA"]]@misc &lt;- list()</code>.</p>
+<p>The output is a list of matrices where the hamming distance between
+each pair of gene expression vectors evenly divided across expression
+bins is calculated. Expression binning is introduced to increase
+computational performance. In the wrapper function <code>oar</code> you
+have the possibility of storing this result in your Seurat object, so
+that future score calculations are completed faster. The wrapper
+function automatically detects a previously calculated hamming distance
+matrix and uses that for further analysis. <strong>WARNING: If you use a
+different count filter value, or a different set of cells, these
+distances will no longer be appropriate. In that case, remove previously
+calculated distance matrix using</strong>
+<code>oar_obj[["RNA"]]@misc &lt;- list()</code>.</p>
 <p>Next, we want to group genes into co-expression patters based on a
 minimal hamming distance threshold, which we refer to as
 <code>tolerance</code>. This tolerance value is the fraction of mismatch
@@ -218,13 +220,15 @@ of this approach.</p>
 <code class="sourceCode R"><span><span class="va">mdp_auto_tol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span></span>
 <span>  <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">dm</span>, tolerance <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Scanning for optimal tolerance..."</span></span>
-<span><span class="co">#&gt; [1] "Tolerance set to 0.02"</span></span>
-<span><span class="co">#&gt; [1] "Identified 2 non-unique missing data patterns"</span></span>
-<span><span class="co">#&gt; [1] "A total of 598 genes captured in non-unique patterns"</span></span>
+<span><span class="co">#&gt; [1] "Tolerance set to 0.03"</span></span>
+<span><span class="co">#&gt; [1] "Identified 6 non-unique missing data patterns"</span></span>
+<span><span class="co">#&gt; [1] "A total of 187 genes captured in non-unique patterns"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mdp_auto_tol</span><span class="op">)</span></span>
 <span><span class="co">#&gt; mdp_auto_tol</span></span>
-<span><span class="co">#&gt;       Pattern 1       Pattern 2 Unique patterns </span></span>
-<span><span class="co">#&gt;             124             474           11108</span></span></code></pre></div>
+<span><span class="co">#&gt;    B1.Pattern 1    B1.Pattern 2    B1.Pattern 3    B1.Pattern 4    B2.Pattern 1 </span></span>
+<span><span class="co">#&gt;               6              25              11               2               3 </span></span>
+<span><span class="co">#&gt;    B9.Pattern 1 Unique patterns </span></span>
+<span><span class="co">#&gt;             140           11519</span></span></code></pre></div>
 <p><strong>A few considerantions on tolerance setting:</strong> - Using
 a tolerance of 0 <em>(i.e. allowing only for exact matches)</em> results
 in very few, and often no, co-expressed gene patterns. This
@@ -241,7 +245,7 @@ will be faster. Values greater than 0 and lower than 0.05 are
 recommended.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">dm</span>, tolerance <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></code></pre></div>
-<p>In this dataset a tolerance of 0.02 produced the best results, with 2
+<p>In this dataset a tolerance of 0.03 produced the best results, with 6
 distinct patters found across cells (plus the combination of all genes
 with non-unique patterns). We can visualize these results like this:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
@@ -272,11 +276,11 @@ the gene expression values and the missing data patterns.</p>
 <code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_base.html">oar_base</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp_auto_tol</span><span class="op">)</span></span>
 <span><span class="va">output</span><span class="op">$</span><span class="va">barcodes</span> <span class="op">=</span> <span class="va">cells</span> <span class="co">#add back our barcodes</span></span>
 <span><span class="va">output</span></span>
-<span><span class="co">#&gt;          OARscore     KW.pvalue  KW.BH.pvalue pct.missing             barcodes</span></span>
-<span><span class="co">#&gt; 1     0.132887681  1.636314e-90  2.332498e-90    79.46352 AAACCTGAGAACAATC-1_1</span></span>
-<span><span class="co">#&gt; 2    -0.064545692  1.455368e-92  2.428218e-92    87.92927 AAACCTGAGGTGCTAG-1_1</span></span>
-<span><span class="co">#&gt; 3    -1.143204805 7.776601e-105 3.580117e-103    85.27251 AAACCTGGTAGCAAAT-1_1</span></span>
-<span><span class="co">#&gt; 4    -1.323046723 3.152359e-107 5.597688e-105    78.79720 AAACGGGGTACCCAAT-1_1</span></span>
+<span><span class="co">#&gt;           OARscore     KW.pvalue  KW.BH.pvalue pct.missing             barcodes</span></span>
+<span><span class="co">#&gt; 1     1.921628e-01  4.270367e-98  6.172170e-98    79.46352 AAACCTGAGAACAATC-1_1</span></span>
+<span><span class="co">#&gt; 2     5.693256e-01  2.363281e-93  2.813753e-93    87.92927 AAACCTGAGGTGCTAG-1_1</span></span>
+<span><span class="co">#&gt; 3    -8.652167e-01 4.615539e-112 5.361790e-111    85.27251 AAACCTGGTAGCAAAT-1_1</span></span>
+<span><span class="co">#&gt; 4    -1.343913e+00 2.108008e-119 6.550633e-117    78.79720 AAACGGGGTACCCAAT-1_1</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>The result is a matrix with these columns:</p>
 <ul>
@@ -367,13 +371,13 @@ missing data patterns (mdp) they have been included in
 <code class="sourceCode R"><span><span class="va">sc.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">sc.data</span>, </span>
 <span>               seurat_v5 <span class="op">=</span> <span class="cn">T</span>, count.filter <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>               blacklisted.genes <span class="op">=</span> <span class="cn">NULL</span>, suffix <span class="op">=</span> <span class="st">""</span>,</span>
-<span>               tolerance <span class="op">=</span> <span class="fl">0.02</span>, store.hamming <span class="op">=</span> <span class="cn">T</span>,</span>
+<span>               tolerance <span class="op">=</span> <span class="fl">0.03</span>, store.hamming <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data = sc.data, seurat_v5 = T, count.filter = 1, blacklisted.genes = NULL, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-03-28 14:54:45 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-03-31 21:49:12 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We set these parameters based on our earlier results and adjusted to
