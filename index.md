@@ -7,7 +7,6 @@ The OAR (observed at random) score reveals cellular heterogeneity, allowing **ce
 -   Technologies
 -   Technical batches/library preparations
 -   Organisms
--   Sampling
 
 **OAR score is a measure of heterogeneity among cells**. A cell with a **positive** OAR score is one where a set of genes appears to be expressed more homogenously than in other cells tested, and is consequently a highly distinct cell.
 

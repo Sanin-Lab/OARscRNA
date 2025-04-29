@@ -28,11 +28,11 @@ oar_hamming_distance <- function (data, cores = 1) {
   
   d.list <- split(as.data.frame(data),bins) # Split data across bins
   
-  dm <- lapply(d.list, function(mm){ 
-    x <- parallelDist::parDist(
-      x = +(!is.na(as.matrix(mm))), method = "hamming", 
-      threads = cores) %>% as.matrix() # Calculate Hamming distance between gene vectors across data splits
-    
+  dm <- lapply(d.list, function(mm){
+    x <- FastHamming::hamming_distance(
+      X = +(!is.na(as.matrix(mm))),
+      nthreads = cores) # Calculate Hamming distance between gene vectors across data splits
+    x <- x/ncol(mm)
     rownames(x) <- 1:nrow(x)
     colnames(x) <- 1:ncol(x)
     return(x)

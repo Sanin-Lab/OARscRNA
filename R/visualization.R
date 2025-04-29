@@ -119,7 +119,7 @@ oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
     border = T, show_row_dend = F, show_column_dend = F,
     show_column_names = F, show_row_names = T,
     cluster_rows = F, cluster_columns = T,
-    row_labels = paste0(rownames(m)," genes"),
+    row_labels = rownames(m),
     row_names_side = "left", row_names_gp = grid::gpar(fontsize = 8),
     column_title = "Cells", column_title_side = "top",
     column_title_gp = grid::gpar(fontsize = 8),

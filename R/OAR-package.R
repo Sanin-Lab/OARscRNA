@@ -8,7 +8,6 @@ utils::globalVariables(c(".","Var2","adj_pval","count","gene_id","group","value"
 #' @importFrom dplyr %>%
 #' @importFrom dplyr filter
 #' @importFrom dplyr n
-#' @importFrom foreach %dopar%
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 element_blank
 #' @importFrom ggplot2 geom_hline
