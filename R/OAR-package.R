@@ -1,7 +1,7 @@
 #' @keywords internal
 "_PACKAGE"
 
-utils::globalVariables(c(".","Var2","adj_pval","count","gene_id","group","value","x","y","p"))
+utils::globalVariables(c(".","OARscore","Var2","adj_pval","count","gene_id","group","value","x","y","p"))
 
 ## usethis namespace: start
 #' @importFrom data.table %chin%

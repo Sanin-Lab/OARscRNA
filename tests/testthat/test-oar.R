@@ -3,7 +3,7 @@ test_that("oar works with defaults - starting from Seurat", {
   
   oar_input <- readRDS(test_path("fixtures", "oar_data.rds"))
   oar_output <- readRDS(test_path("fixtures", "oar_out.rds"))
-  check_oar <- oar(oar_input, seurat_v5 = T, cores = parallelly::availableCores()-2)
+  check_oar <- oar(oar_input, seurat_v5 = T, cores = 1)
   check_oar <- check_oar@meta.data
   
   expect_snapshot(
@@ -16,7 +16,7 @@ test_that("oar works with defaults - starting from Matrix", {
   
   oar_input <- readRDS(test_path("fixtures", "oar_data_m.rds"))
   oar_output <- readRDS(test_path("fixtures", "oar_out_m.rds"))
-  check_oar <- oar(oar_input, seurat_v5 = F, cores = parallelly::availableCores()-2)
+  check_oar <- oar(oar_input, seurat_v5 = F, cores = 1)
   
   expect_snapshot(
     waldo::compare(oar_output, check_oar)
