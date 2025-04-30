@@ -66,6 +66,13 @@ oar_missing_data_patterns <- function (data, dm, tolerance = TRUE) {
   for(i in dm){g = c(g,nrow(i))}
   if(!sum(g) == nrow(data)){stop("Hamming distance matrix and count matrix have different number of genes.\nWhere similar filters applied?\n")}
   
+  labels <- paste0("B",1:10) # Create labels for bins
+  bins <- base::rowSums(!is.na(data))/ncol(data) # Define bin ranges
+  bins <- base::cut(
+    bins, 
+    breaks = as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1))), # split genes evenly across 10 bins
+    right = T, labels = labels, include.lowest = T) # Make sure all genes are assigned a bin
+  
   if(is.numeric(tolerance)){
     mdp <- lapply(names(dm), function(x){
       if(!nrow(dm[[x]]) == ncol(dm[[x]])){stop("Hamming distance matrix is not square\n")}
@@ -78,7 +85,7 @@ oar_missing_data_patterns <- function (data, dm, tolerance = TRUE) {
 
     mdp <- unlist(mdp)
     mdp.t <- rep(NA,nrow(data))
-    for(i in levels(bins)){mdp.t[bins == i] <- mdp[grepl(pattern = i, x = mdp, perl = F, fixed = T)]}
+    for(i in levels(bins)){mdp.t[bins == i] <- mdp[grepl(pattern = paste0(i,"."), x = mdp, perl = F, fixed = T)]}
     idx <- match(names(table(mdp.t)[(!table(mdp.t)>1)]),mdp.t)
     mdp.t[idx] <- "Unique"
     mdp <- mdp.t
@@ -105,7 +112,7 @@ oar_missing_data_patterns <- function (data, dm, tolerance = TRUE) {
       
       mdp <- unlist(mdp)
       mdp.t <- rep(NA,nrow(data))
-      for(i in levels(bins)){mdp.t[bins == i] <- mdp[grepl(pattern = i, x = mdp, perl = F, fixed = T)]}
+      for(i in levels(bins)){mdp.t[bins == i] <- mdp[grepl(pattern = paste0(i,"."), x = mdp, perl = F, fixed = T)]}
       idx <- match(names(table(mdp.t)[(!table(mdp.t)>1)]),mdp.t)
       mdp.t[idx] <- "Unique"
       mdp <- mdp.t
