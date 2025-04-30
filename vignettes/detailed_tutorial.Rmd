@@ -132,7 +132,7 @@ We can choose our own tolerance and pass it to the function, which will be faste
 oar_missing_data_patterns(oar_data[[1]], dm, tolerance = 0.05)
 ```
 
-In this dataset a tolerance of 0.03 produced the best results, with 6 distinct patters found across cells (plus the combination of all genes with non-unique patterns). We can visualize these results like this:
+In this dataset a tolerance of 0.02 produced the best results, with 7 distinct patters found across cells (plus the combination of all genes with non-unique patterns). We can visualize these results like this:
 
 ```{r patterns_found_mdp, out.width="50%", fig.cap="Missing Data Pattern Plot"}
 p3 <- oar_missing_data_plot(data = oar_data[[1]], mdp = mdp_auto_tol, seurat_v5 = FALSE)

@@ -81,7 +81,6 @@ oar_preprocess_data <- function(data, tr = 1, seurat_v5 = TRUE, blacklisted.gene
 oar_missing_data_graph <- function (dm, tol = 0.05) {
   g <- igraph::graph_from_adjacency_matrix(
     adjmatrix = dm <= tol, mode = "undirected", diag = F) # Create an graph based on similar gene patterns
-  unp <- igraph::V(g)[igraph::degree(g) <= 0]$name # Identify genes with unique patterns
   g <- igraph::decompose(g) # Split into connected nodes
   mdp <- rep(NA,nrow(dm)) # create space holder for patterns
   ps <- 1:length(g) # create pattern numbers
@@ -90,12 +89,6 @@ oar_missing_data_graph <- function (dm, tol = 0.05) {
     mdp[as.numeric(igraph::V(i)$name)] <- ps[n]
     n=1+n
   }
-  mdp[as.numeric(unp)] <- "unique"
-  map <- data.frame(
-    "on" = names(table(mdp)),
-    "rn" = c(paste0("Pattern ",1:(length(names(table(mdp)))-1)),"Unique patterns"))
-  idx <- match(mdp,map$on)
-  mdp <- map$rn[idx]
   return(mdp)
 }
 
