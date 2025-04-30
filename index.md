@@ -48,6 +48,8 @@ If you want to install our vignettes (takes a few minutes!), try:
 
 `devtools::install_github("Sanin-Lab/OARscRNA", build_vignettes = TRUE)`
 
+**For Mac and Linux users**: The package uses `FastHamming::hamming_distance()` to speed up the hamming distance calculation. This function requires you to install `OpenMP`. To install via Homebrew run on your terminal: `brew install libomp`
+
 ## Usage
 
 To calculate an OAR score from a Seurat object with **default** parameters run:
