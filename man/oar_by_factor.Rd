@@ -10,6 +10,7 @@ oar_by_factor(
   blacklisted.genes = NULL,
   suffix = "",
   tolerance = TRUE,
+  factor = "ident",
   cores = 1
 )
 }
@@ -22,9 +23,9 @@ oar_by_factor(
 
 \item{suffix}{a string to append to the output variables. Default is empty}
 
-\item{cores}{a numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities.}
-
 \item{factor}{a  character string mapping to a column in \code{meta.data}. Defaults to \code{ident}.}
+
+\item{cores}{a numeric value indicating the number of cores to use un parallel processing. Use \code{parallel::detectCores()} or \code{parallelly::availableCores()} to identify possibilities.}
 }
 \value{
 a Seurat object with OAR stats added into meta data

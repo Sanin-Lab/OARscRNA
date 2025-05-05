@@ -8,7 +8,7 @@ The OAR (observed at random) score reveals cellular heterogeneity, allowing **ce
 -   Technical batches/library preparations
 -   Organisms
 
-**OAR score is a measure of heterogeneity among cells**. A cell with a **positive** OAR score is one where a set of genes appears to be expressed more homogenously than in other cells tested, and is consequently a highly distinct cell.
+**OAR score is a measure of heterogeneity among cells**. A cell with a **positive** OAR score is one where a set of genes appears to be expressed more homogeneously than in other cells tested, and is consequently a highly distinct cell.
 
 ## Motivation
 
@@ -34,7 +34,7 @@ At the core of the OAR score is the identification of missing data patterns, fol
 To calculate the OAR score we:
 
 1.  Estimate [Hamming distances](https://en.wikipedia.org/wiki/Hamming_distance) between binarized vectors of gene expression.
-2.  Group genes across missing data patterns defined as those with a small (0-0.05) hamming distance between them. Genes with unique patterns *- i.e. with no "neighbors"*, are grouped together.
+2.  Group genes across missing data patterns based on hamming distances between them. Genes with unique patterns *- i.e. with no "neighbors"*, are grouped together.
 3.  Compare the distribution of gene expression across identified patterns for *each cell* with a [Kruskal-Wallis](https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test) test.
 4.  Scale the resulting *corrected p value* distributions *across all cells* to obtain the **OAR score**.
 
@@ -48,7 +48,7 @@ If you want to install our vignettes (takes a few minutes!), try:
 
 `devtools::install_github("Sanin-Lab/OARscRNA", build_vignettes = TRUE)`
 
-**For Mac and Linux users**: The package uses `FastHamming::hamming_distance()` to speed up the hamming distance calculation. This function requires you to install `OpenMP`. To install via Homebrew run on your terminal: `brew install libomp`
+**For Mac and Linux users**: The package uses `FastHamming::hamming_distance()` to speed up the hamming distance calculation. Unless `OpenMP` is installed in your computer, the function will default to use all available threads. To install via Homebrew run on your terminal: `brew install libomp`
 
 ## Usage
 

@@ -61,7 +61,7 @@ In this tutorial we will walk you through all the steps of generating and analyz
 
 The process starting from a gene expression matrix is very similar and you should be able to adapt this workflow to that input. Skip a few lines down to the **data pre-processing step** to run the tutorial that way.
 
-At the end, we provide an alternative single line [wrapper function](wrapper-functions-and-result-interpretation) that runs the whole process, and adds the results to the `meta.data` slot of a Seurat object. If starting from a dataset with multiple cell types, we recommend running this process cluster by cluster, and similarly provide a wrapper function that accomplishes that.
+At the end, we provide an alternative single line [wrapper function](wrapper-functions-and-result-interpretation) that runs the whole process, and adds the results to the `meta.data` slot of a Seurat object. If starting from a dataset with multiple cell types or where a biological perturbation greatly alters gene expression, we recommend running this process splitting the data by that factor, and similarly provide a wrapper function that accomplishes that.
 
 ## 1. Loading and pre-processing your data
 
@@ -73,7 +73,7 @@ cells = colnames(sc.data)
 sc.data
 ```
 
-Now lets set a count threshold where we only analyze genes expressed in at least 1% of cells[^1]. We do not recommend using thresholds higher than 2%, as information will be lost.
+Now lets set a count threshold where we only analyze genes expressed in at least 1% of cells[^1]. We do not recommend using thresholds higher than 4%, as information will be lost.
 
 [^1]: *Filtering genes may reduce the time it takes to run the analysis.*
 
@@ -100,7 +100,7 @@ For a full description of each parameter consult the documentation. Briefly:
 
 ## 2. Identifying Missing Data Patterns
 
-Our scoring relies on identifying co-expressed genes patterns (which we call missing data patterns) which is a computationally intensive process. To do this, we can identify genes with minimal mismatch between them, but we need to first enable R to run in parallel. To determine your computers capacity, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as it will go much faster in the identification of the patterns.
+Our scoring relies on identifying co-expressed genes patterns (which we call missing data patterns) which is a computationally intensive process. To do this, we can identify genes with minimal mismatch between them, but we need to first enable R to run in parallel. To determine how many thread are available in your computer, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as pattern identification will go much faster.
 
 ```{r parallel cores, output.lines=5}
 parallelly::availableCores()
@@ -114,28 +114,21 @@ dm <- oar_hamming_distance(
 dm[[1]][1:5,1:5]
 ```
 
-The output is a list of matrices where the hamming distance between each pair of gene expression vectors evenly divided across expression bins is calculated. Expression binning is introduced to increase computational performance. In the wrapper function `oar` you have the possibility of storing this result in your Seurat object, so that future score calculations are completed faster. The wrapper function automatically detects a previously calculated hamming distance matrix and uses that for further analysis. **WARNING: If you use a different count filter value, or a different set of cells, these distances will no longer be appropriate. In that case, remove previously calculated distance matrix using** `oar_obj[["RNA"]]@misc <- list()`.
+The output is a list of matrices where the hamming distance between each pair of gene expression vectors evenly divided across expression bins is calculated. Expression binning is introduced to increase computational performance and introduce a dynamic threshold to identify patterns. In the wrapper function `oar` you have the possibility of storing this result in your Seurat object, so that future score calculations are completed faster. The wrapper function automatically detects a previously calculated hamming distance matrix and uses that for further analysis. **WARNING: If you use a different count filter value, or a different set of cells, these distances will no longer be appropriate. In that case, remove previously calculated distance matrix using** `oar_obj[["RNA"]]@misc <- list()`.
 
-Next, we want to group genes into co-expression patters based on a minimal hamming distance threshold, which we refer to as `tolerance`. This tolerance value is the fraction of mismatch between gene vectors that we allow to consider genes as part of the same pattern. To identify a suitable value between 0.01 and 0.05, we can set `tolerance` to `TRUE` in the `oar_missing_data_patterns` function. This function will search for a `tolerance` that does not introduce biases in the pattern matching. We have found that increasing `tolerance` can introduce an artificial relationship between the percentage of missing values and the significance test at the core of this approach.
+Next, we want to group genes into co-expression patters based on a minimal hamming distance threshold.
 
 ```{r mdp with automatic tolerance, output.lines=5}
-mdp_auto_tol <- oar_missing_data_patterns(
-  oar_data[[1]], dm, tolerance = T)
-table(mdp_auto_tol)
+mdp <- oar_missing_data_patterns(oar_data[[1]], dm)
+table(mdp)
 ```
 
-**A few considerantions on tolerance setting:** - Using a tolerance of 0 *(i.e. allowing only for exact matches)* results in very few, and often no, co-expressed gene patterns. This configuration generally fails and is not recommended. - The automatic tolerance setting selects the minimum tolerance above 0 where the percentage of missing values in a cell is not predictive of the *observed at random* test. If you choose your own tolerance, it is recommended you plot those two variables against each other (`KW.BH.pvalue` vs. `pct.missing`) and fit a linear model. If the slope of the model is significant and negative, the tolerance setting might not be appropriate.
+**A few considerations on pattern matching:** Allowing only for exact matches results in very few, and often no, co-expressed gene patterns, which is why our method makes this process more flexible. Internally, each gene expression bin is assigned a separate minimal hamming distance threshold (minimum of 0.01), which is used to generate an adjacency matrix for all genes. Then a graph is built based on this matrix and the eccentricities of all nodes calculated. Then the minimal hamming distance threshold is adjusted to cap the eccentricity of all nodes to maintain pattern integrity. We recommended you plot `KW.BH.pvalue` vs. `pct.missing` to examine the results. You should obverve no relationship between these variables, other than higher p values in some **- but not all -** cells with a high pct.missing.
 
-We can choose our own tolerance and pass it to the function, which will be faster. Values greater than 0 and lower than 0.05 are recommended.
-
-```{r mdp with specific tolerance, output.lines=5, eval = FALSE}
-oar_missing_data_patterns(oar_data[[1]], dm, tolerance = 0.05)
-```
-
-In this dataset a tolerance of 0.02 produced the best results, with 7 distinct patters found across cells (plus the combination of all genes with non-unique patterns). We can visualize these results like this:
+We can visualize these results of the pattern search by using:
 
 ```{r patterns_found_mdp, out.width="50%", fig.cap="Missing Data Pattern Plot"}
-p3 <- oar_missing_data_plot(data = oar_data[[1]], mdp = mdp_auto_tol, seurat_v5 = FALSE)
+p3 <- oar_missing_data_plot(data = oar_data[[1]], mdp = mdp, seurat_v5 = FALSE)
 p3
 ```
 
@@ -146,7 +139,7 @@ Each slice of the bar represents a cell, and it is colored based on what percent
 Now we are ready to do a cell-wise estimation of the overlap between the gene expression distributions in each detected pattern. When these distributions are distinct, we find that the data is not missing at random (NOAR), with highly significant p values and an OAR score of less than 2. Alternatively, when these distributions overlap, gene expression appears more randomly distributed (OAR), and cells have a larger p value and an OAR score greater than 2. Critically, our test incorporates both the gene expression values and the missing data patterns.
 
 ```{r oar base, output.lines=5}
-output <- oar_base(data = oar_data[[1]], mdp = mdp_auto_tol)
+output <- oar_base(data = oar_data[[1]], mdp = mdp)
 output$barcodes = cells #add back our barcodes
 output
 ```
@@ -210,24 +203,23 @@ In order to fully understand the features in the dataset driving the high OAR sc
 
 We can run this entire process with a single line. The result is the Seurat object with the `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `pct.missing` values in the `meta.data` slot. Additionally, genes are annotated by which missing data patterns (mdp) they have been included in `sc.data@assays$RNA@meta.data`.
 
-```{r oar wrapper, output.lines=5}
+```{r oar wrapper, output.lines=5, eval = FALSE}
 sc.data <- oar(data = sc.data, 
                seurat_v5 = T, count.filter = 1,
                blacklisted.genes = NULL, suffix = "",
-               tolerance = 0.03, store.hamming = T,
+               store.hamming = T,
                cores = 1)
 ```
 
-We set these parameters based on our earlier results and adjusted to the data provided:
+We set these parameters based on our earlier discussion:
 
 -   `seurat_v5` confirms the type of data being used. Defaults to `TRUE`.
--   `tolerance` controls whether the mismatch threshold should be determined automatically (between 0.01 and 0.05 hamming distances) or if a user supplied threshold should be used. Defaults to `TRUE`, and can take `TRUE` or a numeric value smaller than 1. Here we set it to 0.02 based on our results above.
 -   `count.filter` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
 -   `blacklisted.genes` Allows you to provide a vector of uninformative gene names (i.e. non-conding genes) to exclude from the analysis. Defaults to `NULL`.
 -   `suffix` Allows you to provide a character string to avoid overwriting previous OAR calculations. Defaults to `NULL`.
 -   `store.hamming` allows you to store the calculated hamming distances for pattern matching in your Seurat object for faster re-calculation of the scores if you need to alter other parameters later (found in `oar_obj[["RNA"]]@misc`). Defaults to `TRUE`.
 
-You can use a similar approach to analyse the data cluster by cluster - recommended when you have multiple cell types. In that case, use `oar_by_cluster()`.
+You can use a similar approach to analyse the data cluster by cluster - recommended when you have multiple cell types - or separated by another variable in your data. In that case, use `oar_by_factor()` and see `vignette("OAR_Factor")` for more details.
 
 #### Interpreting high OAR scores
 

@@ -79,7 +79,7 @@ data_obj
 
 Once you have the seurat version 5 object loaded, you can run the oar function. This function requires the input data, as well as some information on the number of cores (which is set to 1 by **DEFAULT**).
 
-To determine your computers capacity, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as it will go much faster in the identification of the patterns.
+To determine how many threads are available for the analysis, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as pattern identification will go much faster.
 
 ```{r run basic oar, output.lines=5}
 oar_obj <- oar(data_obj, cores = 1)
@@ -88,7 +88,6 @@ oar_obj <- oar(data_obj, cores = 1)
 We deliberately left most parameters as defaults, however we recommend you explore each to familiarize yourself with their impact on the result. Some critical parameters to consider include:
 
 -   `seurat_v5` confirms the type of data being used. Defaults to `TRUE`.
--   `tolerance` controls whether the mismatch threshold should be determined automatically (between 0.01 and 0.05 hamming distances) or if a user supplied threshold should be used. Defaults to `TRUE`, and can take `TRUE` or a numeric value smaller than 1.
 -   `count.filter` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
 -   `blacklisted.genes` allows you to provide a vector of uninformative gene names (i.e. non-coding genes) to exclude from the analysis. Defaults to `NULL`.
 -   `store.hamming` allows you to store the calculated hamming distances for pattern matching in your Seurat object for faster re-calculation of the scores if you need to alter other parameters later (found in `oar_obj[["RNA"]]@misc`). Defaults to `TRUE`.
@@ -102,12 +101,12 @@ The result is a Seurat object with these additional metadata columns:
 
 Additionally, genes are annotated by which missing data patterns (mdp) they have been included in. This mdp matrix has been added to the assay metadata (found in [oar_obj\@assays](mailto:oar_obj@assays){.email}\$[RNA\@meta.data](mailto:RNA@meta.data){.email}).
 
-### Analysis by Cluster
+### Analysis by Factor
 
-OAR scores are typically more informative when distinguishing among cells of the same type. When working with a dataset with diverse cell types, it can be helpful to run the function by cluster.
+OAR scores are typically more informative when distinguishing among cells of the same type. When working with a dataset with diverse cell types or dramatically affected by a biological variable, it can be helpful to split the data by that factor and run the test independently. See `vignette("OAR_Factors")` for more details.
 
 ```{r run oar by cluster, output.lines=5, eval = FALSE}
-oar_obj_bycluster <- oar_by_cluster(data_obj, cores = 1)
+oar_obj_byfactor <- oar_by_factor(data_obj, cores = 1, factor = "ident")
 ```
 
 This functions takes the same parameters as `oar`, but it will not store the calculated hamming distances in the resulting Seurat object.
@@ -132,12 +131,12 @@ These plot reveals which clusters have the highest OAR scores, as well as how th
 
 In some cases, you might want to explore the patterns that were identified during the analysis to understand what the co-expression gene modules are telling you. First, you can visualize missing data patterns like this:
 
-```{r patterns_found, out.width="50%", fig.cap="Missing Data Pattern Plot"}
+```{r patterns_found, out.width="80%", fig.cap="Missing Data Pattern Plot"}
 p3 <- oar_missing_data_plot(oar_obj)
 p3
 ```
 
-For this dataset, we identified 4 sets of genes: 3 relatively conserved patterns allowing for some mismatch, and a fourth which is a combination of all genes with unique patterns. Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell. For example, a pattern of 13 genes is expressed in only about a 10% of cells.
+For this dataset, we identified 24 sets of genes. Each slice of the bar represents a cell, and it is colored based on what percentage of genes from that pattern are expressed in each cell.
 
 To get a data.frame of the genes within each pattern, use:
 
@@ -145,7 +144,7 @@ To get a data.frame of the genes within each pattern, use:
 mdp <- get_missing_pattern_genes(oar_obj)
 ```
 
-It is also possible to retrieve missing data patterns when `oar_by_cluster()` is applied. Please see the documentation for `get_missing_pattern_genes()` for more details. Currently, the `oar_missing_data_plot()` is not supported when `oar_by_cluster()` is executed.
+It is also possible to retrieve missing data patterns when `oar_by_factor()` is applied. Please see the documentation for `get_missing_pattern_genes()` for more details. Currently, the `oar_missing_data_plot()` is not supported when `oar_by_factor()` is executed.
 
 #### Score projection with Seurat FeaturePlot
 
@@ -173,7 +172,6 @@ Once you have data loaded, you can run the oar function. In addition to the inpu
 
 ```{r run OAR on matrix, output.lines=5}
 oar_data<- oar(data, seurat_v5 = FALSE,
-               tolerance = TRUE, 
                cores = 1)
 oar_data
 ```

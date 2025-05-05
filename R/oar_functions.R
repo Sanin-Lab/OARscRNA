@@ -161,10 +161,10 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
 #' }
 oar_by_factor <- function (data, count.filter = 1,
                             blacklisted.genes = NULL, suffix = "",
-                            tolerance = TRUE,
+                            tolerance = TRUE, factor = "ident",
                             cores = 1) {
   
-  if (! factor %chin% colnames(data@meta.data) ){
+  if (! factor %chin% c(colnames(data@meta.data),"ident") ){
     stop("Specified factor not a column in meta.data.\nPlease double check your syntax!\n")}
   
   print("Splitting data by specified factor...")
