@@ -4,7 +4,7 @@
 \alias{oar_missing_data_graph}
 \title{Group missing data patterns based on tolerance with a graph}
 \usage{
-oar_missing_data_graph(dm, tol = 0.05)
+oar_missing_data_graph(dm, tol = 0.01)
 }
 \arguments{
 \item{dm}{a matrix of gene vector hamming distances.}
@@ -19,6 +19,6 @@ Group missing data patterns based on tolerance with a graph
 }
 \examples{
 \dontrun{
-mdp <- oar_missing_data_patterns(dm, tol = 0.05)
+mdp <- oar_missing_data_patterns(dm, tol = 0.01)
 }
 }

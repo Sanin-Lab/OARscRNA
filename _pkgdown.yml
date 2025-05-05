@@ -8,7 +8,7 @@ reference:
     These are all the functions you need to run the full analysis on your data.
   contents:
   - oar
-  - oar_by_cluster
+  - oar_by_factor
   - oar_deg
   - get_missing_pattern_genes
 - subtitle: Visualize results

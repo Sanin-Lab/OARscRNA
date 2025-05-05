@@ -48,20 +48,15 @@ oar_hamming_distance <- function (data, cores = 1) {
 #'
 #' @param data a minimal dataset ready for processing.
 #' @param dm a matrix of hamming distances between gene vectors.
-#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
 #'
 #' @return Vector of missing data patterns
 #' @export
 #'
 #' @examples 
 #' \dontrun{
-#' ##Automatic tolerance setting
-#' mdp <- oar_missing_data_patterns(data, dm, tolerance = T)
-#'
-#' ##User defined
-#' mdp <- oar_missing_data_patterns(data, dm, tolerance = 0.01)
+#' mdp <- oar_missing_data_patterns(data, dm)
 #' }
-oar_missing_data_patterns <- function (data, dm, tolerance = TRUE) {
+oar_missing_data_patterns <- function (data, dm) {
   g <- c()
   for(i in dm){g = c(g,nrow(i))}
   if(!sum(g) == nrow(data)){stop("Hamming distance matrix and count matrix have different number of genes.\nWhere similar filters applied?\n")}
@@ -73,71 +68,35 @@ oar_missing_data_patterns <- function (data, dm, tolerance = TRUE) {
     breaks = as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1))), # split genes evenly across 10 bins
     right = T, labels = labels, include.lowest = T) # Make sure all genes are assigned a bin
   
-  if(is.numeric(tolerance)){
-    mdp <- lapply(names(dm), function(x){
-      if(!nrow(dm[[x]]) == ncol(dm[[x]])){stop("Hamming distance matrix is not square\n")}
-      if(!all(diag(dm[[x]]) == 0)){stop("Hamming distance matrix must contain 0s in its diagonal\n")}
-
-      out <- oar_missing_data_graph(dm[[x]], tol = tolerance)
-      out <- paste(x, out, sep = ".P")
-      return(out)
-    })
-
-    mdp <- unlist(mdp)
-    mdp.t <- rep(NA,nrow(data))
-    for(i in levels(bins)){mdp.t[bins == i] <- mdp[grepl(pattern = paste0(i,"."), x = mdp, perl = F, fixed = T)]}
-    idx <- match(names(table(mdp.t)[(!table(mdp.t)>1)]),mdp.t)
-    mdp.t[idx] <- "Unique"
-    mdp <- mdp.t
+  mdp <- lapply(names(dm), function(x){
+    if(!nrow(dm[[x]]) == ncol(dm[[x]])){stop("Hamming distance matrix is not square\n")}
+    if(!all(diag(dm[[x]]) == 0)){stop("Hamming distance matrix must contain 0s in its diagonal\n")}
     
-    print(paste0("Identified ",length(unique(mdp))-1," non-unique missing data patterns"))
-    print(paste0("Tolerance set to ",tolerance))
-    print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["Unique"])," genes captured in non-unique patterns"))
+    vm <- dm[[x]][base::upper.tri(dm[[x]], diag = F)]
+    tol <- base::mean(vm) - 4*stats::sd(vm)
+    if(tol < 0.01){tol = 0.01}
     
-    }else if(is.logical(tolerance) && tolerance){
-    print("Scanning for optimal tolerance...")
-    s.data = data[,sample(1:ncol(data), size = ifelse(ncol(data)>=1000,1000,ncol(data)))]
-    z = 0.01
-    test = TRUE
-    mdp <- NULL
-    while(test){
-      mdp.out <- mdp
-      mdp <- lapply(names(dm), function(x){
-        if(!nrow(dm[[x]]) == ncol(dm[[x]])){stop("Hamming distance matrix is not square\n")}
-        if(!all(diag(dm[[x]]) == 0)){stop("Hamming distance matrix must contain 0s in its diagonal\n")}
-        
-        out <- oar_missing_data_graph(dm[[x]], tol = z)
-        out <- paste(x, out, sep = ".P")
-        return(out)})
-      
-      mdp <- unlist(mdp)
-      mdp.t <- rep(NA,nrow(data))
-      for(i in levels(bins)){mdp.t[bins == i] <- mdp[grepl(pattern = paste0(i,"."), x = mdp, perl = F, fixed = T)]}
-      idx <- match(names(table(mdp.t)[(!table(mdp.t)>1)]),mdp.t)
-      mdp.t[idx] <- "Unique"
-      mdp <- mdp.t
-      
-      lm.out <- oar_base(s.data,mdp) %>% 
-        dplyr::filter(abs(OARscore)<=2) %>% 
-        dplyr::select("x"="pct.missing","y"="KW.BH.pvalue") %>% 
-        dplyr::mutate(y = -log10(y)) %>% 
-        stats::lm(formula = y~x) %>% 
-        summary()
-      test <- ((lm.out$coefficients[2,4] > 0.01) + (lm.out$coefficients[2,1] > 0)) >= 1
-      if(!test && z == 0.01){
-        mdp.out <- mdp
-        print("Tolerance set to 0.01")
-        break}
-      if(!test){print(paste0("Tolerance set to ",z-0.01))}
-      z = z + 0.01
-      if(z == 0.06){warning("Setting tolerances avobe 0.05 is not recommended")}
-    }
-    mdp = mdp.out
-    print(paste0("Identified ",length(unique(mdp))-1," non-unique missing data patterns"))
-    print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["Unique"])," genes captured in non-unique patterns"))
-  }else{
-    stop("Tolerance must be TRUE or a mumerical value less than 1")
-  }
+    out <- oar_missing_data_graph(dm[[x]], tol = tol)
+    out <- paste(x, out, sep = ".P")
+    return(out)
+  })
+  
+  mdp <- unlist(mdp)
+  mdp.t <- rep(NA,nrow(data))
+  for(i in levels(bins)){mdp.t[bins == i] <- mdp[grepl(pattern = paste0(i,"."), x = mdp, perl = F, fixed = T)]}
+  idx <- match(names(table(mdp.t)[(!table(mdp.t)>1)]),mdp.t)
+  mdp.t[idx] <- "Unique"
+  mdp <- mdp.t
+  
+  print(paste0("Identified ",length(unique(mdp))-1," non-unique missing data patterns"))
+  print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["Unique"])," genes captured in non-unique patterns"))
+  
+  from = unique(mdp)[!unique(mdp) %chin% "Unique"]
+  to = paste0("ptn.",1:length(from))
+  df <- data.frame("from" = c(from,"Unique"), "to" = c(to,"Unique"))
+  idx <- match(mdp,df$from)
+  mdp <- df$to[idx]
+  
   return(mdp)
 }
 

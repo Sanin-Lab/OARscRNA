@@ -76,20 +76,27 @@ oar_preprocess_data <- function(data, tr = 1, seurat_v5 = TRUE, blacklisted.gene
 #'
 #' @examples 
 #' \dontrun{
-#' mdp <- oar_missing_data_patterns(dm, tol = 0.05)
+#' mdp <- oar_missing_data_patterns(dm, tol = 0.01)
 #' }
-oar_missing_data_graph <- function (dm, tol = 0.05) {
-  g <- igraph::graph_from_adjacency_matrix(
-    adjmatrix = dm <= tol, mode = "undirected", diag = F) # Create an graph based on similar gene patterns
-  g <- igraph::decompose(g) # Split into connected nodes
-  mdp <- rep(NA,nrow(dm)) # create space holder for patterns
-  ps <- 1:length(g) # create pattern numbers
-  n=1
-  for(i in g){ # Assign pattern numbers
-    mdp[as.numeric(igraph::V(i)$name)] <- ps[n]
-    n=1+n
+oar_missing_data_graph <- function (dm, tol = 0.01) {
+  loop = TRUE
+  while(loop){
+    g <- igraph::graph_from_adjacency_matrix(
+      adjmatrix = dm <= tol, mode = "undirected", diag = F)
+    ecc <- max(igraph::eccentricity(g, mode = "all"))
+    loop = ecc > 3
+    if(loop){tol = tol - 0.01}
   }
-  return(mdp)
+  
+  g <- igraph::decompose(g)
+  out <- rep(NA, nrow(dm))
+  ps <- 1:length(g)
+  n = 1
+  for (i in g) {
+    out[as.numeric(igraph::V(i)$name)] <- ps[n]
+    n = 1 + n
+  }
+  return(out)
 }
 
 ##===================================================================

@@ -97,6 +97,7 @@ oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
       group = as.factor(
         rep(mdp,
             times = length(unique(Var2))))) %>% 
+    dplyr::filter(!group == "Unique") %>% 
     dplyr::group_by(group, x) %>% 
     dplyr::summarise(p = sum(value)/n(),
                      count = n()) %>% 
@@ -118,12 +119,12 @@ oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
       transparency = 0),
     border = T, show_row_dend = F, show_column_dend = F,
     show_column_names = F, show_row_names = T,
-    cluster_rows = F, cluster_columns = T,
+    cluster_rows = T, cluster_columns = T,
     row_labels = rownames(m),
     row_names_side = "left", row_names_gp = grid::gpar(fontsize = 8),
     column_title = "Cells", column_title_side = "top",
     column_title_gp = grid::gpar(fontsize = 8),
-    width = unit(ncol(m)*0.05, "mm"), height = unit(3*nrow(m), "mm"))
+    width = unit(ncol(m)*0.01, "mm"), height = unit(3*nrow(m), "mm"))
   
   # Output #
   return(ht)

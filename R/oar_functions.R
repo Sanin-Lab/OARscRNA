@@ -41,7 +41,6 @@ oar_base <- function (data, mdp) {
 #' @param count.filter a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.
 #' @param blacklisted.genes a character vector with gene names to be excluded from the analysis. Default is empty.
 #' @param suffix a string to append to the output variables. Default is empty
-#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
 #' @param cores a numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities. Default is 1.
 #' @param store.hamming a boolean to control if hamming distances should be stored in the Seurat object. Default set to `TRUE`
 #'
@@ -55,12 +54,11 @@ oar_base <- function (data, mdp) {
 #' 
 oar <- function (data, seurat_v5 = TRUE, count.filter = 1, 
                  blacklisted.genes = NULL, suffix = "",
-                 tolerance = TRUE, cores = 1, store.hamming = TRUE) {
+                 cores = 1, store.hamming = TRUE) {
   
   #Check parameters were correctly supplied
   if(!is.numeric(count.filter)){stop("count.filter must be numeric\n")}
   if(!is.character(suffix)){stop("suffix must be a string\n")}
-  if(!is.logical(tolerance)){if(!is.numeric(tolerance))stop("tolerance must be logical or numeric\n")}
   if(!is.logical(seurat_v5)){stop("seurat_v5 must be TRUE or FALSE\n")}
   if(!is.null(blacklisted.genes)){if(!is.character(blacklisted.genes))stop("Supplied blacklisted genes are not characters\n")}
   if(seurat_v5){if(!is.logical(store.hamming)){stop("store.hamming must be TRUE or FALSE\n")}}
@@ -70,13 +68,6 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
     warning("Overfiltering expression matrix (count.filter > 2) may lower signal detection\n")
   }else if(count.filter == 0) {
     warning("Minimum fraction of cells expressing any given gene should be greater than 0\n")
-  }
-  if(is.numeric(tolerance)){
-    if (tolerance == 0) {
-      warning("Tolerance should be greater than 0\n")
-    }else if(tolerance >= 0.1) {
-      warning("Tolerances greater than 0.10 are not recommended\n")
-    }
   }
   
   #Processing Warnings 
@@ -117,7 +108,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   }else{
     dm <- oar_hamming_distance(data, cores = cores)
   }
-  mdp <- oar_missing_data_patterns(data = data, dm = dm, tolerance = tolerance)
+  mdp <- oar_missing_data_patterns(data = data, dm = dm)
   
   #Run missingness test
   print("Calculating scores")
@@ -150,15 +141,15 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
 }
 
 ##===================================================================
-#Oar Test By Cluster
+#Oar Test By Factor
 ##===================================================================
 #' Generate OAR score within each cluster and add them to full objects metadata
 #'
-#' @param data a clustered Seurat (v5) object.
+#' @param data a Seurat (v5) object.
+#' @param factor a  character string mapping to a column in `meta.data`. Defaults to `ident`.
 #' @param count.filter a numeric value indicating the minimum fraction of cells expressing any given gene that will be included in the analysis, default is 1. Values between 0.5 and 2 are recommended.
 #' @param blacklisted.genes a character vector with gene names to be excluded from the analysis. Default is empty.
 #' @param suffix a string to append to the output variables. Default is empty
-#' @param tolerance a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to `TRUE`, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.
 #' @param cores a numeric value indicating the number of cores to use un parallel processing. Use `parallel::detectCores()` or `parallelly::availableCores()` to identify possibilities.
 #'
 #' @return a Seurat object with OAR stats added into meta data
@@ -168,26 +159,28 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
 #' \dontrun{
 #' pmbcs <- oar_by_cluster(pmbcs)
 #' }
-oar_by_cluster <- function (data, count.filter = 1,
+oar_by_factor <- function (data, count.filter = 1,
                             blacklisted.genes = NULL, suffix = "",
                             tolerance = TRUE,
                             cores = 1) {
   
-  print("Splitting data by cluster...")
+  if (! factor %chin% colnames(data@meta.data) ){
+    stop("Specified factor not a column in meta.data.\nPlease double check your syntax!\n")}
   
-  data_list <- Seurat::SplitObject(data) #split into list of objects by active ident
+  print("Splitting data by specified factor...")
+  
+  data_list <- Seurat::SplitObject(data, split.by = factor) #split into list of objects by active ident
   if("hamming" %in% names(data[["RNA"]]@misc)){
     data_list <- lapply(data_list,function(x){
       x[["RNA"]]@misc <- list()
       return(x)})
-    warning("Previously calculated hamming distances will not be used/stored when estimating OAR score by cluster")
+    warning("Previously calculated hamming distances will not be used/stored when estimating OAR score by specified factors")
   }
   
   #run oar on each object
   data_oar <- lapply(data_list, oar, count.filter = count.filter,
                      blacklisted.genes = blacklisted.genes, 
-                     suffix = suffix, store.hamming = FALSE,
-                     tolerance = tolerance, cores = cores)
+                     suffix = suffix, store.hamming = FALSE, cores = cores)
   
   #combine objects back together
   collect <- paste0(c("OARscore","KW.pvalue","KW.BH.pvalue","pct.missing"),suffix)
