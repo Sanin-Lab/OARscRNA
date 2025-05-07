@@ -160,9 +160,9 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
 #' pmbcs <- oar_by_cluster(pmbcs)
 #' }
 oar_by_factor <- function (data, count.filter = 1,
-                            blacklisted.genes = NULL, suffix = "",
-                            tolerance = TRUE, factor = "ident",
-                            cores = 1) {
+                           blacklisted.genes = NULL, suffix = "",
+                           factor = "ident",
+                           cores = 1) {
   
   if (! factor %chin% c(colnames(data@meta.data),"ident") ){
     stop("Specified factor not a column in meta.data.\nPlease double check your syntax!\n")}
@@ -190,7 +190,7 @@ oar_by_factor <- function (data, count.filter = 1,
   
   mdp_combine <- lapply(data_oar, function(x){
     rn = c("mdp")
-    names(rn) = paste0("mdp_cl_",levels(Seurat::Idents(x)))
+    names(rn) = paste0("mdp_",unique(x[[factor]]))
     x[["RNA"]]@meta.data %>% dplyr::select(dplyr::any_of(rn))})
   mdp_combine <- do.call(cbind,mdp_combine)
   

@@ -76,6 +76,10 @@ Follow our quick guide on running the analysis with a single line: `vignette("in
 
 Follow our step-by-step tutorial on exploring how we can identify highly activated plasmacytoid dendritic cells based on a high OAR score: `vignette("detailed_tutorial")`
 
+### Cell prioritization across biological conditions
+
+OAR scores are typically more informative when distinguishing among cells of the same type. When working with a dataset with diverse cell types or dramatically affected by a biological variable, it can be helpful to split the data by that factor and run the test independently: `vignette("OAR_Factor")`
+
 ### Model gene expression data at the single cell level
 
 Identify genes responsible for high OAR scoring cells at a single cell resolution: `vignette("Gene_expression")`

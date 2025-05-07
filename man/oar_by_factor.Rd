@@ -9,7 +9,6 @@ oar_by_factor(
   count.filter = 1,
   blacklisted.genes = NULL,
   suffix = "",
-  tolerance = TRUE,
   factor = "ident",
   cores = 1
 )

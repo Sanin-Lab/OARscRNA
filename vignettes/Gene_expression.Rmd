@@ -68,7 +68,6 @@ library(Seurat)
 sc.data <- oar(data = readRDS(file = "pdcs.rds"), 
                seurat_v5 = T, count.filter = 1,
                blacklisted.genes = NULL, suffix = "",
-               tolerance = 0.02,
                cores = 1)
 ```
 

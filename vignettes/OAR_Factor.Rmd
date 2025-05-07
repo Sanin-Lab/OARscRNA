@@ -1,0 +1,119 @@
+---
+title: "Running OAR in a datset split by Factors"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Running OAR in a datset split by Factors}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = F}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(knitr)
+
+hook_output <- knitr::knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+   lines <- options$output.lines
+   if (is.null(lines)) {
+     return(hook_output(x, options))  # pass to default hook
+   }
+   x <- unlist(strsplit(x, "\n"))
+   more <- "..."
+   if (length(lines)==1) {        # first n lines
+     if (length(x) > lines) {
+       # truncate the output, but add ....
+       x <- c(head(x, lines), more)
+     }
+   } else {
+     x <- c(more, x[lines], more)
+   }
+   # paste these lines together
+   x <- paste(c(x, ""), collapse = "\n")
+   hook_output(x, options)
+ })
+
+opts_chunk$set(eval=TRUE,
+   ## text results
+   echo=TRUE,
+   results=c('markup', 'asis', 'hold', 'hide')[1],
+   ## plots
+   fig.path=c('figure', 'figure/minimal-')[1],
+   fig.keep=c('high', 'none', 'all', 'first', 'last')[1],
+   fig.align=c('center', 'left', 'right', 'default')[1],
+   fig.show=c('hold', 'asis', 'animate', 'hide')[1],
+   dev=c('pdf', 'png', 'tikz')[2],
+   fig.width=5, fig.height=3, #inches
+   fig.env=c('figure', 'marginfigure')[1],
+   fig.pos=c('', 'h', 't', 'b', 'p', 'H')[1]
+   )
+```
+
+```{r setup}
+library(OAR)
+```
+
+# Overview
+
+In this tutorial we will walk you through generating OAR scores from your single cell dataset separated by a factor in your data. We will begin with a Seurat object with *Dictyostelium discoideum* cells (dicty) that you can download from our [github repository](#0).
+
+This approach is usually recommended when you have multiple cell types in your dataset or your experimental conditions introduce dramatic shifts in gene expression patterns. Our approach works best to detect heterogeneity within a set of cells that you expect to be somewhat similar. Consequently, in situations like the ones outlined above, it makes more sense to split the data by a factor before running the analysis.
+
+First, we will take a look at how the test performs when the data is not split. Later we will run the analysis split by factors. As always, we begin by loading the seurat object with the dataset we are interested in.
+
+```{r load seurat object}
+library(Seurat)
+sc.data <- readRDS(file = "dicty.rds")
+sc.data
+```
+
+## 1. Running the full test
+
+We can run the full test entire process with a single line. For a description of all these parameters see our other vignettes. The result is the Seurat object with the `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `pct.missing` values in the `meta.data` slot.
+
+```{r oar wrapper, output.lines=5, eval = TRUE}
+sc.data <- oar(data = sc.data, 
+               seurat_v5 = T, count.filter = 1,
+               blacklisted.genes = NULL, suffix = "",
+               store.hamming = F,
+               cores = 1)
+```
+
+To explore the results we can visualize `OARscore` vs `pct.missing` values, coloring the cells based on some of the attributes in our Seurat object meta.data.
+
+```{r create_scatter_plot_condition, out.width="100%", fig.cap="Scatter Plots by Factors"}
+library(patchwork)
+library(ggplot2)
+p1 <- scatter_score_missing(sc.data, pt.size = 0.5)+NoLegend()
+p2 <- scatter_score_missing(sc.data, pt.size = 0.5, group.by = "group")
+p1+p2
+```
+
+Here we can see that the underlying biological conditions are resulting in very different sets of OARscores. In particular, 10h of starvation, induces a completely separate profile of values. For that reason, running the test separating the data by this biological variable will allow us to prioritize cells within each condition for further analysis.
+
+## 2. Analysis by Factor
+
+OAR scores are typically more informative when distinguishing among cells of the same type. When working with a dataset with diverse cell types or dramatically affected by a biological variable, it can be helpful to split the data by that factor and run the test independently. This can be easily accomplished with our wrapper function, which takes the same parameters as we have discussed before and returns a Seurat object containing the results of the analysis.
+
+```{r run oar by cluster, output.lines=5, eval = TRUE}
+sc.data <- oar_by_factor(sc.data, cores = 1, factor = "group", suffix = ".factor")
+```
+
+Now let us examine the outcome of this analysis:
+
+```{r scatter_by_condition, out.width="100%", fig.cap="Scatter Plots by Factors"}
+p3 <- scatter_score_missing(sc.data, pt.size = 0.5, suffix = ".factor")+NoLegend()
+p4 <- scatter_score_missing(sc.data, pt.size = 0.5, group.by = "group", suffix = ".factor")
+p3+p4
+```
+
+As you can see, we are able to identify heterogeneoty within each biological condition. Moreover, we can visualize these results in a UMAP projection of the using `Seurat::FeaturePlot()`.
+
+```{r OAR_factor_featureplot, out.width="100%", fig.cap="Results by factor"}
+p5 <- FeaturePlot(
+  sc.data, features = "OARscore.factor", order = T, pt.size = 0.5, 
+  min.cutoff = "q40", max.cutoff = "q90")
+p5
+```
