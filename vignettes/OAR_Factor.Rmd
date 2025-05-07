@@ -1,5 +1,5 @@
 ---
-title: "Running OAR in a datset split by Factors"
+title: "Running OAR in a dataset split by Factors"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Running OAR in a datset split by Factors}
@@ -109,7 +109,7 @@ p4 <- scatter_score_missing(sc.data, pt.size = 0.5, group.by = "group", suffix =
 p3+p4
 ```
 
-As you can see, we are able to identify heterogeneoty within each biological condition. Moreover, we can visualize these results in a UMAP projection of the using `Seurat::FeaturePlot()`.
+As you can see, we are able to identify heterogeneity within each biological condition. Moreover, we can visualize these results in a UMAP projection of the using `Seurat::FeaturePlot()`.
 
 ```{r OAR_factor_featureplot, out.width="100%", fig.cap="Results by factor"}
 p5 <- FeaturePlot(
