@@ -2,6 +2,7 @@
 <url><loc>https://sanin-lab.github.io/OARscRNA/404.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/LICENSE.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/articles/Gene_expression.html</loc></url>
+<url><loc>https://sanin-lab.github.io/OARscRNA/articles/OAR_Factor.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/articles/detailed_tutorial.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/articles/index.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/articles/introductory_vignette.html</loc></url>
@@ -13,7 +14,7 @@
 <url><loc>https://sanin-lab.github.io/OARscRNA/reference/missing_pattern_pval_kw.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/reference/oar.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/reference/oar_base.html</loc></url>
-<url><loc>https://sanin-lab.github.io/OARscRNA/reference/oar_by_cluster.html</loc></url>
+<url><loc>https://sanin-lab.github.io/OARscRNA/reference/oar_by_factor.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/reference/oar_deg.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/reference/oar_hamming_distance.html</loc></url>
 <url><loc>https://sanin-lab.github.io/OARscRNA/reference/oar_missing_data_graph.html</loc></url>

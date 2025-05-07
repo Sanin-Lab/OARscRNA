@@ -43,6 +43,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/introductory_vignette.html">Introductory Vignette for OARscRNA</a></li>
     <li><a class="dropdown-item" href="articles/detailed_tutorial.html">Step-by-step guide to running OAR</a></li>
+    <li><a class="dropdown-item" href="articles/OAR_Factor.html">Running OAR in a datset split by Factors</a></li>
     <li><a class="dropdown-item" href="articles/Gene_expression.html">Gene Expression Analysis based on OAR scores</a></li>
   </ul>
 </li>
@@ -81,7 +82,7 @@
 <li>Technical batches/library preparations</li>
 <li>Organisms</li>
 </ul>
-<p><strong>OAR score is a measure of heterogeneity among cells</strong>. A cell with a <strong>positive</strong> OAR score is one where a set of genes appears to be expressed more homogenously than in other cells tested, and is consequently a highly distinct cell.</p>
+<p><strong>OAR score is a measure of heterogeneity among cells</strong>. A cell with a <strong>positive</strong> OAR score is one where a set of genes appears to be expressed more homogeneously than in other cells tested, and is consequently a highly distinct cell.</p>
 </div>
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
@@ -104,7 +105,7 @@
 <p>To calculate the OAR score we:</p>
 <ol style="list-style-type: decimal">
 <li>Estimate <a href="https://en.wikipedia.org/wiki/Hamming_distance" class="external-link">Hamming distances</a> between binarized vectors of gene expression.</li>
-<li>Group genes across missing data patterns defined as those with a small (0-0.05) hamming distance between them. Genes with unique patterns <em>- i.e. with no “neighbors”</em>, are grouped together.</li>
+<li>Group genes across missing data patterns based on hamming distances between them. Genes with unique patterns <em>- i.e. with no “neighbors”</em>, are grouped together.</li>
 <li>Compare the distribution of gene expression across identified patterns for <em>each cell</em> with a <a href="https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test" class="external-link">Kruskal-Wallis</a> test.</li>
 <li>Scale the resulting <em>corrected p value</em> distributions <em>across all cells</em> to obtain the <strong>OAR score</strong>.</li>
 </ol>
@@ -116,7 +117,7 @@
 <p><code>devtools::install_github("Sanin-Lab/OARscRNA")</code></p>
 <p>If you want to install our vignettes (takes a few minutes!), try:</p>
 <p><code>devtools::install_github("Sanin-Lab/OARscRNA", build_vignettes = TRUE)</code></p>
-<p><strong>For Mac and Linux users</strong>: The package uses <code><a href="https://rdrr.io/pkg/FastHamming/man/hamming_distance.html" class="external-link">FastHamming::hamming_distance()</a></code> to speed up the hamming distance calculation. This function requires you to install <code>OpenMP</code>. To install via Homebrew run on your terminal: <code>brew install libomp</code></p>
+<p><strong>For Mac and Linux users</strong>: The package uses <code><a href="https://rdrr.io/pkg/FastHamming/man/hamming_distance.html" class="external-link">FastHamming::hamming_distance()</a></code> to speed up the hamming distance calculation. Unless <code>OpenMP</code> is installed in your computer, the function will default to use all available threads. To install via Homebrew run on your terminal: <code>brew install libomp</code></p>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -143,6 +144,11 @@
 <h3 id="cell-prioritization-for-downstream-analysis">Cell prioritization for downstream analysis<a class="anchor" aria-label="anchor" href="#cell-prioritization-for-downstream-analysis"></a>
 </h3>
 <p>Follow our step-by-step tutorial on exploring how we can identify highly activated plasmacytoid dendritic cells based on a high OAR score: <code><a href="articles/detailed_tutorial.html">vignette("detailed_tutorial")</a></code></p>
+</div>
+<div class="section level3">
+<h3 id="cell-prioritization-across-biological-conditions">Cell prioritization across biological conditions<a class="anchor" aria-label="anchor" href="#cell-prioritization-across-biological-conditions"></a>
+</h3>
+<p>OAR scores are typically more informative when distinguishing among cells of the same type. When working with a dataset with diverse cell types or dramatically affected by a biological variable, it can be helpful to split the data by that factor and run the test independently: <code><a href="articles/OAR_Factor.html">vignette("OAR_Factor")</a></code></p>
 </div>
 <div class="section level3">
 <h3 id="model-gene-expression-data-at-the-single-cell-level">Model gene expression data at the single cell level<a class="anchor" aria-label="anchor" href="#model-gene-expression-data-at-the-single-cell-level"></a>

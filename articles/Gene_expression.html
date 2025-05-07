@@ -40,6 +40,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/introductory_vignette.html">Introductory Vignette for OARscRNA</a></li>
     <li><a class="dropdown-item" href="../articles/detailed_tutorial.html">Step-by-step guide to running OAR</a></li>
+    <li><a class="dropdown-item" href="../articles/OAR_Factor.html">Running OAR in a datset split by Factors</a></li>
     <li><a class="dropdown-item" href="../articles/Gene_expression.html">Gene Expression Analysis based on OAR scores</a></li>
   </ul>
 </li>
@@ -107,13 +108,12 @@ function. The result is a Seurat object with <code>OARscore</code>,
 <span><span class="va">sc.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span>file <span class="op">=</span> <span class="st">"pdcs.rds"</span><span class="op">)</span>, </span>
 <span>               seurat_v5 <span class="op">=</span> <span class="cn">T</span>, count.filter <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>               blacklisted.genes <span class="op">=</span> <span class="cn">NULL</span>, suffix <span class="op">=</span> <span class="st">""</span>,</span>
-<span>               tolerance <span class="op">=</span> <span class="fl">0.02</span>,</span>
 <span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data = readRDS(file = "pdcs.rds"), seurat_v5 = T, count.filter = 1, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-04-30 20:19:26 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-05-07 18:53:43 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>To explore which cells/clusters have the most heterogeneity, we can
@@ -163,13 +163,13 @@ computing.</p>
 <span>    splines <span class="op">=</span> <span class="cn">TRUE</span>, degrees.freedom <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>    auto.threshold <span class="op">=</span> <span class="cn">TRUE</span>, custom.tr <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-04-30 20:19:33 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-05-07 18:53:50 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "FDR threshold set to:"</span></span>
 <span><span class="co">#&gt; [1] 1e-20</span></span>
 <span><span class="co">#&gt; Warning in oar_deg(data = sc.data, seurat_v5 = T, score.name = "OARscore", : Using splines increases calculation time by 3-5x</span></span>
 <span><span class="co">#&gt; [1] "Analysis completed at:"</span></span>
-<span><span class="co">#&gt; [1] "2025-04-30 20:20:26 UTC"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "2025-05-07 18:54:41 UTC"</span></span></code></pre></div>
 <p>A brief explanation of these parameters is presented here:</p>
 <ul>
 <li>
@@ -217,16 +217,16 @@ spurious associations.</li>
 filtered genes:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oar_deg</span></span>
-<span><span class="co">#&gt;              name          pval      adj_pval f_statistic df1      df2 lfc</span></span>
-<span><span class="co">#&gt; 1        PPP1R15A 2.647384e-205 3.086584e-201   286.32180   5 1271.675  NA</span></span>
-<span><span class="co">#&gt; 2             NMI 2.070117e-137 1.206775e-133   168.19020   5 1271.675  NA</span></span>
-<span><span class="co">#&gt; 3          PMAIP1 5.500115e-130 2.137528e-126   156.94063   5 1271.675  NA</span></span>
-<span><span class="co">#&gt; 4            OASL 6.550374e-125 1.909270e-121   149.42073   5 1271.675  NA</span></span>
-<span><span class="co">#&gt; 5          MAP3K8 2.022935e-112 4.717081e-109   131.49119   5 1271.675  NA</span></span>
-<span><span class="co">#&gt; 6          DNAJC7 3.985582e-103 7.744650e-100   118.66064   5 1271.675  NA</span></span>
-<span><span class="co">#&gt; 7           SAR1A  9.789319e-95  1.630481e-91   107.43956   5 1271.675  NA</span></span>
-<span><span class="co">#&gt; 8           TGIF1  2.128175e-92  3.101549e-89   104.37322   5 1271.675  NA</span></span>
-<span><span class="co">#&gt; 9             UBC  3.317622e-92  4.297795e-89   104.12139   5 1271.675  NA</span></span>
+<span><span class="co">#&gt;           name         pval     adj_pval f_statistic df1      df2 lfc</span></span>
+<span><span class="co">#&gt; 1        HSPB1 1.420100e-87 1.655695e-83    98.24009   5 1262.951  NA</span></span>
+<span><span class="co">#&gt; 2     PPP1R15A 1.884017e-67 1.098288e-63    73.25076   5 1262.951  NA</span></span>
+<span><span class="co">#&gt; 3      HLA-DRA 1.599269e-61 6.215294e-58    66.22267   5 1262.951  NA</span></span>
+<span><span class="co">#&gt; 4          UBC 1.854397e-60 5.405103e-57    64.97655   5 1262.951  NA</span></span>
+<span><span class="co">#&gt; 5     HLA-DRB1 5.356963e-60 1.249137e-56    64.43856   5 1262.951  NA</span></span>
+<span><span class="co">#&gt; 6     HSP90AB1 3.049325e-56 5.925347e-53    60.08569   5 1262.951  NA</span></span>
+<span><span class="co">#&gt; 7     HSP90AA1 1.649319e-50 2.747058e-47    53.54926   5 1262.951  NA</span></span>
+<span><span class="co">#&gt; 8     HLA-DPA1 5.614897e-50 8.183010e-47    52.94923   5 1262.951  NA</span></span>
+<span><span class="co">#&gt; 9          UBB 2.792879e-49 3.618020e-46    52.16515   5 1262.951  NA</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>For a full description of each column, visit the
 <code>glmGamPoi</code> documentation. For our purposes, the

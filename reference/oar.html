@@ -20,6 +20,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/introductory_vignette.html">Introductory Vignette for OARscRNA</a></li>
     <li><a class="dropdown-item" href="../articles/detailed_tutorial.html">Step-by-step guide to running OAR</a></li>
+    <li><a class="dropdown-item" href="../articles/OAR_Factor.html">Running OAR in a datset split by Factors</a></li>
     <li><a class="dropdown-item" href="../articles/Gene_expression.html">Gene Expression Analysis based on OAR scores</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -55,7 +56,6 @@
 <span>  count.filter <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  blacklisted.genes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  suffix <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  tolerance <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  cores <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  store.hamming <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -83,10 +83,6 @@
 
 <dt id="arg-suffix">suffix<a class="anchor" aria-label="anchor" href="#arg-suffix"></a></dt>
 <dd><p>a string to append to the output variables. Default is empty</p></dd>
-
-
-<dt id="arg-tolerance">tolerance<a class="anchor" aria-label="anchor" href="#arg-tolerance"></a></dt>
-<dd><p>a boolean or numeric value controlling the tolerance threshold for pattern matching. If set to <code>TRUE</code>, then tolerance is automatically adjusted. Alternatively, user may supply a numeric value indicating the maximum fraction of mismatch between pairs of genes for pattern grouping. Values between 0.01 and 0.05 are recommended.</p></dd>
 
 
 <dt id="arg-cores">cores<a class="anchor" aria-label="anchor" href="#arg-cores"></a></dt>

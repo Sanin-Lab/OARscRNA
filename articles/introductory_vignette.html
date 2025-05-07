@@ -40,6 +40,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/introductory_vignette.html">Introductory Vignette for OARscRNA</a></li>
     <li><a class="dropdown-item" href="../articles/detailed_tutorial.html">Step-by-step guide to running OAR</a></li>
+    <li><a class="dropdown-item" href="../articles/OAR_Factor.html">Running OAR in a datset split by Factors</a></li>
     <li><a class="dropdown-item" href="../articles/Gene_expression.html">Gene Expression Analysis based on OAR scores</a></li>
   </ul>
 </li>
@@ -113,18 +114,18 @@ repository</a>.</p>
 function. This function requires the input data, as well as some
 information on the number of cores (which is set to 1 by
 <strong>DEFAULT</strong>).</p>
-<p>To determine your computers capacity, you can run
-<code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
+<p>To determine how many threads are available for the analysis, you can
+run <code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
 available for other processes running in your computer to prevent
-crashing. Using multiple cores is recommended as it will go much faster
-in the identification of the patterns.</p>
+crashing. Using multiple cores is recommended as pattern identification
+will go much faster.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oar_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in oar(data_obj, cores = 1): Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-04-30 20:20:42 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-05-07 18:54:56 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>We deliberately left most parameters as defaults, however we
@@ -134,12 +135,6 @@ the result. Some critical parameters to consider include:</p>
 <li>
 <code>seurat_v5</code> confirms the type of data being used.
 Defaults to <code>TRUE</code>.</li>
-<li>
-<code>tolerance</code> controls whether the mismatch threshold
-should be determined automatically (between 0.01 and 0.05 hamming
-distances) or if a user supplied threshold should be used. Defaults to
-<code>TRUE</code>, and can take <code>TRUE</code> or a numeric value
-smaller than 1.</li>
 <li>
 <code>count.filter</code> controls the minimum percentage of cells
 expressing any given gene for that gene to be retained in the analysis.
@@ -178,13 +173,15 @@ dataset.</li>
 assay metadata (found in <a href="mailto:oar_obj@assays" class="email">oar_obj@assays</a>$<a href="mailto:RNA@meta.data" class="email">RNA@meta.data</a>).</p>
 </div>
 <div class="section level4">
-<h4 id="analysis-by-cluster">Analysis by Cluster<a class="anchor" aria-label="anchor" href="#analysis-by-cluster"></a>
+<h4 id="analysis-by-factor">Analysis by Factor<a class="anchor" aria-label="anchor" href="#analysis-by-factor"></a>
 </h4>
 <p>OAR scores are typically more informative when distinguishing among
 cells of the same type. When working with a dataset with diverse cell
-types, it can be helpful to run the function by cluster.</p>
+types or dramatically affected by a biological variable, it can be
+helpful to split the data by that factor and run the test independently.
+See <code>vignette("OAR_Factors")</code> for more details.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">oar_obj_bycluster</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_by_cluster.html">oar_by_cluster</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">oar_obj_byfactor</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_by_factor.html">oar_by_factor</a></span><span class="op">(</span><span class="va">data_obj</span>, cores <span class="op">=</span> <span class="fl">1</span>, factor <span class="op">=</span> <span class="st">"ident"</span><span class="op">)</span></span></code></pre></div>
 <p>This functions takes the same parameters as <code>oar</code>, but it
 will not store the calculated hamming distances in the resulting Seurat
 object.</p>
@@ -225,24 +222,21 @@ like this:</p>
 <span><span class="co">#&gt; [1] "Generating plots..."</span></span>
 <span><span class="va">p3</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figurepatterns_found-1.png" alt="Missing Data Pattern Plot" width="50%"><p class="caption">
+<img src="figurepatterns_found-1.png" alt="Missing Data Pattern Plot" width="80%"><p class="caption">
 Missing Data Pattern Plot
 </p>
 </div>
-<p>For this dataset, we identified 4 sets of genes: 3 relatively
-conserved patterns allowing for some mismatch, and a fourth which is a
-combination of all genes with unique patterns. Each slice of the bar
-represents a cell, and it is colored based on what percentage of genes
-from that pattern are expressed in each cell. For example, a pattern of
-13 genes is expressed in only about a 10% of cells.</p>
+<p>For this dataset, we identified 24 sets of genes. Each slice of the
+bar represents a cell, and it is colored based on what percentage of
+genes from that pattern are expressed in each cell.</p>
 <p>To get a data.frame of the genes within each pattern, use:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mdp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_missing_pattern_genes.html">get_missing_pattern_genes</a></span><span class="op">(</span><span class="va">oar_obj</span><span class="op">)</span></span></code></pre></div>
 <p>It is also possible to retrieve missing data patterns when
-<code><a href="../reference/oar_by_cluster.html">oar_by_cluster()</a></code> is applied. Please see the documentation
+<code><a href="../reference/oar_by_factor.html">oar_by_factor()</a></code> is applied. Please see the documentation
 for <code><a href="../reference/get_missing_pattern_genes.html">get_missing_pattern_genes()</a></code> for more details.
 Currently, the <code><a href="../reference/oar_missing_data_plot.html">oar_missing_data_plot()</a></code> is not supported
-when <code><a href="../reference/oar_by_cluster.html">oar_by_cluster()</a></code> is executed.</p>
+when <code><a href="../reference/oar_by_factor.html">oar_by_factor()</a></code> is executed.</p>
 </div>
 <div class="section level5">
 <h5 id="score-projection-with-seurat-featureplot">Score projection with Seurat FeaturePlot<a class="anchor" aria-label="anchor" href="#score-projection-with-seurat-featureplot"></a>
@@ -296,21 +290,20 @@ to the input data we must specify that we are not starting with a Seurat
 object by setting <code>seurat_v5</code> to <code>FALSE</code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oar_data</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span><span class="va">data</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>               tolerance <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in oar(data, seurat_v5 = FALSE, tolerance = TRUE, cores = 1): Running process in fewer than 2 cores will considerably slow down progress</span></span>
+<span><span class="co">#&gt; Warning in oar(data, seurat_v5 = FALSE, cores = 1): Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-04-30 20:21:05 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-05-07 18:55:09 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="va">...</span></span>
 <span><span class="va">oar_data</span></span>
-<span><span class="co">#&gt;          OARscore     KW.pvalue  KW.BH.pvalue pct.missing</span></span>
-<span><span class="co">#&gt; 1     0.119972739  1.200031e-90  1.728434e-90    79.46352</span></span>
-<span><span class="co">#&gt; 2    -0.064520663  1.455368e-92  2.428218e-92    87.92927</span></span>
-<span><span class="co">#&gt; 3    -1.143314583 7.776601e-105 3.580117e-103    85.27251</span></span>
-<span><span class="co">#&gt; 4    -1.323178977 3.152359e-107 5.597688e-105    78.79720</span></span>
+<span><span class="co">#&gt;           OARscore    KW.pvalue KW.BH.pvalue pct.missing</span></span>
+<span><span class="co">#&gt; 1     0.4991194964 1.310249e-74 1.672114e-74    79.46352</span></span>
+<span><span class="co">#&gt; 2    -0.5335102274 9.891672e-83 3.595131e-82    87.92927</span></span>
+<span><span class="co">#&gt; 3    -1.0294046721 7.161214e-87 7.474225e-86    85.27251</span></span>
+<span><span class="co">#&gt; 4    -1.3317223078 2.258655e-89 4.253800e-88    78.79720</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>This results in a table with the following columns:</p>
 <ul>

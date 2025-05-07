@@ -40,6 +40,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/introductory_vignette.html">Introductory Vignette for OARscRNA</a></li>
     <li><a class="dropdown-item" href="../articles/detailed_tutorial.html">Step-by-step guide to running OAR</a></li>
+    <li><a class="dropdown-item" href="../articles/OAR_Factor.html">Running OAR in a datset split by Factors</a></li>
     <li><a class="dropdown-item" href="../articles/Gene_expression.html">Gene Expression Analysis based on OAR scores</a></li>
   </ul>
 </li>
@@ -95,9 +96,10 @@ tutorial that way.</p>
 <p>At the end, we provide an alternative single line <a href="wrapper-functions-and-result-interpretation">wrapper function</a>
 that runs the whole process, and adds the results to the
 <code>meta.data</code> slot of a Seurat object. If starting from a
-dataset with multiple cell types, we recommend running this process
-cluster by cluster, and similarly provide a wrapper function that
-accomplishes that.</p>
+dataset with multiple cell types or where a biological perturbation
+greatly alters gene expression, we recommend running this process
+splitting the data by that factor, and similarly provide a wrapper
+function that accomplishes that.</p>
 <div class="section level3">
 <h3 id="loading-and-pre-processing-your-data">1. Loading and pre-processing your data<a class="anchor" aria-label="anchor" href="#loading-and-pre-processing-your-data"></a>
 </h3>
@@ -115,7 +117,7 @@ cell barcodes so we can later assign them to our output.</p>
 <p>Now lets set a count threshold where we only analyze genes expressed
 in at least 1% of cells<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content="&lt;p&gt;&lt;em&gt;Filtering genes may reduce the time it takes to run
 the analysis.&lt;/em&gt;&lt;/p&gt;"><sup>1</sup></a>. We do not recommend using thresholds
-higher than 2%, as information will be lost.</p>
+higher than 4%, as information will be lost.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tr</span> <span class="op">=</span> <span class="fl">1</span></span></code></pre></div>
 <p>Next, we retrieve the un-normalized count data from the Seurat
@@ -162,12 +164,12 @@ analysis. Defaults to <code>NULL</code>.</li>
 <p>Our scoring relies on identifying co-expressed genes patterns (which
 we call missing data patterns) which is a computationally intensive
 process. To do this, we can identify genes with minimal mismatch between
-them, but we need to first enable R to run in parallel. To determine
-your computers capacity, you can run
+them, but we need to first enable R to run in parallel. To determine how
+many thread are available in your computer, you can run
 <code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
 available for other processes running in your computer to prevent
-crashing. Using multiple cores is recommended as it will go much faster
-in the identification of the patterns.</p>
+crashing. Using multiple cores is recommended as pattern identification
+will go much faster.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; system </span></span>
@@ -198,59 +200,45 @@ analysis.</p>
 <p>The output is a list of matrices where the hamming distance between
 each pair of gene expression vectors evenly divided across expression
 bins is calculated. Expression binning is introduced to increase
-computational performance. In the wrapper function <code>oar</code> you
-have the possibility of storing this result in your Seurat object, so
-that future score calculations are completed faster. The wrapper
-function automatically detects a previously calculated hamming distance
-matrix and uses that for further analysis. <strong>WARNING: If you use a
+computational performance and introduce a dynamic threshold to identify
+patterns. In the wrapper function <code>oar</code> you have the
+possibility of storing this result in your Seurat object, so that future
+score calculations are completed faster. The wrapper function
+automatically detects a previously calculated hamming distance matrix
+and uses that for further analysis. <strong>WARNING: If you use a
 different count filter value, or a different set of cells, these
 distances will no longer be appropriate. In that case, remove previously
 calculated distance matrix using</strong>
 <code>oar_obj[["RNA"]]@misc &lt;- list()</code>.</p>
 <p>Next, we want to group genes into co-expression patters based on a
-minimal hamming distance threshold, which we refer to as
-<code>tolerance</code>. This tolerance value is the fraction of mismatch
-between gene vectors that we allow to consider genes as part of the same
-pattern. To identify a suitable value between 0.01 and 0.05, we can set
-<code>tolerance</code> to <code>TRUE</code> in the
-<code>oar_missing_data_patterns</code> function. This function will
-search for a <code>tolerance</code> that does not introduce biases in
-the pattern matching. We have found that increasing
-<code>tolerance</code> can introduce an artificial relationship between
-the percentage of missing values and the significance test at the core
-of this approach.</p>
+minimal hamming distance threshold.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mdp_auto_tol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span></span>
-<span>  <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">dm</span>, tolerance <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Scanning for optimal tolerance..."</span></span>
-<span><span class="co">#&gt; [1] "Tolerance set to 0.02"</span></span>
-<span><span class="co">#&gt; [1] "Identified 2 non-unique missing data patterns"</span></span>
-<span><span class="co">#&gt; [1] "A total of 593 genes captured in non-unique patterns"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mdp_auto_tol</span><span class="op">)</span></span>
-<span><span class="co">#&gt; mdp_auto_tol</span></span>
-<span><span class="co">#&gt;  B1.P8 B10.P1 Unique </span></span>
-<span><span class="co">#&gt;    469    124  11113</span></span></code></pre></div>
-<p><strong>A few considerantions on tolerance setting:</strong> - Using
-a tolerance of 0 <em>(i.e. allowing only for exact matches)</em> results
-in very few, and often no, co-expressed gene patterns. This
-configuration generally fails and is not recommended. - The automatic
-tolerance setting selects the minimum tolerance above 0 where the
-percentage of missing values in a cell is not predictive of the
-<em>observed at random</em> test. If you choose your own tolerance, it
-is recommended you plot those two variables against each other
-(<code>KW.BH.pvalue</code> vs. <code>pct.missing</code>) and fit a
-linear model. If the slope of the model is significant and negative, the
-tolerance setting might not be appropriate.</p>
-<p>We can choose our own tolerance and pass it to the function, which
-will be faster. Values greater than 0 and lower than 0.05 are
-recommended.</p>
+<code class="sourceCode R"><span><span class="va">mdp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">dm</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Identified 24 non-unique missing data patterns"</span></span>
+<span><span class="co">#&gt; [1] "A total of 331 genes captured in non-unique patterns"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mdp</span><span class="op">)</span></span>
+<span><span class="co">#&gt; mdp</span></span>
+<span><span class="co">#&gt;  ptn.1 ptn.10 ptn.11 ptn.12 ptn.13 ptn.14 ptn.15 ptn.16 ptn.17 ptn.18 ptn.19 </span></span>
+<span><span class="co">#&gt;    108      2     30      2      3      4      2      3      4      3      5 </span></span>
+<span><span class="co">#&gt;  ptn.2 ptn.20 ptn.21 ptn.22 ptn.23 ptn.24  ptn.3  ptn.4  ptn.5  ptn.6  ptn.7 </span></span>
+<span><span class="co">#&gt;     12      2      2      5      2      2     39     21     31      2      2 </span></span>
+<span><span class="va">...</span></span></code></pre></div>
+<p><strong>A few considerations on pattern matching:</strong> Allowing
+only for exact matches results in very few, and often no, co-expressed
+gene patterns, which is why our method makes this process more flexible.
+Internally, each gene expression bin is assigned a separate minimal
+hamming distance threshold (minimum of 0.01), which is used to generate
+an adjacency matrix for all genes. Then a graph is built based on this
+matrix and the eccentricities of all nodes calculated. Then the minimal
+hamming distance threshold is adjusted to cap the eccentricity of all
+nodes to maintain pattern integrity. We recommended you plot
+<code>KW.BH.pvalue</code> vs. <code>pct.missing</code> to examine the
+results. You should obverve no relationship between these variables,
+other than higher p values in some <strong>- but not all -</strong>
+cells with a high pct.missing.</p>
+<p>We can visualize these results of the pattern search by using:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">dm</span>, tolerance <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></code></pre></div>
-<p>In this dataset a tolerance of 0.02 produced the best results, with 7
-distinct patters found across cells (plus the combination of all genes
-with non-unique patterns). We can visualize these results like this:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_plot.html">oar_missing_data_plot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp_auto_tol</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_plot.html">oar_missing_data_plot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Generating plots..."</span></span>
 <span><span class="va">p3</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
@@ -273,15 +261,15 @@ than 2. Alternatively, when these distributions overlap, gene expression
 appears more randomly distributed (OAR), and cells have a larger p value
 and an OAR score greater than 2. Critically, our test incorporates both
 the gene expression values and the missing data patterns.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_base.html">oar_base</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp_auto_tol</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_base.html">oar_base</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp</span><span class="op">)</span></span>
 <span><span class="va">output</span><span class="op">$</span><span class="va">barcodes</span> <span class="op">=</span> <span class="va">cells</span> <span class="co">#add back our barcodes</span></span>
 <span><span class="va">output</span></span>
-<span><span class="co">#&gt;          OARscore     KW.pvalue  KW.BH.pvalue pct.missing             barcodes</span></span>
-<span><span class="co">#&gt; 1     0.119972739  1.200031e-90  1.728434e-90    79.46352 AAACCTGAGAACAATC-1_1</span></span>
-<span><span class="co">#&gt; 2    -0.064520663  1.455368e-92  2.428218e-92    87.92927 AAACCTGAGGTGCTAG-1_1</span></span>
-<span><span class="co">#&gt; 3    -1.143314583 7.776601e-105 3.580117e-103    85.27251 AAACCTGGTAGCAAAT-1_1</span></span>
-<span><span class="co">#&gt; 4    -1.323178977 3.152359e-107 5.597688e-105    78.79720 AAACGGGGTACCCAAT-1_1</span></span>
+<span><span class="co">#&gt;           OARscore    KW.pvalue KW.BH.pvalue pct.missing             barcodes</span></span>
+<span><span class="co">#&gt; 1     0.4991194964 1.310249e-74 1.672114e-74    79.46352 AAACCTGAGAACAATC-1_1</span></span>
+<span><span class="co">#&gt; 2    -0.5335102274 9.891672e-83 3.595131e-82    87.92927 AAACCTGAGGTGCTAG-1_1</span></span>
+<span><span class="co">#&gt; 3    -1.0294046721 7.161214e-87 7.474225e-86    85.27251 AAACCTGGTAGCAAAT-1_1</span></span>
+<span><span class="co">#&gt; 4    -1.3317223078 2.258655e-89 4.253800e-88    78.79720 AAACGGGGTACCCAAT-1_1</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>The result is a matrix with these columns:</p>
 <ul>
@@ -311,7 +299,7 @@ Greater scores indicate distinct cell expression signatures, where high
 scoring cells have different gene co-expression patterns compared to all
 other cells in the test. In this example, we observe that cells with a
 high degree of sparsity, also have a high OAR score</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">output</span>,</span>
@@ -368,31 +356,17 @@ Seurat object with the <code>OARscore</code>, <code>KW.pvalue</code>,
 <code>meta.data</code> slot. Additionally, genes are annotated by which
 missing data patterns (mdp) they have been included in
 <code>sc.data@assays$RNA@meta.data</code>.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sc.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">sc.data</span>, </span>
 <span>               seurat_v5 <span class="op">=</span> <span class="cn">T</span>, count.filter <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>               blacklisted.genes <span class="op">=</span> <span class="cn">NULL</span>, suffix <span class="op">=</span> <span class="st">""</span>,</span>
-<span>               tolerance <span class="op">=</span> <span class="fl">0.03</span>, store.hamming <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in oar(data = sc.data, seurat_v5 = T, count.filter = 1, blacklisted.genes = NULL, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
-<span><span class="co">#&gt; [1] "Extracting data..."</span></span>
-<span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
-<span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-04-30 20:19:08 UTC"</span></span>
-<span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
-<span><span class="va">...</span></span></code></pre></div>
-<p>We set these parameters based on our earlier results and adjusted to
-the data provided:</p>
+<span>               store.hamming <span class="op">=</span> <span class="cn">T</span>,</span>
+<span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>We set these parameters based on our earlier discussion:</p>
 <ul>
 <li>
 <code>seurat_v5</code> confirms the type of data being used.
 Defaults to <code>TRUE</code>.</li>
-<li>
-<code>tolerance</code> controls whether the mismatch threshold
-should be determined automatically (between 0.01 and 0.05 hamming
-distances) or if a user supplied threshold should be used. Defaults to
-<code>TRUE</code>, and can take <code>TRUE</code> or a numeric value
-smaller than 1. Here we set it to 0.02 based on our results above.</li>
 <li>
 <code>count.filter</code> controls the minimum percentage of cells
 expressing any given gene for that gene to be retained in the analysis.
@@ -413,8 +387,10 @@ re-calculation of the scores if you need to alter other parameters later
 <code>TRUE</code>.</li>
 </ul>
 <p>You can use a similar approach to analyse the data cluster by cluster
-- recommended when you have multiple cell types. In that case, use
-<code><a href="../reference/oar_by_cluster.html">oar_by_cluster()</a></code>.</p>
+- recommended when you have multiple cell types - or separated by
+another variable in your data. In that case, use
+<code><a href="../reference/oar_by_factor.html">oar_by_factor()</a></code> and see <code><a href="../articles/OAR_Factor.html">vignette("OAR_Factor")</a></code>
+for more details.</p>
 <div class="section level5">
 <h5 id="interpreting-high-oar-scores">Interpreting high OAR scores<a class="anchor" aria-label="anchor" href="#interpreting-high-oar-scores"></a>
 </h5>
@@ -425,7 +401,7 @@ together. In fact, in this case, high OAR scoring cells represent the
 most activated cells in the experiment, as can be seen when we examine
 <em>IFNA1</em>, which is expressed in activated plasmacytoid dendritic
 cells.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: SeuratObject</span></span>
 <span><span class="co">#&gt; Loading required package: sp</span></span>
@@ -444,6 +420,7 @@ cells.</p>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
+<span><span class="co">#&gt; Warning: The following requested variables were not found: OARscore</span></span>
 <span><span class="va">p1</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="figurefeatureplot_score-1.png" alt="Feature plot of OAR score" width="100%"><p class="caption">
