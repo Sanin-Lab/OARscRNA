@@ -23,8 +23,9 @@ oar_hamming_distance <- function (data, cores = 1) {
   bins <- base::rowSums(!is.na(data))/ncol(data) # Define bin ranges
   bins <- base::cut(
     bins, 
-    breaks = as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1))), # split genes evenly across 10 bins
-    right = T, labels = labels, include.lowest = T) # Make sure all genes are assigned a bin
+    breaks = unique(as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1)))), # split genes evenly across 10 bins
+    labels = labels[1:length(unique(as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1)))))],
+    right = T, include.lowest = T) # Make sure all genes are assigned a bin
   
   d.list <- split(as.data.frame(data),bins) # Split data across bins
   
@@ -65,8 +66,9 @@ oar_missing_data_patterns <- function (data, dm) {
   bins <- base::rowSums(!is.na(data))/ncol(data) # Define bin ranges
   bins <- base::cut(
     bins, 
-    breaks = as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1))), # split genes evenly across 10 bins
-    right = T, labels = labels, include.lowest = T) # Make sure all genes are assigned a bin
+    breaks = unique(as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1)))), # split genes evenly across 10 bins
+    labels = labels[1:length(unique(as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1)))))],
+    right = T, include.lowest = T) # Make sure all genes are assigned a bin
   
   mdp <- lapply(names(dm), function(x){
     if(!nrow(dm[[x]]) == ncol(dm[[x]])){stop("Hamming distance matrix is not square\n")}
