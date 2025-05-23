@@ -19,12 +19,13 @@ oar_hamming_distance <- function (data, cores = 1) {
   print("Calculating Hamming distances between gene vectors using specified cores.")
   print("This operation may take several minutes")
   
-  labels <- paste0("B",1:10) # Create labels for bins
   bins <- base::rowSums(!is.na(data))/ncol(data) # Define bin ranges
   bins <- base::cut(
     bins, 
-    breaks = as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1))), # split genes evenly across 10 bins
-    right = T, labels = labels, include.lowest = T) # Make sure all genes are assigned a bin
+    breaks = unique(as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1)))), # split genes evenly across 10 bins
+    right = T, include.lowest = T) # Make sure all genes are assigned a bin
+  labels <- paste0("B",1:length(unique(bins))) # Create labels for bins
+  levels(bins) <- labels
   
   d.list <- split(as.data.frame(data),bins) # Split data across bins
   
@@ -61,12 +62,13 @@ oar_missing_data_patterns <- function (data, dm) {
   for(i in dm){g = c(g,nrow(i))}
   if(!sum(g) == nrow(data)){stop("Hamming distance matrix and count matrix have different number of genes.\nWhere similar filters applied?\n")}
   
-  labels <- paste0("B",1:10) # Create labels for bins
   bins <- base::rowSums(!is.na(data))/ncol(data) # Define bin ranges
   bins <- base::cut(
     bins, 
-    breaks = as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1))), # split genes evenly across 10 bins
-    right = T, labels = labels, include.lowest = T) # Make sure all genes are assigned a bin
+    breaks = unique(as.vector(stats::quantile(bins, probs = seq(from = 0, to = 1, by = 0.1)))), # split genes evenly across 10 bins
+    right = T, include.lowest = T) # Make sure all genes are assigned a bin
+  labels <- paste0("B",1:length(unique(bins))) # Create labels for bins
+  levels(bins) <- labels
   
   mdp <- lapply(names(dm), function(x){
     if(!nrow(dm[[x]]) == ncol(dm[[x]])){stop("Hamming distance matrix is not square\n")}
