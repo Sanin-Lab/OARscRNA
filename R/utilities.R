@@ -118,7 +118,11 @@ oar_missing_data_graph <- function (dm, tol = 0.01) {
 missing_pattern_pval_kw = function(x, mdp){
   y.l <- x[!is.na(x)] # subset observed genes of the nth cell to y.l
   mdp.l <- mdp[!is.na(x)] # subset observed genes of the nth cell to y.l
-  pval = kruskal.test(x = y.l, g = factor(mdp.l))$p.value
+  if(length(unique(mdp.l)) > 1){ # check that cell participates in more than one pattern
+    pval = kruskal.test(x = y.l, g = factor(mdp.l))$p.value
+  }else{
+    pval = NA # return NA for all cells that do not participate in more than one pattern
+  }
   
   return(pval)
 }

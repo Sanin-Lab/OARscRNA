@@ -22,6 +22,10 @@ oar_base <- function (data, mdp) {
   #transform and scale adjusted pvalues
   score = scale(-log10(pvalue.KW.BH+1e-320), center = T, scale = T)*-1
   
+  if(sum(is.na(score)) > 0){
+    warning("Genes in one ore more cells are all in the same pattern\nOARscore assigned as NA")
+  }
+  
   #calculate missing values
   sp = unlist(lapply(cl, naniar::pct_miss))
   
