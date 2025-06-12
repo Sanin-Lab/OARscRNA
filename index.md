@@ -84,13 +84,9 @@ OAR scores are typically more informative when distinguishing among cells of the
 
 Identify genes responsible for high OAR scoring cells at a single cell resolution: `vignette("Gene_expression")`
 
-### Remove sources of variation from scRNAseq data analysis
-
-Regress out OAR scores calculated on raw counts and found to be associated with unwanted sources of variation (batches, low quality cells, individual samples) to remove confounding factors.
-
 ## References
 
-*scRNAseq implementation:* Chen, R., Moore, H., Gueguen, PM., Kelly, B., Fertig, EJ., Sanin, DE., (2025). Scoring Cellular Heterogeneity by interrogating Missingness in single-cell RNA-seq Data. *In press*
+*scRNAseq implementation:* Chen, R., Moore, H., Gueguen, PM., Kelly, B., Sanin, DE., (2025). Scoring Cellular Heterogeneity by interrogating Missingness in single-cell RNA-seq Data. *In press*
 
 *Statistical proof:* Chen, R., Chung, YC., Basu, S., Shi, Q., (2024). Diagnostic Test for Realized Missingness in Mixed-type Data. Sankhya B, 86(1), 109-138. DOI: 10.1007/s13571-023-00317-5
 

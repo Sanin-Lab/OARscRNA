@@ -49,7 +49,7 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   #Load and filter expression data####
   if(seurat_v5){
     if(!sum(colnames(data@meta.data) %chin% score.name) == 1){
-      stop("OARscore column not present, or repeated, in the Seurat object. Have you run OARfold?\n")
+      stop("OARscore column not present, or repeated, in the Seurat object. Have you run oar?\n")
     }
     
     layersList <- lapply(data@assays$RNA@layers,function(x){dim(x)}) #Identify empty layers
@@ -118,7 +118,7 @@ oar_deg <- function (data, seurat_v5 = T, score = NULL, count.filter = 1,
   }
   
   print("FDR threshold set to:")
-  if(!auto.threshold){threshold = custom.tr}else{threshold = 10^(-(ceiling(log10(dim(dt)[[2]]))*5))}
+  if(!auto.threshold){threshold = custom.tr}else{threshold = 10^(-(ceiling(log10(dim(dt)[[2]]))*3))}
   print(threshold)
   
   #Set up models####
