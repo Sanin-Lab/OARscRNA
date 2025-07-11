@@ -1,7 +1,7 @@
 ##===================================================================
 #Base Test
 ##===================================================================
-#' Generate scores and p-values to determine heterogeneity of data by looking at whether missingness is observed-at-random (OAR)
+#' Generate scores and p-values to determine transcriptional shifts of data by looking at whether missingness is observed-at-random (OAR)
 #'
 #' @param data A gene-cell expression matrix with NA values in place of 0s.
 #' @param mdp A vector indicating the pattern to which each gene belongs. 

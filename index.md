@@ -1,14 +1,14 @@
 # OARscRNA <img src="man/figures/logo.png" align="right" height="139"/>
 
-## Heterogeneity scoring on scRNAseq data based on missingness
+## Transcriptional shifts in scRNAseq revealed through Missingness
 
-The OAR (observed at random) score reveals cellular heterogeneity, allowing **cell prioritization** for downstream applications. For best results, apply the test to group of similar cells where you expect some heterogeneity - *i.e. one cell type across various biological samples or conditions*. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:
+The OAR (observed at random) score reveals cellular transcriptional shifts, allowing **cell prioritization** for downstream applications. For best results, apply the test to group of cells where you expect some common transcriptional programs - *i.e. one cell type across various biological samples or conditions*. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:
 
 -   Technologies
 -   Technical batches/library preparations
 -   Organisms
 
-**OAR score is a measure of heterogeneity among cells**. A cell with a **positive** OAR score is one where a set of genes appears to be expressed more homogeneously than in other cells tested, and is consequently a highly distinct cell.
+**OAR score is a measure of transcriptional shifts among cells**. A cell with a **positive** OAR score is one where a set of genes appears to be expressed more homogeneously than in other cells tested, and is consequently a highly distinct cell.
 
 ## Motivation
 
@@ -86,7 +86,7 @@ Identify genes responsible for high OAR scoring cells at a single cell resolutio
 
 ## References
 
-*scRNAseq implementation:* Chen, R., Moore, H., Gueguen, PM., Kelly, B., Sanin, DE., (2025). Scoring Cellular Heterogeneity by interrogating Missingness in single-cell RNA-seq Data. *In press*
+*scRNAseq implementation:* Chen, R., Moore, H., Gueguen, PM., Kelly, B., Sanin, DE., (2025). Missing data in single-cell transcriptomes reveals transcriptional shifts. *In press*
 
 *Statistical proof:* Chen, R., Chung, YC., Basu, S., Shi, Q., (2024). Diagnostic Test for Realized Missingness in Mixed-type Data. Sankhya B, 86(1), 109-138. DOI: 10.1007/s13571-023-00317-5
 

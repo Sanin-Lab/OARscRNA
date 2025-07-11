@@ -1,22 +1,22 @@
 # OARscRNA [![R build status](https://github.com/Sanin-Lab/OARscRNA/workflows/build-check/badge.svg)](https://github.com/Sanin-Lab/OARscRNA/actions?workflow=build-check) <img src="man/figures/logo.png" align="right" height="139"/>
 
-## Heterogeneity scoring on scRNAseq data based on missingness
+## Transcriptional shifts in scRNAseq revealed through Missingness
 
-The OAR (observed at random) score reveals cellular heterogeneity, allowing **cell prioritization** for downstream applications. For best results, apply the test to group of similar cells where you expect some heterogeneity - *i.e. one cell type across various biological samples or conditions*. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:
+The OAR (observed at random) score reveals cellular transcriptional shifts, allowing **cell prioritization** for downstream applications. For best results, apply the test to group of cells where you expect some common transcriptional programs - *i.e. one cell type across various biological samples or conditions*. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:
 
 -   Technologies
 -   Technical batches/library preparations
 -   Organisms
 
-**OAR score is a measure of heterogeneity among cells**. A cell with a **positive** OAR score is one where a set of genes appears to be expressed more homogeneously than in other cells tested, and is consequently a highly distinct cell.
+**OAR score is a measure of transcriptional shifts among cells**. A cell with a **positive** OAR score is one where a set of genes appears to be expressed more homogeneously than in other cells tested, and is consequently a highly distinct cell.
 
 ## Motivation
 
-scRNAseq data is very sparse (50-90% of expression values are 0). Sparsity is *generally* attributed to technical limitations associated with capturing RNA molecules from individual cells. **Some 0s are expected**, and are a consequence of the Gamma-Poisson distribution of count data[^readme-1], whereas “Drop-out” (when 0s occur where positive counts are expected) is a problem associated with specific technologies (UMI- vs. nonUMI-based)[^readme-2].
+scRNAseq data is very sparse (50-90% of expression values are 0). Sparsity is *generally* attributed to technical limitations associated with capturing RNA molecules from individual cells. **Some 0s are expected**, and are a consequence of the Gamma-Poisson distribution of count data[^index-1], whereas “Drop-out” (when 0s occur where positive counts are expected) is a problem associated with specific technologies (UMI- vs. nonUMI-based)[^index-2].
 
-[^readme-1]: Svensson, V. (2020). Droplet scRNA-seq is not zero-inflated [DOI: 10.1038/s41587-019-0379-5](https://www.nature.com/articles/s41587-019-0379-5)
+[^index-1]: Svensson, V. (2020). Droplet scRNA-seq is not zero-inflated [DOI: 10.1038/s41587-019-0379-5](https://www.nature.com/articles/s41587-019-0379-5)
 
-[^readme-2]: Cao, Y. *et. al.* (2021). UMI or not UMI, that is the question for scRNA-seq zero-inflation [DOI: 10.1038/s41587-020-00810-6](https://www.nature.com/articles/s41587-020-00810-6)
+[^index-2]: Cao, Y. *et. al.* (2021). UMI or not UMI, that is the question for scRNA-seq zero-inflation [DOI: 10.1038/s41587-020-00810-6](https://www.nature.com/articles/s41587-020-00810-6)
 
 Sparsity has been used to:
 
@@ -86,7 +86,7 @@ Identify genes responsible for high OAR scoring cells at a single cell resolutio
 
 ## References
 
-*scRNAseq implementation:* Chen, R., Moore, H., Gueguen, PM., Kelly, B., Sanin, DE., (2025). Scoring Cellular Heterogeneity by interrogating Missingness in single-cell RNA-seq Data. *In press*
+*scRNAseq implementation:* Chen, R., Moore, H., Gueguen, PM., Kelly, B., Sanin, DE., (2025). Missing data in single-cell transcriptomes reveals transcriptional shifts. *In press*
 
 *Statistical proof:* Chen, R., Chung, YC., Basu, S., Shi, Q., (2024). Diagnostic Test for Realized Missingness in Mixed-type Data. Sankhya B, 86(1), 109-138. DOI: 10.1007/s13571-023-00317-5
 

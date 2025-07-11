@@ -59,7 +59,7 @@ library(OAR)
 
 In this tutorial we will walk you through generating OAR scores from your single cell dataset separated by a factor in your data. We will begin with a Seurat object with *Dictyostelium discoideum* cells (dicty) that you can download from our [github repository](#0).
 
-This approach is usually recommended when you have multiple cell types in your dataset or your experimental conditions introduce dramatic shifts in gene expression patterns. Our approach works best to detect heterogeneity within a set of cells that you expect to be somewhat similar. Consequently, in situations like the ones outlined above, it makes more sense to split the data by a factor before running the analysis.
+This approach is usually recommended when you have multiple cell types in your dataset or your experimental conditions introduce dramatic shifts in gene expression patterns. Our approach works best to detect trasncriptional shifts within a set of cells that you expect to be somewhat similar. Consequently, in situations like the ones outlined above, it makes more sense to split the data by a factor before running the analysis.
 
 First, we will take a look at how the test performs when the data is not split. Later we will run the analysis split by factors. As always, we begin by loading the seurat object with the dataset we are interested in.
 
@@ -109,7 +109,7 @@ p4 <- scatter_score_missing(sc.data, pt.size = 0.5, group.by = "group", suffix =
 p3+p4
 ```
 
-As you can see, we are able to identify heterogeneity within each biological condition. Moreover, we can visualize these results in a UMAP projection of the using `Seurat::FeaturePlot()`.
+As you can see, we are able to identify trasncriptional shifts within each biological condition. Moreover, we can visualize these results in a UMAP projection of the using `Seurat::FeaturePlot()`.
 
 ```{r OAR_factor_featureplot, out.width="100%", fig.cap="Results by factor"}
 p5 <- FeaturePlot(

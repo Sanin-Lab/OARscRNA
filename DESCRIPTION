@@ -1,5 +1,5 @@
 Package: OAR
-Title: Heterogeneity Scoring on scRNA Sequencing Data Based on Missingness
+Title: Transcriptional shifts in scRNAseq revealed through Missingness
 Version: 1.0.0
 Authors@R: 
   c(
@@ -9,7 +9,7 @@ Authors@R:
   person("Dmitrijs", "Lvovs", , "dlvovs1@jh.edu", role = c("aut"), comment = c(ORCID = "0009-0003-2152-6853")),
   person("Paul", "Gueguen", , "paul.gueguen@fgcz.ethz.ch", role = c("aut"), comment = c(ORCID = "0000-0003-2930-6073"))
   )
-Description: OAR (observed at random) score is a measure of heterogeneity among cells, allowing cell prioritization for downstream applications. For best results, test a group of similar cells where you expect some heterogeneity - i.e. one cell type across various biological samples or conditions.
+Description: OAR (observed at random) score is a measure of transcriptional shifts among cells, allowing cell prioritization for downstream applications. For best results, test a group of similar cells where you expect some heterogeneity - i.e. one cell type across various biological samples or conditions.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

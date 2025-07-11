@@ -71,7 +71,7 @@ sc.data <- oar(data = readRDS(file = "pdcs.rds"),
                cores = 1)
 ```
 
-To explore which cells/clusters have the most heterogeneity, we can visualize the results in a UMAP projection.
+To explore which cells/clusters display transcriptional shifts, we can visualize the results in a UMAP projection.
 
 ```{r featureplot_score_deg, out.width="100%", fig.cap="Feature plot of OAR score"}
 library(Seurat)
