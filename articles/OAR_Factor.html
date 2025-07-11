@@ -92,10 +92,10 @@ repository</a>.</p>
 <p>This approach is usually recommended when you have multiple cell
 types in your dataset or your experimental conditions introduce dramatic
 shifts in gene expression patterns. Our approach works best to detect
-heterogeneity within a set of cells that you expect to be somewhat
-similar. Consequently, in situations like the ones outlined above, it
-makes more sense to split the data by a factor before running the
-analysis.</p>
+trasncriptional shifts within a set of cells that you expect to be
+somewhat similar. Consequently, in situations like the ones outlined
+above, it makes more sense to split the data by a factor before running
+the analysis.</p>
 <p>First, we will take a look at how the test performs when the data is
 not split. Later we will run the analysis split by factors. As always,
 we begin by loading the seurat object with the dataset we are interested
@@ -104,6 +104,9 @@ in.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: SeuratObject</span></span>
 <span><span class="co">#&gt; Loading required package: sp</span></span>
+<span><span class="co">#&gt; 'SeuratObject' was built under R 4.5.0 but the current version is</span></span>
+<span><span class="co">#&gt; 4.5.1; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
+<span><span class="co">#&gt; for R may have changed</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'SeuratObject'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
@@ -134,7 +137,7 @@ is the Seurat object with the <code>OARscore</code>,
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-06-12 17:18:22 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-07-11 19:00:36 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>To explore the results we can visualize <code>OARscore</code> vs
@@ -175,21 +178,21 @@ object containing the results of the analysis.</p>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-06-12 17:18:40 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-07-11 19:00:54 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span>
 <span><span class="co">#&gt; Warning in FUN(X[[i]], ...): Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-06-12 17:18:49 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-07-11 19:01:03 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span>
 <span><span class="co">#&gt; Warning in FUN(X[[i]], ...): Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-06-12 17:18:53 UTC"</span></span>
+<span><span class="co">#&gt; [1] "2025-07-11 19:01:06 UTC"</span></span>
 <span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>Now let us examine the outcome of this analysis:</p>
@@ -202,9 +205,9 @@ object containing the results of the analysis.</p>
 Scatter Plots by Factors
 </p>
 </div>
-<p>As you can see, we are able to identify heterogeneity within each
-biological condition. Moreover, we can visualize these results in a UMAP
-projection of the using <code><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">Seurat::FeaturePlot()</a></code>.</p>
+<p>As you can see, we are able to identify trasncriptional shifts within
+each biological condition. Moreover, we can visualize these results in a
+UMAP projection of the using <code><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">Seurat::FeaturePlot()</a></code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">FeaturePlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">sc.data</span>, features <span class="op">=</span> <span class="st">"OARscore.factor"</span>, order <span class="op">=</span> <span class="cn">T</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span>, </span>
