@@ -173,7 +173,7 @@ will go much faster.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">parallelly</span><span class="fu">::</span><span class="fu"><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">availableCores</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; system </span></span>
-<span><span class="co">#&gt;      2</span></span></code></pre></div>
+<span><span class="co">#&gt;      4</span></span></code></pre></div>
 <p>Now we can select an appropriate number to set up parallel processing
 for this R session. To identify the missing data patterns allowing for
 mismatch, we calculate the hamming distance between all pairs of gene
@@ -186,9 +186,9 @@ analysis.</p>
 <span>  <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="co">#&gt; [1] "This operation may take several minutes"</span></span>
-<span><span class="co">#&gt; OpenMP reports: max_threads = 1, num_procs = 2, actual used = 1</span></span>
-<span><span class="co">#&gt; OpenMP reports: max_threads = 1, num_procs = 2, actual used = 1</span></span>
-<span><span class="co">#&gt; OpenMP reports: max_threads = 1, num_procs = 2, actual used = 1</span></span>
+<span><span class="co">#&gt; OpenMP reports: max_threads = 1, num_procs = 4, actual used = 1</span></span>
+<span><span class="co">#&gt; OpenMP reports: max_threads = 1, num_procs = 4, actual used = 1</span></span>
+<span><span class="co">#&gt; OpenMP reports: max_threads = 1, num_procs = 4, actual used = 1</span></span>
 <span><span class="va">...</span></span>
 <span><span class="va">dm</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span>
 <span><span class="co">#&gt;            1          2          3          4          5</span></span>
