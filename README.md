@@ -86,7 +86,7 @@ Identify genes responsible for high OAR scoring cells at a single cell resolutio
 
 ## References
 
-*scRNAseq implementation:* Chen, R., Moore, H., Gueguen, PM., Kelly, B., Sanin, DE., (2025). Missing data in single-cell transcriptomes reveals transcriptional shifts. *In press*
+*scRNAseq implementation:* Chen, R., Chung, YC., Kelly, B., Moore, H., Lvovs, D., Basu, S., Gueguen, P.M., Sanin, D.E. (2025) Missing data in single-cell transcriptomes reveals transcriptional shifts. bioRxiv 2025.08.15.669765; doi: https://doi.org/10.1101/2025.08.15.669765
 
 *Statistical proof:* Chen, R., Chung, YC., Basu, S., Shi, Q., (2024). Diagnostic Test for Realized Missingness in Mixed-type Data. Sankhya B, 86(1), 109-138. DOI: 10.1007/s13571-023-00317-5
 
