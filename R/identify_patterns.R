@@ -91,7 +91,7 @@ oar_patterns <- function (data, dm) {
   mdp <- mdp.t
   
   print(paste0("Identified ",length(unique(mdp))-1," gene co-expression patterns"))
-  print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["Unique"])," genes captured with no co-expression patterns"))
+  print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["Unique"])," genes captured in co-expression patterns"))
   
   from = unique(mdp)[!unique(mdp) %chin% "Unique"]
   to = paste0("ptn.",1:length(from))
@@ -114,16 +114,16 @@ oar_patterns <- function (data, dm) {
 #'
 #' @examples 
 #' \dontrun{
-#' mdp <- get_pattern_genes(data)
+#' gcp <- get_pattern_genes(data)
 #' }
 get_pattern_genes <- function (data) {
-  mdp <- data@assays$RNA@meta.data
+  gcp <- data@assays$RNA@meta.data
   
-  mdp <- mdp %>% 
-    dplyr::select(dplyr::contains("mdp")) %>%
+  gcp <- gcp %>% 
+    dplyr::select(dplyr::contains("gcp")) %>%
     dplyr::mutate(gene_id = rownames(data))
   
-  mdp[is.na(mdp)] <- "Filtered"
+  gcp[is.na(gcp)] <- "Filtered"
   
-  return(mdp)
+  return(gcp)
   }

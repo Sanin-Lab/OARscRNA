@@ -136,7 +136,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
     sc.data@meta.data <- base::cbind(
       sc.data@meta.data,
       output[idx,!colnames(output) %in% "barcodes"])
-    sc.data[["RNA"]]<- SeuratObject::AddMetaData(sc.data[["RNA"]], gcp, col.name = "gcp")
+    sc.data[["RNA"]] <- SeuratObject::AddMetaData(sc.data[["RNA"]], gcp, col.name = "gcp")
     
     return(sc.data)
   }else{
