@@ -4,12 +4,12 @@
 \alias{oar_gcp_plot}
 \title{Plot identified gene co-expression patterns}
 \usage{
-oar_gcp_plot(data, cgp = NULL, seurat_v5 = TRUE)
+oar_gcp_plot(data, gcp = NULL, seurat_v5 = TRUE)
 }
 \arguments{
 \item{data}{a gene-cell expression matrix with NA values in place of 0s and 1s everywhere else or a Seurat Object to which \code{oar} has been applied to.}
 
-\item{cgp}{a vector indicating the pattern to which each gene belongs. Default is NULL.}
+\item{gcp}{a vector indicating the pattern to which each gene belongs. Default is NULL.}
 
 \item{seurat_v5}{a boolean to indicate where or not the input data is a Seurat object. Default is TRUE.}
 }
@@ -25,6 +25,6 @@ Plot identified gene co-expression patterns
 output <- oar_gcp_plot(data, seurat_v5 = TRUE)
 
 ##Starting from filtered and binarized expression matrix
-output <- oar_gcp_plot(data, cgp, seurat_v5 = FALSE)
+output <- oar_gcp_plot(data, gcp, seurat_v5 = FALSE)
 }
 }

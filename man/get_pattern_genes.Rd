@@ -17,6 +17,6 @@ Create list of which genes participate in each pattern.
 }
 \examples{
 \dontrun{
-mdp <- get_pattern_genes(data)
+gcp <- get_pattern_genes(data)
 }
 }

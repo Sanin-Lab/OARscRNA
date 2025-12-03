@@ -4,12 +4,12 @@
 \alias{oar_base}
 \title{Generate scores and p-values to determine transcriptional shifts}
 \usage{
-oar_base(data, cgp)
+oar_base(data, gcp)
 }
 \arguments{
 \item{data}{A gene-cell expression matrix with NA values in place of 0s.}
 
-\item{cgp}{A vector indicating the pattern to which each gene belongs.}
+\item{gcp}{A vector indicating the pattern to which each gene belongs.}
 }
 \value{
 Data frame with OAR-score, p-value, adjusted p-value, and sparsity as a percentage for each cell.
@@ -19,6 +19,6 @@ Generate scores and p-values to determine transcriptional shifts
 }
 \examples{
 \dontrun{
-output <- oar_base(data, cgp)
+output <- oar_base(data, gcp)
 }
 }

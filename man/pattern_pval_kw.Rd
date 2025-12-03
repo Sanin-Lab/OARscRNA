@@ -4,12 +4,12 @@
 \alias{pattern_pval_kw}
 \title{Kruskal-Wallis test to generate a per cell p-value based on gene co-expression patterns}
 \usage{
-pattern_pval_kw(x, cgp)
+pattern_pval_kw(x, gcp)
 }
 \arguments{
 \item{x}{Item from list of cell gene expression vectors}
 
-\item{cgp}{Matrix with gene participation per pattern}
+\item{gcp}{Matrix with gene participation per pattern}
 }
 \value{
 list with a p-value for each cell
@@ -19,7 +19,7 @@ Kruskal-Wallis test to generate a per cell p-value based on gene co-expression p
 }
 \examples{
 \dontrun{
-pvalue <- pattern_pval_kw(x, cgp)
+pvalue <- pattern_pval_kw(x, gcp)
 }
 
 }

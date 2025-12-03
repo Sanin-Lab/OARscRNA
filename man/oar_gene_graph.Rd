@@ -19,6 +19,6 @@ Group gene co-expression patterns based on tolerance with a graph
 }
 \examples{
 \dontrun{
-cgp <- oar_gene_graph(dm, tol)
+gcp <- oar_gene_graph(dm, tol)
 }
 }
