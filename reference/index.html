@@ -47,8 +47,7 @@
 
       <div class="section-desc"><p>These are all the functions you need to run the full analysis on your data.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -59,21 +58,24 @@
 
         </dt>
         <dd>Single line pipeline to run complete analysis</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="oar_by_factor.html">oar_by_factor()</a></code>
 
         </dt>
         <dd>Generate OAR score within each cluster and add them to full objects metadata</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="oar_deg.html">oar_deg()</a></code>
 
         </dt>
         <dd>Generate DEGs based on OAR score</dd>
-      </dl><dl><dt>
 
-          <code><a href="get_missing_pattern_genes.html">get_missing_pattern_genes()</a></code>
+        <dt>
+
+          <code><a href="get_pattern_genes.html">get_pattern_genes()</a></code>
 
         </dt>
         <dd>Create list of which genes participate in each pattern.</dd>
@@ -82,31 +84,30 @@
       <h3 id="visualize-results">Visualize results<a class="anchor" aria-label="anchor" href="#visualize-results"></a></h3>
       <div class="section-desc"><p>A few convenient functions to visualize the results of your analysis.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
 
       <dl><dt>
 
-          <code><a href="scatter_score_missing.html">scatter_score_missing()</a></code>
+          <code><a href="scatter_score.html">scatter_score()</a></code>
 
         </dt>
-        <dd>Create scatter plot of OAR score vs percent missing</dd>
-      </dl><dl><dt>
+        <dd>Create scatter plot of OAR score vs sparsity</dd>
 
-          <code><a href="oar_missing_data_plot.html">oar_missing_data_plot()</a></code>
+        <dt>
+
+          <code><a href="oar_gcp_plot.html">oar_gcp_plot()</a></code>
 
         </dt>
-        <dd>Plot identified missing data patterns</dd>
+        <dd>Plot identified gene co-expression patterns</dd>
       </dl></div><div class="section level2">
       <h2 id="step-by-step-functions">Step-by-step functions<a class="anchor" aria-label="anchor" href="#step-by-step-functions"></a></h2>
 
       <div class="section-desc"><p>Run these in this order to achieve the same results as with the wrapper functions.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -117,47 +118,50 @@
 
         </dt>
         <dd>Prepare data for oar fold functions</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="oar_hamming_distance.html">oar_hamming_distance()</a></code>
 
         </dt>
         <dd>Calculate hamming distances between genes</dd>
-      </dl><dl><dt>
 
-          <code><a href="oar_missing_data_patterns.html">oar_missing_data_patterns()</a></code>
+        <dt>
+
+          <code><a href="oar_patterns.html">oar_patterns()</a></code>
 
         </dt>
-        <dd>Identify missing data patterns allowing for mismatch</dd>
-      </dl><dl><dt>
+        <dd>Identify gene co-expression patterns allowing for mismatch</dd>
+
+        <dt>
 
           <code><a href="oar_base.html">oar_base()</a></code>
 
         </dt>
-        <dd>Generate scores and p-values to determine heterogeneity of data by looking at whether missingness is observed-at-random (OAR)</dd>
+        <dd>Generate scores and p-values to determine transcriptional shifts</dd>
       </dl></div><div class="section level2">
       <h2 id="utility-functions">Utility functions<a class="anchor" aria-label="anchor" href="#utility-functions"></a></h2>
 
       <div class="section-desc"><p>Called within other functions in the package.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
 
       <dl><dt>
 
-          <code><a href="missing_pattern_pval_kw.html">missing_pattern_pval_kw()</a></code>
+          <code><a href="pattern_pval_kw.html">pattern_pval_kw()</a></code>
 
         </dt>
-        <dd>Kruskal-Wallis test to generate a per cell p-value based on missing data patterns</dd>
-      </dl><dl><dt>
+        <dd>Kruskal-Wallis test to generate a per cell p-value based on gene co-expression patterns</dd>
 
-          <code><a href="oar_missing_data_graph.html">oar_missing_data_graph()</a></code>
+        <dt>
+
+          <code><a href="oar_gene_graph.html">oar_gene_graph()</a></code>
 
         </dt>
-        <dd>Group missing data patterns based on tolerance with a graph</dd>
+        <dd>Group gene co-expression patterns based on tolerance with a graph</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
@@ -168,7 +172,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

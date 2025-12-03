@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Transcriptional shifts in scRNAseq revealed through Missingness • OAR</title>
+<title>Scoring transcriptional shifts in scRNAseq • OAR</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Transcriptional shifts in scRNAseq revealed through Missingness">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Scoring transcriptional shifts in scRNAseq">
 <meta name="description" content="OAR (observed at random) score is a measure of transcriptional shifts among cells, allowing cell prioritization for downstream applications. For best results, test a group of similar cells where you expect some heterogeneity - i.e. one cell type across various biological samples or conditions.">
 <meta property="og:description" content="OAR (observed at random) score is a measure of transcriptional shifts among cells, allowing cell prioritization for downstream applications. For best results, test a group of similar cells where you expect some heterogeneity - i.e. one cell type across various biological samples or conditions.">
 <meta property="og:image" content="https://sanin-lab.github.io/OARscRNA/logo.png">
@@ -74,9 +74,9 @@
 </h1>
 </div>
 <div class="section level2">
-<h2 id="transcriptional-shifts-in-scrnaseq-revealed-through-missingness">Transcriptional shifts in scRNAseq revealed through Missingness<a class="anchor" aria-label="anchor" href="#transcriptional-shifts-in-scrnaseq-revealed-through-missingness"></a>
+<h2 id="scoring-transcriptional-shifts-in-scrnaseq">Scoring transcriptional shifts in scRNAseq<a class="anchor" aria-label="anchor" href="#scoring-transcriptional-shifts-in-scrnaseq"></a>
 </h2>
-<p>The OAR (observed at random) score reveals cellular transcriptional shifts, allowing <strong>cell prioritization</strong> for downstream applications. For best results, apply the test to group of cells where you expect some common transcriptional programs - <em>i.e. one cell type across various biological samples or conditions</em>. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:</p>
+<p>The OAR score reveals cellular transcriptional shifts, allowing <strong>cell prioritization</strong> for downstream applications. For best results, apply the test to group of cells where you expect some common transcriptional programs - <em>i.e. one cell type across various biological samples or conditions</em>. OAR scores are cluster agnostic (no cluster labels are required) and are robust across:</p>
 <ul>
 <li>Technologies</li>
 <li>Technical batches/library preparations</li>
@@ -93,19 +93,19 @@
 <li><a href="https://doi.org/10.1038/s41467-020-14976-9" class="external-link">Cluster cells</a></li>
 <li><a href="https://academic.oup.com/bioinformatics/article/35/16/2865/5258099" class="external-link">Define variable genes</a></li>
 </ul>
-<p><strong>Is there something else we can learn about cellular identity from sparsity in scRNAseq data?</strong> <strong>Is sparsity (~missingness) occurring completely at random?</strong></p>
+<p><strong>Is there something else we can learn about cellular identity from sparsity in scRNAseq data?</strong></p>
 </div>
 <div class="section level2">
 <h2 id="test-overview">Test overview<a class="anchor" aria-label="anchor" href="#test-overview"></a>
 </h2>
-<p>At the core of the OAR score is the identification of missing data patterns, followed by comparing the distribution of genes expressed in the identified patterns in each cell individually.</p>
+<p>At the core of the OAR score is the identification of gene co-expression patterns, followed by comparing the distribution of genes expressed in the identified patterns in each cell individually.</p>
 <div class="float">
 <img src="reference/figures/Test_OV.png" alt="Base Test"><div class="figcaption">Base Test</div>
 </div>
 <p>To calculate the OAR score we:</p>
 <ol style="list-style-type: decimal">
 <li>Estimate <a href="https://en.wikipedia.org/wiki/Hamming_distance" class="external-link">Hamming distances</a> between binarized vectors of gene expression.</li>
-<li>Group genes across missing data patterns based on hamming distances between them. Genes with unique patterns <em>- i.e. with no “neighbors”</em>, are grouped together.</li>
+<li>Group genes across gene co-expression patterns based on hamming distances between them. Genes with unique patterns <em>- i.e. with no “neighbors”</em>, are grouped together.</li>
 <li>Compare the distribution of gene expression across identified patterns for <em>each cell</em> with a <a href="https://en.wikipedia.org/wiki/Kruskal%E2%80%93Wallis_test" class="external-link">Kruskal-Wallis</a> test.</li>
 <li>Scale the resulting <em>corrected p value</em> distributions <em>across all cells</em> to obtain the <strong>OAR score</strong>.</li>
 </ol>
@@ -126,7 +126,7 @@
 <p><code>oar(data = seurat.obj)</code></p>
 <p>Or from a matrix of <strong>unnormalized</strong> read counts, run:</p>
 <p><code>oar(data = read.counts, seurat_v5 = F)</code></p>
-<p>This will automatically filter genes with low expression, identify a suitable tolerance for the hamming distance, and return a OAR score, corrected and uncorrected p values and percentage of missing data for each cell (column) in the supplied object.</p>
+<p>This will automatically filter genes with low expression, identify a suitable tolerance for the hamming distance, and return a OAR score, corrected and uncorrected p values and sparsity for each cell (column) in the supplied object.</p>
 <ul>
 <li>If a Seurat object is supplied, the results are added as columns in the <code>meta.data</code> slot.</li>
 </ul>
@@ -159,8 +159,7 @@
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<p><em>scRNAseq implementation:</em> Chen, R., Chung, YC., Kelly, B., Moore, H., Lvovs, D., Basu, S., Gueguen, P.M., Sanin, D.E. (2025) Missing data in single-cell transcriptomes reveals transcriptional shifts. bioRxiv 2025.08.15.669765; doi: <a href="https://doi.org/10.1101/2025.08.15.669765" class="external-link uri">https://doi.org/10.1101/2025.08.15.669765</a></p>
-<p><em>Statistical proof:</em> Chen, R., Chung, YC., Basu, S., Shi, Q., (2024). Diagnostic Test for Realized Missingness in Mixed-type Data. Sankhya B, 86(1), 109-138. DOI: 10.1007/s13571-023-00317-5</p>
+<p><em>scRNAseq implementation:</em> Chen, R., Moore, H., Gueguen, PM., Kelly, B., Sanin, DE., (2025). Co-expression patterns in single-cell transcriptomes reveal transcriptional shifts. <em>In press</em></p>
 <p><em>Copyright 2025 - The Johns Hopkins University</em></p>
 </div>
 </div>
@@ -212,7 +211,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

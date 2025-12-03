@@ -126,8 +126,8 @@ uninformative<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-
 the analysis.&lt;/em&gt;&lt;/p&gt;"><sup>2</sup></a>. The output of this function is a list with
 the first element being the processed matrix and the second the list of
 genes in that matrix after filtering. We will skip the later for this
-tutorial. Missing values in the processed matrix of gene counts are
-denoted as <code>NA</code>.</p>
+tutorial. Zero-counts in the processed matrix are denoted as
+<code>NA</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">oar_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_preprocess_data.html">oar_preprocess_data</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">sc.data</span>, tr <span class="op">=</span> <span class="va">tr</span>, </span>
@@ -159,13 +159,12 @@ analysis. Defaults to <code>NULL</code>.</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="identifying-missing-data-patterns">2. Identifying Missing Data Patterns<a class="anchor" aria-label="anchor" href="#identifying-missing-data-patterns"></a>
+<h3 id="identifying-gene-co-expression-patterns">2. Identifying gene co-expression patterns<a class="anchor" aria-label="anchor" href="#identifying-gene-co-expression-patterns"></a>
 </h3>
-<p>Our scoring relies on identifying co-expressed genes patterns (which
-we call missing data patterns) which is a computationally intensive
-process. To do this, we can identify genes with minimal mismatch between
-them, but we need to first enable R to run in parallel. To determine how
-many thread are available in your computer, you can run
+<p>Our scoring relies on defining gene co-expression patterns based on a
+binarized count matrix. To do this, we can identify genes with minimal
+mismatch between them, but we need to first enable R to run in parallel.
+To determine how many thread are available in your computer, you can run
 <code><a href="https://parallelly.futureverse.org/reference/availableCores.html" class="external-link">parallelly::availableCores()</a></code>. Leave at least 1-2 cores
 available for other processes running in your computer to prevent
 crashing. Using multiple cores is recommended as pattern identification
@@ -175,12 +174,11 @@ will go much faster.</p>
 <span><span class="co">#&gt; system </span></span>
 <span><span class="co">#&gt;      4</span></span></code></pre></div>
 <p>Now we can select an appropriate number to set up parallel processing
-for this R session. To identify the missing data patterns allowing for
-mismatch, we calculate the hamming distance between all pairs of gene
-expression vectors. Internally, the gene vectors are converted to 0
-(missing) and 1 (observed) values. This function needs to have the
-number of cores specified explicitly, and is the slowest portion of the
-analysis.</p>
+for this R session. To identify patterns allowing for mismatch, we
+calculate the hamming distance between all pairs of gene expression
+vectors. Internally, the gene vectors are converted to 0 (absent) and 1
+(expressed) values. This function needs to have the number of cores
+specified explicitly.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_hamming_distance.html">oar_hamming_distance</a></span><span class="op">(</span></span>
 <span>  <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -197,27 +195,28 @@ analysis.</p>
 <span><span class="co">#&gt; 3 0.02976669 0.03218021 0.00000000 0.02735318 0.03218021</span></span>
 <span><span class="co">#&gt; 4 0.02815768 0.02896219 0.02735318 0.00000000 0.02896219</span></span>
 <span><span class="va">...</span></span></code></pre></div>
-<p>The output is a list of matrices where the hamming distance between
-each pair of gene expression vectors evenly divided across expression
-bins is calculated. Expression binning is introduced to increase
-computational performance and introduce a dynamic threshold to identify
-patterns. In the wrapper function <code>oar</code> you have the
-possibility of storing this result in your Seurat object, so that future
-score calculations are completed faster. The wrapper function
-automatically detects a previously calculated hamming distance matrix
-and uses that for further analysis. <strong>WARNING: If you use a
-different count filter value, or a different set of cells, these
-distances will no longer be appropriate. In that case, remove previously
-calculated distance matrix using</strong>
+<p>The output is a list of matrices, with each matrix containing a set
+of genes grouped based on overall sparsity, and where the hamming
+distance between pairs of gene expression vectors within each matrix is
+calculated. Expression binning is introduced to increase computational
+performance and introduce a dynamic threshold to identify patterns. In
+the wrapper function <code>oar</code> you have the possibility of
+storing this result in your Seurat object, so that future score
+calculations are completed faster. The wrapper function automatically
+detects a previously calculated hamming distance matrix and uses that
+for further analysis. <strong>WARNING: If you use a different count
+filter value, or a different set of cells, these distances will no
+longer be appropriate. In that case, remove previously calculated
+distance matrix using</strong>
 <code>oar_obj[["RNA"]]@misc &lt;- list()</code>.</p>
-<p>Next, we want to group genes into co-expression patters based on a
+<p>Next, we want to group genes into co-expression patterns based on a
 minimal hamming distance threshold.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mdp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_patterns.html">oar_missing_data_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">dm</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Identified 24 non-unique missing data patterns"</span></span>
-<span><span class="co">#&gt; [1] "A total of 331 genes captured in non-unique patterns"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mdp</span><span class="op">)</span></span>
-<span><span class="co">#&gt; mdp</span></span>
+<code class="sourceCode R"><span><span class="va">gcp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_patterns.html">oar_patterns</a></span><span class="op">(</span><span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">dm</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Identified 24 gene co-expression patterns"</span></span>
+<span><span class="co">#&gt; [1] "A total of 331 genes captured in co-expression patterns"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">gcp</span><span class="op">)</span></span>
+<span><span class="co">#&gt; gcp</span></span>
 <span><span class="co">#&gt;  ptn.1 ptn.10 ptn.11 ptn.12 ptn.13 ptn.14 ptn.15 ptn.16 ptn.17 ptn.18 ptn.19 </span></span>
 <span><span class="co">#&gt;    108      2     30      2      3      4      2      3      4      3      5 </span></span>
 <span><span class="co">#&gt;  ptn.2 ptn.20 ptn.21 ptn.22 ptn.23 ptn.24  ptn.3  ptn.4  ptn.5  ptn.6  ptn.7 </span></span>
@@ -232,18 +231,19 @@ an adjacency matrix for all genes. Then a graph is built based on this
 matrix and the eccentricities of all nodes calculated. Then the minimal
 hamming distance threshold is adjusted to cap the eccentricity of all
 nodes to maintain pattern integrity. We recommended you plot
-<code>KW.BH.pvalue</code> vs. <code>pct.missing</code> to examine the
-results. You should obverve no relationship between these variables,
+<code>KW.BH.pvalue</code> vs. <code>sparsity</code> to examine the
+results. You should observe no relationship between these variables,
 other than higher p values in some <strong>- but not all -</strong>
-cells with a high pct.missing.</p>
+cells with a high sparsity (defined here as a percentage of genes with 0
+counts within each cell).</p>
 <p>We can visualize these results of the pattern search by using:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_plot.html">oar_missing_data_plot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_gcp_plot.html">oar_gcp_plot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, gcp <span class="op">=</span> <span class="va">gcp</span>, seurat_v5 <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Generating plots..."</span></span>
 <span><span class="va">p3</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figurepatterns_found_mdp-1.png" alt="Missing Data Pattern Plot" width="150%"><p class="caption">
-Missing Data Pattern Plot
+<img src="figurepatterns_found_gcp-1.png" class="r-plt" alt="Gene co-expression patterns Plot" width="150%"><p class="caption">
+Gene co-expression patterns Plot
 </p>
 </div>
 <p>Each slice of the bar represents a cell, and it is colored based on
@@ -255,21 +255,23 @@ cell.</p>
 </h3>
 <p>Now we are ready to do a cell-wise estimation of the overlap between
 the gene expression distributions in each detected pattern. When these
-distributions are distinct, we find that the data is not missing at
-random (NOAR), with highly significant p values and an OAR score of less
-than 2. Alternatively, when these distributions overlap, gene expression
-appears more randomly distributed (OAR), and cells have a larger p value
-and an OAR score greater than 2. Critically, our test incorporates both
-the gene expression values and the missing data patterns.</p>
+distributions are distinct we obtain a highly significant p value and an
+OAR score of less than 2. Alternatively, when these distributions
+overlap cells have a larger p value and an OAR score greater than 2.
+<strong>Thus, a cell where the patterns defined in the whole dataset do
+not explain gene expression, will have a with a high OAR score and is
+potentially distinct from all others.</strong> Critically, our test
+incorporates both the gene expression values and the gene co-expression
+patterns.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_base.html">oar_base</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, mdp <span class="op">=</span> <span class="va">mdp</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_base.html">oar_base</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">oar_data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, gcp <span class="op">=</span> <span class="va">gcp</span><span class="op">)</span></span>
 <span><span class="va">output</span><span class="op">$</span><span class="va">barcodes</span> <span class="op">=</span> <span class="va">cells</span> <span class="co">#add back our barcodes</span></span>
 <span><span class="va">output</span></span>
-<span><span class="co">#&gt;           OARscore    KW.pvalue KW.BH.pvalue pct.missing             barcodes</span></span>
-<span><span class="co">#&gt; 1     0.4991194964 1.310249e-74 1.672114e-74    79.46352 AAACCTGAGAACAATC-1_1</span></span>
-<span><span class="co">#&gt; 2    -0.5335102274 9.891672e-83 3.595131e-82    87.92927 AAACCTGAGGTGCTAG-1_1</span></span>
-<span><span class="co">#&gt; 3    -1.0294046721 7.161214e-87 7.474225e-86    85.27251 AAACCTGGTAGCAAAT-1_1</span></span>
-<span><span class="co">#&gt; 4    -1.3317223078 2.258655e-89 4.253800e-88    78.79720 AAACGGGGTACCCAAT-1_1</span></span>
+<span><span class="co">#&gt;           OARscore    KW.pvalue KW.BH.pvalue sparsity             barcodes</span></span>
+<span><span class="co">#&gt; 1     0.4991194964 1.310249e-74 1.672114e-74 79.46352 AAACCTGAGAACAATC-1_1</span></span>
+<span><span class="co">#&gt; 2    -0.5335102274 9.891672e-83 3.595131e-82 87.92927 AAACCTGAGGTGCTAG-1_1</span></span>
+<span><span class="co">#&gt; 3    -1.0294046721 7.161214e-87 7.474225e-86 85.27251 AAACCTGGTAGCAAAT-1_1</span></span>
+<span><span class="co">#&gt; 4    -1.3317223078 2.258655e-89 4.253800e-88 78.79720 AAACGGGGTACCCAAT-1_1</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>The result is a matrix with these columns:</p>
 <ul>
@@ -284,9 +286,8 @@ test.</li>
 <code>KW.BH.pvalue</code> is the Benjamini-Hochberg corrected
 p-value.</li>
 <li>
-<code>pct.missing</code> is the percent of missing genes in each
-cell as a fraction of all genes expressed by all cells in the
-dataset.</li>
+<code>sparsity</code> is the percent of genes in each cell with a
+count of 0.</li>
 </ul>
 <p>We can now proceed to visualize these results to identify which cells
 display transcriptional shifts.</p>
@@ -303,12 +304,12 @@ high degree of sparsity, also have a high OAR score</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="va">p1</span> <span class="op">&lt;-</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">output</span>,</span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">pct.missing</span>,</span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">sparsity</span>,</span>
 <span>      y <span class="op">=</span> <span class="va">OARscore</span>, </span>
 <span>      color <span class="op">=</span> <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log10</a></span><span class="op">(</span><span class="va">KW.BH.pvalue</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="st">"% Missing Data"</span>,</span>
+<span>    x <span class="op">=</span> <span class="st">"Sparsity (%)"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"OAR score"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span></span>
 <span>    yintercept <span class="op">=</span> <span class="fl">2</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, </span>
@@ -336,12 +337,11 @@ high degree of sparsity, also have a high OAR score</p>
 <span>    plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p1</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figurecreate_scatter_plot-1.png" alt="Scatter Plots" width="100%"><p class="caption">
+<img src="figurecreate_scatter_plot-1.png" class="r-plt" alt="Scatter Plots" width="100%"><p class="caption">
 Scatter Plots
 </p>
 </div>
-<p>You may recreate this plot using
-<code><a href="../reference/scatter_score_missing.html">scatter_score_missing()</a></code>.</p>
+<p>You may recreate this plot using <code><a href="../reference/scatter_score.html">scatter_score()</a></code>.</p>
 <p>In order to fully understand the features in the dataset driving the
 high OAR score in some cells, it will be necessary to annotate these
 with their biological context. This is more easily achieved within a
@@ -352,9 +352,9 @@ Seurat object with the additional experimental details.</p>
 </h3>
 <p>We can run this entire process with a single line. The result is the
 Seurat object with the <code>OARscore</code>, <code>KW.pvalue</code>,
-<code>KW.BH.pvalue</code> and <code>pct.missing</code> values in the
+<code>KW.BH.pvalue</code> and <code>sparsity</code> values in the
 <code>meta.data</code> slot. Additionally, genes are annotated by which
-missing data patterns (mdp) they have been included in
+gene co-expression patterns they have been included in
 <code>sc.data@assays$RNA@meta.data</code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sc.data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar.html">oar</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">sc.data</span>, </span>
@@ -406,8 +406,11 @@ activated plasmacytoid dendritic cells.</p>
 <span><span class="co">#&gt; Loading required package: SeuratObject</span></span>
 <span><span class="co">#&gt; Loading required package: sp</span></span>
 <span><span class="co">#&gt; 'SeuratObject' was built under R 4.5.0 but the current version is</span></span>
-<span><span class="co">#&gt; 4.5.1; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
+<span><span class="co">#&gt; 4.5.2; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
 <span><span class="co">#&gt; for R may have changed</span></span>
+<span><span class="co">#&gt; 'SeuratObject' was built with package 'Matrix' 1.7.3 but the current</span></span>
+<span><span class="co">#&gt; version is 1.7.4; it is recomended that you reinstall 'SeuratObject' as</span></span>
+<span><span class="co">#&gt; the ABI for 'Matrix' may have changed</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'SeuratObject'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
@@ -416,17 +419,10 @@ activated plasmacytoid dendritic cells.</p>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">FeaturePlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">sc.data</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OARscore"</span>,<span class="st">"IFNA1"</span><span class="op">)</span>, order <span class="op">=</span> <span class="cn">T</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span>, </span>
 <span>  min.cutoff <span class="op">=</span> <span class="st">"q40"</span>, max.cutoff <span class="op">=</span> <span class="st">"q90"</span>, slot <span class="op">=</span> <span class="st">"counts"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: The `slot` argument of `FetchData()` is deprecated as of SeuratObject 5.0.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `layer` argument instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">Seurat</span> package.</span></span>
-<span><span class="co">#&gt;   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/satijalab/seurat/issues&gt;</span>.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span><span class="co">#&gt; Warning: The following requested variables were not found: OARscore</span></span>
 <span><span class="va">p1</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figurefeatureplot_score-1.png" alt="Feature plot of OAR score" width="100%"><p class="caption">
+<img src="figurefeatureplot_score-1.png" class="r-plt" alt="Feature plot of OAR score" width="100%"><p class="caption">
 Feature plot of OAR score
 </p>
 </div>
@@ -454,7 +450,7 @@ populations of cells studied. These can be achieved by passing
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

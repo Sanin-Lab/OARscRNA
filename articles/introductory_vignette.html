@@ -126,12 +126,12 @@ will go much faster.</p>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-08-21 21:33:50 UTC"</span></span>
-<span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
+<span><span class="co">#&gt; [1] "2025-12-03 20:31:07 UTC"</span></span>
+<span><span class="co">#&gt; [1] "Identifying gene co-expression patterns..."</span></span>
 <span><span class="va">...</span></span></code></pre></div>
-<p>We deliberately left most parameters as defaults, however we
-recommend you explore each to familiarize yourself with their impact on
-the result. Some critical parameters to consider include:</p>
+<p>We deliberately left most parameters to their default values, however
+we recommend you explore each to familiarize yourself with their impact
+on the result. Some critical parameters to consider include:</p>
 <ul>
 <li>
 <code>seurat_v5</code> confirms the type of data being used.
@@ -165,13 +165,12 @@ test.</li>
 <code>KW.BH.pvalue</code> is the Benjamini-Hochberg corrected
 p-value.</li>
 <li>
-<code>pct.missing</code> is the percent of missing genes in each
-cell as a fraction of all genes expressed by all cells in the
-dataset.</li>
+<code>sparsity</code> is the percent of genes in each cell with a
+count of 0.</li>
 </ul>
-<p>Additionally, genes are annotated by which missing data patterns
-(mdp) they have been included in. This mdp matrix has been added to the
-assay metadata (found in <a href="mailto:oar_obj@assays" class="email">oar_obj@assays</a>$<a href="mailto:RNA@meta.data" class="email">RNA@meta.data</a>).</p>
+<p>Additionally, genes are annotated by which gene co-expression pattern
+they have been included in. This matrix is added to the assay metadata
+(found in <a href="mailto:oar_obj@assays" class="email">oar_obj@assays</a>$<a href="mailto:RNA@meta.data" class="email">RNA@meta.data</a>).</p>
 </div>
 <div class="section level4">
 <h4 id="analysis-by-factor">Analysis by Factor<a class="anchor" aria-label="anchor" href="#analysis-by-factor"></a>
@@ -193,38 +192,38 @@ object.</p>
 <p>Below are a few examples of how you might explore the results of this
 analysis.</p>
 <div class="section level5">
-<h5 id="oarscore-v-percent-missing-scatter-plot">OARscore v Percent Missing Scatter Plot<a class="anchor" aria-label="anchor" href="#oarscore-v-percent-missing-scatter-plot"></a>
+<h5 id="oarscore-v-sparsity-scatter-plot">OARscore v Sparsity Scatter Plot<a class="anchor" aria-label="anchor" href="#oarscore-v-sparsity-scatter-plot"></a>
 </h5>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scatter_score_missing.html">scatter_score_missing</a></span><span class="op">(</span><span class="va">oar_obj</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
-<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scatter_score_missing.html">scatter_score_missing</a></span><span class="op">(</span><span class="va">oar_obj</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span>, group.by <span class="op">=</span> <span class="st">"condition"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
+<span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scatter_score.html">scatter_score</a></span><span class="op">(</span><span class="va">oar_obj</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
+<span><span class="va">p2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scatter_score.html">scatter_score</a></span><span class="op">(</span><span class="va">oar_obj</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span>, group.by <span class="op">=</span> <span class="st">"condition"</span><span class="op">)</span><span class="op">+</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
 <span><span class="va">p1</span><span class="op">+</span><span class="va">p2</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figurecreate_scatter_plot-1.png" alt="Scatter Plots" width="100%"><p class="caption">
+<img src="figurecreate_scatter_plot-1.png" class="r-plt" alt="Scatter Plots" width="100%"><p class="caption">
 Scatter Plots
 </p>
 </div>
 <p>These plot reveals which clusters have the highest OAR scores, as
-well as how the score relates to the percent of missing genes. Adjust
-the <code>group.by</code> metric to examine other variables.</p>
+well as how the score relates to sparsity. Adjust the
+<code>group.by</code> metric to examine other variables.</p>
 </div>
 <div class="section level5">
-<h5 id="missing-data-patterns">Missing Data Patterns<a class="anchor" aria-label="anchor" href="#missing-data-patterns"></a>
+<h5 id="gene-co-expression-patterns">Gene co-expression Patterns<a class="anchor" aria-label="anchor" href="#gene-co-expression-patterns"></a>
 </h5>
 <p>In some cases, you might want to explore the patterns that were
 identified during the analysis to understand what the co-expression gene
-modules are telling you. First, you can visualize missing data patterns
-like this:</p>
+modules are telling you. First, you can visualize these patterns like
+this:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_missing_data_plot.html">oar_missing_data_plot</a></span><span class="op">(</span><span class="va">oar_obj</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">p3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/oar_gcp_plot.html">oar_gcp_plot</a></span><span class="op">(</span><span class="va">oar_obj</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
 <span><span class="co">#&gt; [1] "Generating plots..."</span></span>
 <span><span class="va">p3</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figurepatterns_found-1.png" alt="Missing Data Pattern Plot" width="80%"><p class="caption">
-Missing Data Pattern Plot
+<img src="figurepatterns_found-1.png" class="r-plt" alt="CGP Plot" width="80%"><p class="caption">
+CGP Plot
 </p>
 </div>
 <p>For this dataset, we identified 24 sets of genes. Each slice of the
@@ -232,12 +231,12 @@ bar represents a cell, and it is colored based on what percentage of
 genes from that pattern are expressed in each cell.</p>
 <p>To get a data.frame of the genes within each pattern, use:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mdp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_missing_pattern_genes.html">get_missing_pattern_genes</a></span><span class="op">(</span><span class="va">oar_obj</span><span class="op">)</span></span></code></pre></div>
-<p>It is also possible to retrieve missing data patterns when
+<code class="sourceCode R"><span><span class="va">gcp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_pattern_genes.html">get_pattern_genes</a></span><span class="op">(</span><span class="va">oar_obj</span><span class="op">)</span></span></code></pre></div>
+<p>It is also possible to retrieve patterns when
 <code><a href="../reference/oar_by_factor.html">oar_by_factor()</a></code> is applied. Please see the documentation
-for <code><a href="../reference/get_missing_pattern_genes.html">get_missing_pattern_genes()</a></code> for more details.
-Currently, the <code><a href="../reference/oar_missing_data_plot.html">oar_missing_data_plot()</a></code> is not supported
-when <code><a href="../reference/oar_by_factor.html">oar_by_factor()</a></code> is executed.</p>
+for <code><a href="../reference/get_pattern_genes.html">get_pattern_genes()</a></code> for more details. Currently, the
+<code><a href="../reference/oar_gcp_plot.html">oar_gcp_plot()</a></code> is not supported when
+<code><a href="../reference/oar_by_factor.html">oar_by_factor()</a></code> is executed.</p>
 </div>
 <div class="section level5">
 <h5 id="score-projection-with-seurat-featureplot">Score projection with Seurat FeaturePlot<a class="anchor" aria-label="anchor" href="#score-projection-with-seurat-featureplot"></a>
@@ -253,8 +252,11 @@ clusters.</p>
 <span><span class="co">#&gt; Loading required package: SeuratObject</span></span>
 <span><span class="co">#&gt; Loading required package: sp</span></span>
 <span><span class="co">#&gt; 'SeuratObject' was built under R 4.5.0 but the current version is</span></span>
-<span><span class="co">#&gt; 4.5.1; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
+<span><span class="co">#&gt; 4.5.2; it is recomended that you reinstall 'SeuratObject' as the ABI</span></span>
 <span><span class="co">#&gt; for R may have changed</span></span>
+<span><span class="co">#&gt; 'SeuratObject' was built with package 'Matrix' 1.7.3 but the current</span></span>
+<span><span class="co">#&gt; version is 1.7.4; it is recomended that you reinstall 'SeuratObject' as</span></span>
+<span><span class="co">#&gt; the ABI for 'Matrix' may have changed</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Attaching package: 'SeuratObject'</span></span>
 <span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
@@ -263,16 +265,9 @@ clusters.</p>
 <span><span class="va">p4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">FeaturePlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">oar_obj</span>, features <span class="op">=</span> <span class="st">"OARscore"</span>, order <span class="op">=</span> <span class="cn">T</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span>, </span>
 <span>  min.cutoff <span class="op">=</span> <span class="st">"q40"</span>, max.cutoff <span class="op">=</span> <span class="st">"q90"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: The `slot` argument of `FetchData()` is deprecated as of SeuratObject 5.0.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use the `layer` argument instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">Seurat</span> package.</span></span>
-<span><span class="co">#&gt;   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/satijalab/seurat/issues&gt;</span>.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span><span class="va">p4</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figureOAR_featureplot-1.png" alt="Feature plot of results" width="100%"><p class="caption">
+<img src="figureOAR_featureplot-1.png" class="r-plt" alt="Feature plot of results" width="100%"><p class="caption">
 Feature plot of results
 </p>
 </div>
@@ -298,16 +293,16 @@ object by setting <code>seurat_v5</code> to <code>FALSE</code>.</p>
 <span><span class="co">#&gt; Warning in oar(data, seurat_v5 = FALSE, cores = 1): Running process in fewer than 2 cores will considerably slow down progress</span></span>
 <span><span class="co">#&gt; [1] "Extracting data..."</span></span>
 <span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
-<span><span class="co">#&gt; [1] "2025-08-21 21:34:04 UTC"</span></span>
-<span><span class="co">#&gt; [1] "Identifying missing data patterns..."</span></span>
+<span><span class="co">#&gt; [1] "2025-12-03 20:31:21 UTC"</span></span>
+<span><span class="co">#&gt; [1] "Identifying gene co-expression patterns..."</span></span>
 <span><span class="co">#&gt; [1] "Calculating Hamming distances between gene vectors using specified cores."</span></span>
 <span><span class="va">...</span></span>
 <span><span class="va">oar_data</span></span>
-<span><span class="co">#&gt;           OARscore    KW.pvalue KW.BH.pvalue pct.missing</span></span>
-<span><span class="co">#&gt; 1     0.4991194964 1.310249e-74 1.672114e-74    79.46352</span></span>
-<span><span class="co">#&gt; 2    -0.5335102274 9.891672e-83 3.595131e-82    87.92927</span></span>
-<span><span class="co">#&gt; 3    -1.0294046721 7.161214e-87 7.474225e-86    85.27251</span></span>
-<span><span class="co">#&gt; 4    -1.3317223078 2.258655e-89 4.253800e-88    78.79720</span></span>
+<span><span class="co">#&gt;           OARscore    KW.pvalue KW.BH.pvalue sparsity</span></span>
+<span><span class="co">#&gt; 1     0.4991194964 1.310249e-74 1.672114e-74 79.46352</span></span>
+<span><span class="co">#&gt; 2    -0.5335102274 9.891672e-83 3.595131e-82 87.92927</span></span>
+<span><span class="co">#&gt; 3    -1.0294046721 7.161214e-87 7.474225e-86 85.27251</span></span>
+<span><span class="co">#&gt; 4    -1.3317223078 2.258655e-89 4.253800e-88 78.79720</span></span>
 <span><span class="va">...</span></span></code></pre></div>
 <p>This results in a table with the following columns:</p>
 <ul>
@@ -322,21 +317,20 @@ test.</li>
 <code>KW.BH.pvalue</code> is the Benjamini-Hochberg corrected
 p-value.</li>
 <li>
-<code>pct.missing</code> is the percent of missing genes in each
-cell as a fraction of all genes expressed by all cells in the
-dataset.</li>
+<code>sparsity</code> is the percent of genes in each cell with a
+count of 0.</li>
 </ul>
 </div>
 <div class="section level4">
 <h4 id="visualize-results-1">Visualize Results<a class="anchor" aria-label="anchor" href="#visualize-results-1"></a>
 </h4>
-<p>We can visualize these OAR scores with a scatter plot against the
-percent missing genes.</p>
+<p>We can visualize these OAR scores with a scatter plot against
+sparsity.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scatter_score_missing.html">scatter_score_missing</a></span><span class="op">(</span><span class="va">oar_data</span>, seurat_v5 <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">p5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scatter_score.html">scatter_score</a></span><span class="op">(</span><span class="va">oar_data</span>, seurat_v5 <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
 <span><span class="va">p5</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
-<img src="figureOAR_scatter-1.png" alt="Scatter plot of results" width="100%"><p class="caption">
+<img src="figureOAR_scatter-1.png" class="r-plt" alt="Scatter plot of results" width="100%"><p class="caption">
 Scatter plot of results
 </p>
 </div>
@@ -354,7 +348,7 @@ Scatter plot of results
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
