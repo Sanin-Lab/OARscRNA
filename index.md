@@ -85,7 +85,6 @@ OAR scores are typically more informative when distinguishing among cells of the
 Identify genes responsible for high OAR scoring cells at a single cell resolution: `vignette("Gene_expression")`
 
 ## References
-
 *scRNAseq implementation:* Chen, R., Moore, H., Gueguen, PM., Kelly, B., Sanin, DE., (2025). Co-expression patterns in single-cell transcriptomes reveal transcriptional shifts. *In press*
 
 *Copyright 2025 - The Johns Hopkins University*
