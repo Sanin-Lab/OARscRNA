@@ -65,7 +65,7 @@ sc.data <- oar(data = sc.data,
 #> [1] "Extracting data..."
 #> [1] "Extracting count tables"
 #> [1] "Analysis started on:"
-#> [1] "2025-12-03 20:52:20 UTC"
+#> [1] "2025-12-03 21:37:31 UTC"
 #> [1] "Identifying gene co-expression patterns..."
 ...
 ```
@@ -109,21 +109,21 @@ sc.data <- oar_by_factor(sc.data, cores = 1, factor = "group", suffix = ".factor
 #> [1] "Extracting data..."
 #> [1] "Extracting count tables"
 #> [1] "Analysis started on:"
-#> [1] "2025-12-03 20:52:37 UTC"
+#> [1] "2025-12-03 21:37:50 UTC"
 #> [1] "Identifying gene co-expression patterns..."
 ...
 #> Warning in FUN(X[[i]], ...): Running process in fewer than 2 cores will considerably slow down progress
 #> [1] "Extracting data..."
 #> [1] "Extracting count tables"
 #> [1] "Analysis started on:"
-#> [1] "2025-12-03 20:52:46 UTC"
+#> [1] "2025-12-03 21:38:00 UTC"
 #> [1] "Identifying gene co-expression patterns..."
 ...
 #> Warning in FUN(X[[i]], ...): Running process in fewer than 2 cores will considerably slow down progress
 #> [1] "Extracting data..."
 #> [1] "Extracting count tables"
 #> [1] "Analysis started on:"
-#> [1] "2025-12-03 20:52:50 UTC"
+#> [1] "2025-12-03 21:38:04 UTC"
 #> [1] "Identifying gene co-expression patterns..."
 ...
 ```

@@ -41,7 +41,7 @@ sc.data <- oar(data = readRDS(file = "pdcs.rds"),
 #> [1] "Extracting data..."
 #> [1] "Extracting count tables"
 #> [1] "Analysis started on:"
-#> [1] "2025-12-03 20:50:38 UTC"
+#> [1] "2025-12-03 21:35:36 UTC"
 #> [1] "Identifying gene co-expression patterns..."
 ...
 ```
@@ -87,13 +87,13 @@ oar_deg <- oar_deg(
     splines = TRUE, degrees.freedom = 5,
     auto.threshold = TRUE, custom.tr = NULL)
 #> [1] "Analysis started on:"
-#> [1] "2025-12-03 20:50:45 UTC"
+#> [1] "2025-12-03 21:35:44 UTC"
 #> [1] "Extracting count tables"
 #> [1] "FDR threshold set to:"
 #> [1] 1e-12
 #> Warning in oar_deg(data = sc.data, seurat_v5 = T, score.name = "OARscore", : Using splines increases calculation time by 3-5x
 #> [1] "Analysis completed at:"
-#> [1] "2025-12-03 20:51:35 UTC"
+#> [1] "2025-12-03 21:36:38 UTC"
 ```
 
 A brief explanation of these parameters is presented here:
