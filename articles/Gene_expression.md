@@ -41,7 +41,7 @@ sc.data <- oar(data = readRDS(file = "pdcs.rds"),
 #> [1] "Extracting data..."
 #> [1] "Extracting count tables"
 #> [1] "Analysis started on:"
-#> [1] "2025-12-03 20:29:40 UTC"
+#> [1] "2025-12-03 20:50:38 UTC"
 #> [1] "Identifying gene co-expression patterns..."
 ...
 ```
@@ -87,13 +87,13 @@ oar_deg <- oar_deg(
     splines = TRUE, degrees.freedom = 5,
     auto.threshold = TRUE, custom.tr = NULL)
 #> [1] "Analysis started on:"
-#> [1] "2025-12-03 20:29:47 UTC"
+#> [1] "2025-12-03 20:50:45 UTC"
 #> [1] "Extracting count tables"
 #> [1] "FDR threshold set to:"
 #> [1] 1e-12
 #> Warning in oar_deg(data = sc.data, seurat_v5 = T, score.name = "OARscore", : Using splines increases calculation time by 3-5x
 #> [1] "Analysis completed at:"
-#> [1] "2025-12-03 20:30:52 UTC"
+#> [1] "2025-12-03 20:51:35 UTC"
 ```
 
 A brief explanation of these parameters is presented here:
@@ -136,15 +136,15 @@ genes:
 ``` r
 oar_deg
 #>              name         pval     adj_pval f_statistic df1      df2 lfc
-#> 1           HSPB1 1.420842e-87 1.656560e-83    98.23984   5 1262.948  NA
-#> 2        PPP1R15A 1.884842e-67 1.098769e-63    73.25056   5 1262.948  NA
-#> 3         HLA-DRA 1.600308e-61 6.219329e-58    66.22236   5 1262.948  NA
-#> 4             UBC 1.855197e-60 5.407436e-57    64.97635   5 1262.948  NA
-#> 5        HLA-DRB1 5.359826e-60 1.249804e-56    64.43831   5 1262.948  NA
-#> 6        HSP90AB1 3.050566e-56 5.927758e-53    60.08550   5 1262.948  NA
-#> 7        HSP90AA1 1.649947e-50 2.748104e-47    53.54909   5 1262.948  NA
-#> 8        HLA-DPA1 5.617257e-50 8.186450e-47    52.94904   5 1262.948  NA
-#> 9             UBB 2.793980e-49 3.619446e-46    52.16497   5 1262.948  NA
+#> 1           HSPB1 1.420100e-87 1.655695e-83    98.24009   5 1262.951  NA
+#> 2        PPP1R15A 1.884017e-67 1.098288e-63    73.25076   5 1262.951  NA
+#> 3         HLA-DRA 1.599269e-61 6.215294e-58    66.22267   5 1262.951  NA
+#> 4             UBC 1.854397e-60 5.405103e-57    64.97655   5 1262.951  NA
+#> 5        HLA-DRB1 5.356963e-60 1.249137e-56    64.43856   5 1262.951  NA
+#> 6        HSP90AB1 3.049325e-56 5.925347e-53    60.08569   5 1262.951  NA
+#> 7        HSP90AA1 1.649319e-50 2.747058e-47    53.54926   5 1262.951  NA
+#> 8        HLA-DPA1 5.614897e-50 8.183010e-47    52.94923   5 1262.951  NA
+#> 9             UBB 2.792879e-49 3.618020e-46    52.16515   5 1262.951  NA
 ...
 ```
 
