@@ -60,7 +60,7 @@ scatter_score <- function(
 #' Plot identified gene co-expression patterns
 #'
 #' @param data a gene-cell expression matrix with NA values in place of 0s and 1s everywhere else or a Seurat Object to which `oar` has been applied to.
-#' @param cgp a vector indicating the pattern to which each gene belongs. Default is NULL.
+#' @param gcp a vector indicating the pattern to which each gene belongs. Default is NULL.
 #' @param seurat_v5 a boolean to indicate where or not the input data is a Seurat object. Default is TRUE. 
 #'
 #' @return Plot of gene co-expression patterns. 
@@ -73,21 +73,21 @@ scatter_score <- function(
 #' output <- oar_gcp_plot(data, seurat_v5 = TRUE)
 #' 
 #' ##Starting from filtered and binarized expression matrix
-#' output <- oar_gcp_plot(data, cgp, seurat_v5 = FALSE)
+#' output <- oar_gcp_plot(data, gcp, seurat_v5 = FALSE)
 #' }
-oar_gcp_plot <- function(data, cgp = NULL, seurat_v5 = TRUE) {
+oar_gcp_plot <- function(data, gcp = NULL, seurat_v5 = TRUE) {
   if(seurat_v5){
-    cgp <- get_pattern_genes(data) %>% 
-      dplyr::select(dplyr::all_of("cgp")) %>% 
-      dplyr::filter(!cgp == "Filtered") %>% 
-      .$cgp
+    gcp <- get_pattern_genes(data) %>% 
+      dplyr::select(dplyr::all_of("gcp")) %>% 
+      dplyr::filter(!gcp == "Filtered") %>% 
+      .$gcp
     
     output <- oar_preprocess_data(data)
     data <- output[[1]]
     
   }else{
     data <- data
-    cgp <- cgp
+    gcp <- gcp
   }
   
   m <- +(!is.na(data)) %>% 
@@ -95,7 +95,7 @@ oar_gcp_plot <- function(data, cgp = NULL, seurat_v5 = TRUE) {
     dplyr::mutate(
       x = as.factor(Var2),
       group = as.factor(
-        rep(cgp,
+        rep(gcp,
             times = length(unique(Var2))))) %>% 
     dplyr::filter(!group == "Unique") %>% 
     dplyr::group_by(group, x) %>% 

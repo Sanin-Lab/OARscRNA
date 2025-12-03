@@ -4,7 +4,7 @@
 #' Generate scores and p-values to determine transcriptional shifts
 #'
 #' @param data A gene-cell expression matrix with NA values in place of 0s.
-#' @param cgp A vector indicating the pattern to which each gene belongs. 
+#' @param gcp A vector indicating the pattern to which each gene belongs. 
 #'
 #' @return Data frame with OAR-score, p-value, adjusted p-value, and sparsity as a percentage for each cell. 
 #' 
@@ -12,11 +12,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' output <- oar_base(data, cgp)
+#' output <- oar_base(data, gcp)
 #' }
-oar_base <- function (data, cgp) {
+oar_base <- function (data, gcp) {
   cl = lapply(seq_len(dim(data)[2L]), function(i) data[,i]) #convert mtx to list of cell vectors
-  pvalue.list.KW <- unlist(lapply(cl, FUN = pattern_pval_kw, cgp = cgp)) # Calculate p value
+  pvalue.list.KW <- unlist(lapply(cl, FUN = pattern_pval_kw, gcp = gcp)) # Calculate p value
   pvalue.KW.BH = p.adjust(pvalue.list.KW, method = "BH") # Benjamini & Hochberg correction ("BH" or its alias "fdr")
   
   #transform and scale adjusted pvalues
@@ -112,15 +112,15 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   }else{
     dm <- oar_hamming_distance(data, cores = cores)
   }
-  cgp <- oar_patterns(data = data, dm = dm)
+  gcp <- oar_patterns(data = data, dm = dm)
   
   #Run test
   print("Calculating scores")
-  output <- oar_base(data, cgp)
+  output <- oar_base(data, gcp)
   output$barcodes = cells
   
-  #add names to cgp
-  names(cgp) <- gene_names
+  #add names to gcp
+  names(gcp) <- gene_names
   
   # Clean up output
   print("Collecting results")
@@ -136,7 +136,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
     sc.data@meta.data <- base::cbind(
       sc.data@meta.data,
       output[idx,!colnames(output) %in% "barcodes"])
-    sc.data[["RNA"]]<- SeuratObject::AddMetaData(sc.data[["RNA"]], cgp, col.name = "cgp")
+    sc.data[["RNA"]]<- SeuratObject::AddMetaData(sc.data[["RNA"]], gcp, col.name = "gcp")
     
     return(sc.data)
   }else{
@@ -192,13 +192,13 @@ oar_by_factor <- function (data, count.filter = 1,
   oar_combine <- do.call(rbind,oar_combine)
   data <- SeuratObject::AddMetaData(data, metadata = oar_combine)
   
-  cgp_combine <- lapply(data_oar, function(x){
-    rn = c("cgp")
-    names(rn) = paste0("cgp_",unique(x[[factor]]))
+  gcp_combine <- lapply(data_oar, function(x){
+    rn = c("gcp")
+    names(rn) = paste0("gcp_",unique(x[[factor]]))
     x[["RNA"]]@meta.data %>% dplyr::select(dplyr::any_of(rn))})
-  cgp_combine <- do.call(cbind,cgp_combine)
+  gcp_combine <- do.call(cbind,gcp_combine)
   
-  data[["RNA"]] <- SeuratObject::AddMetaData(data[["RNA"]], cgp_combine)
+  data[["RNA"]] <- SeuratObject::AddMetaData(data[["RNA"]], gcp_combine)
   
   return(data)
 }

@@ -76,7 +76,7 @@ oar_preprocess_data <- function(data, tr = 1, seurat_v5 = TRUE, blacklisted.gene
 #'
 #' @examples 
 #' \dontrun{
-#' cgp <- oar_gene_graph(dm, tol)
+#' gcp <- oar_gene_graph(dm, tol)
 #' }
 oar_gene_graph <- function (dm, tol) {
   loop = TRUE
@@ -105,21 +105,21 @@ oar_gene_graph <- function (dm, tol) {
 #' Kruskal-Wallis test to generate a per cell p-value based on gene co-expression patterns
 #'
 #' @param x Item from list of cell gene expression vectors
-#' @param cgp Matrix with gene participation per pattern
+#' @param gcp Matrix with gene participation per pattern
 #'
 #' @return list with a p-value for each cell
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' pvalue <- pattern_pval_kw(x, cgp)
+#' pvalue <- pattern_pval_kw(x, gcp)
 #' }
 #' 
-pattern_pval_kw = function(x, cgp){
+pattern_pval_kw = function(x, gcp){
   y.l <- x[!is.na(x)] # subset observed genes of the nth cell to y.l
-  cgp.l <- cgp[!is.na(x)] # subset observed genes of the nth cell to y.l
-  if(length(unique(cgp.l)) > 1){ # check that cell participates in more than one pattern
-    pval = kruskal.test(x = y.l, g = factor(cgp.l))$p.value
+  gcp.l <- gcp[!is.na(x)] # subset observed genes of the nth cell to y.l
+  if(length(unique(gcp.l)) > 1){ # check that cell participates in more than one pattern
+    pval = kruskal.test(x = y.l, g = factor(gcp.l))$p.value
   }else{
     pval = NA # return NA for all cells that do not participate in more than one pattern
   }
