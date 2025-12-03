@@ -2,23 +2,23 @@
 % Please edit documentation in R/oar_functions.R
 \name{oar_base}
 \alias{oar_base}
-\title{Generate scores and p-values to determine heterogeneity of data by looking at whether missingness is observed-at-random (OAR)}
+\title{Generate scores and p-values to determine transcriptional shifts}
 \usage{
-oar_base(data, mdp)
+oar_base(data, cgp)
 }
 \arguments{
 \item{data}{A gene-cell expression matrix with NA values in place of 0s.}
 
-\item{mdp}{A vector indicating the pattern to which each gene belongs.}
+\item{cgp}{A vector indicating the pattern to which each gene belongs.}
 }
 \value{
-Data frame with OAR-score, p-value, adjusted p-value, and percent missing data for each cell.
+Data frame with OAR-score, p-value, adjusted p-value, and sparsity as a percentage for each cell.
 }
 \description{
-Generate scores and p-values to determine heterogeneity of data by looking at whether missingness is observed-at-random (OAR)
+Generate scores and p-values to determine transcriptional shifts
 }
 \examples{
 \dontrun{
-output <- oar_base(data, mdp)
+output <- oar_base(data, cgp)
 }
 }

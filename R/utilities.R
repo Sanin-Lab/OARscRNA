@@ -55,7 +55,7 @@ oar_preprocess_data <- function(data, tr = 1, seurat_v5 = TRUE, blacklisted.gene
   
   # data must be in .data.frame()
   if (all(complete.cases(data))) {
-    stop("No missing data exists\n")
+    stop("Data is not sparse\n")
   }
   output <- list(data, gene_names)
   
@@ -64,21 +64,21 @@ oar_preprocess_data <- function(data, tr = 1, seurat_v5 = TRUE, blacklisted.gene
 }
 
 ##===================================================================
-#Group missing data patterns based on tolerance with a graph
+#Group gene co-expression patterns based on tolerance with a graph
 ##===================================================================
-#' Group missing data patterns based on tolerance with a graph
+#' Group gene co-expression patterns based on tolerance with a graph
 #'
 #' @param dm a matrix of gene vector hamming distances.
-#' @param tol a numeric value indicating the maximum fraction of mismatch in genes to group as a pattern, default is 0.05.
+#' @param tol a numeric value indicating the maximum fraction of mismatch in genes to group as a pattern.
 #'
-#' @return missing data pattern vector
+#' @return gene co-expression pattern vector
 #' @export
 #'
 #' @examples 
 #' \dontrun{
-#' mdp <- oar_missing_data_patterns(dm, tol = 0.01)
+#' cgp <- oar_gene_graph(dm, tol)
 #' }
-oar_missing_data_graph <- function (dm, tol = 0.01) {
+oar_gene_graph <- function (dm, tol) {
   loop = TRUE
   while(loop){
     g <- igraph::graph_from_adjacency_matrix(
@@ -102,24 +102,24 @@ oar_missing_data_graph <- function (dm, tol = 0.01) {
 ##===================================================================
 #Test gene distributions across patterns
 ##===================================================================
-#' Kruskal-Wallis test to generate a per cell p-value based on missing data patterns
+#' Kruskal-Wallis test to generate a per cell p-value based on gene co-expression patterns
 #'
 #' @param x Item from list of cell gene expression vectors
-#' @param mdp Matrix with gene participation per pattern
+#' @param cgp Matrix with gene participation per pattern
 #'
 #' @return list with a p-value for each cell
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' pvalue <- missing_pattern_pval_kw(x, mdp)
+#' pvalue <- pattern_pval_kw(x, cgp)
 #' }
 #' 
-missing_pattern_pval_kw = function(x, mdp){
+pattern_pval_kw = function(x, cgp){
   y.l <- x[!is.na(x)] # subset observed genes of the nth cell to y.l
-  mdp.l <- mdp[!is.na(x)] # subset observed genes of the nth cell to y.l
-  if(length(unique(mdp.l)) > 1){ # check that cell participates in more than one pattern
-    pval = kruskal.test(x = y.l, g = factor(mdp.l))$p.value
+  cgp.l <- cgp[!is.na(x)] # subset observed genes of the nth cell to y.l
+  if(length(unique(cgp.l)) > 1){ # check that cell participates in more than one pattern
+    pval = kruskal.test(x = y.l, g = factor(cgp.l))$p.value
   }else{
     pval = NA # return NA for all cells that do not participate in more than one pattern
   }

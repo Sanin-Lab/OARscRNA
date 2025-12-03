@@ -71,7 +71,7 @@ sc.data
 
 ## 1. Running the full test
 
-We can run the full test entire process with a single line. For a description of all these parameters see our other vignettes. The result is the Seurat object with the `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `pct.missing` values in the `meta.data` slot.
+We can run the full test entire process with a single line. For a description of all these parameters see our other vignettes. The result is the Seurat object with the `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `sparsity` values in the `meta.data` slot.
 
 ```{r oar wrapper, output.lines=5, eval = TRUE}
 sc.data <- oar(data = sc.data, 
@@ -81,13 +81,13 @@ sc.data <- oar(data = sc.data,
                cores = 1)
 ```
 
-To explore the results we can visualize `OARscore` vs `pct.missing` values, coloring the cells based on some of the attributes in our Seurat object meta.data.
+To explore the results we can visualize `OARscore` vs `sparsity` values, coloring the cells based on some of the attributes in our Seurat object meta.data.
 
 ```{r create_scatter_plot_condition, out.width="100%", fig.cap="Scatter Plots by Factors"}
 library(patchwork)
 library(ggplot2)
-p1 <- scatter_score_missing(sc.data, pt.size = 0.5)+NoLegend()
-p2 <- scatter_score_missing(sc.data, pt.size = 0.5, group.by = "group")
+p1 <- scatter_score(sc.data, pt.size = 0.5)+NoLegend()
+p2 <- scatter_score(sc.data, pt.size = 0.5, group.by = "group")
 p1+p2
 ```
 
@@ -104,8 +104,8 @@ sc.data <- oar_by_factor(sc.data, cores = 1, factor = "group", suffix = ".factor
 Now let us examine the outcome of this analysis:
 
 ```{r scatter_by_condition, out.width="100%", fig.cap="Scatter Plots by Factors"}
-p3 <- scatter_score_missing(sc.data, pt.size = 0.5, suffix = ".factor")+NoLegend()
-p4 <- scatter_score_missing(sc.data, pt.size = 0.5, group.by = "group", suffix = ".factor")
+p3 <- scatter_score(sc.data, pt.size = 0.5, suffix = ".factor")+NoLegend()
+p4 <- scatter_score(sc.data, pt.size = 0.5, group.by = "group", suffix = ".factor")
 p3+p4
 ```
 

@@ -61,7 +61,7 @@ In this vignette we will explore what genes are associated with increased OAR sc
 
 ## 1. Calculating OAR scores
 
-We can calculate OAR scores with a single line of code. We recommend you follow the introductory tutorials for a full description of this function. The result is a Seurat object with `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `pct.missing` values in the `meta.data` slot.
+We can calculate OAR scores with a single line of code. We recommend you follow the introductory tutorials for a full description of this function. The result is a Seurat object with `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `sparsity` values in the `meta.data` slot.
 
 ```{r oar wrapper, output.lines=5}
 library(Seurat)

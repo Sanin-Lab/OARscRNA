@@ -1,22 +1,22 @@
 ##===================================================================
 #Base Test
 ##===================================================================
-#' Generate scores and p-values to determine transcriptional shifts of data by looking at whether missingness is observed-at-random (OAR)
+#' Generate scores and p-values to determine transcriptional shifts
 #'
 #' @param data A gene-cell expression matrix with NA values in place of 0s.
-#' @param mdp A vector indicating the pattern to which each gene belongs. 
+#' @param cgp A vector indicating the pattern to which each gene belongs. 
 #'
-#' @return Data frame with OAR-score, p-value, adjusted p-value, and percent missing data for each cell. 
+#' @return Data frame with OAR-score, p-value, adjusted p-value, and sparsity as a percentage for each cell. 
 #' 
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' output <- oar_base(data, mdp)
+#' output <- oar_base(data, cgp)
 #' }
-oar_base <- function (data, mdp) {
+oar_base <- function (data, cgp) {
   cl = lapply(seq_len(dim(data)[2L]), function(i) data[,i]) #convert mtx to list of cell vectors
-  pvalue.list.KW <- unlist(lapply(cl, FUN = missing_pattern_pval_kw, mdp = mdp)) # Calculate p value
+  pvalue.list.KW <- unlist(lapply(cl, FUN = pattern_pval_kw, cgp = cgp)) # Calculate p value
   pvalue.KW.BH = p.adjust(pvalue.list.KW, method = "BH") # Benjamini & Hochberg correction ("BH" or its alias "fdr")
   
   #transform and scale adjusted pvalues
@@ -26,12 +26,12 @@ oar_base <- function (data, mdp) {
     warning("Genes in one ore more cells are all in the same pattern\nOARscore assigned as NA")
   }
   
-  #calculate missing values
+  #calculate sparsity
   sp = unlist(lapply(cl, naniar::pct_miss))
   
   #output
   out <- data.frame(score,pvalue.list.KW,pvalue.KW.BH,sp)
-  colnames(out) <- c("OARscore","KW.pvalue","KW.BH.pvalue","pct.missing")
+  colnames(out) <- c("OARscore","KW.pvalue","KW.BH.pvalue","sparsity")
   return(out)
 }
 
@@ -98,8 +98,8 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   print("Analysis started on:")
   print(ot)
   
-  #Identify missing data patterns
-  print("Identifying missing data patterns...")
+  #Identify gene co-expression patterns
+  print("Identifying gene co-expression patterns...")
   if(seurat_v5){
     if("hamming" %in% names(sc.data[["RNA"]]@misc)){
       dm <- sc.data[["RNA"]]@misc[["hamming"]]
@@ -112,15 +112,15 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
   }else{
     dm <- oar_hamming_distance(data, cores = cores)
   }
-  mdp <- oar_missing_data_patterns(data = data, dm = dm)
+  cgp <- oar_patterns(data = data, dm = dm)
   
-  #Run missingness test
+  #Run test
   print("Calculating scores")
-  output <- oar_base(data, mdp)
+  output <- oar_base(data, cgp)
   output$barcodes = cells
   
-  #add names to mdp
-  names(mdp) <- gene_names
+  #add names to cgp
+  names(cgp) <- gene_names
   
   # Clean up output
   print("Collecting results")
@@ -136,7 +136,7 @@ oar <- function (data, seurat_v5 = TRUE, count.filter = 1,
     sc.data@meta.data <- base::cbind(
       sc.data@meta.data,
       output[idx,!colnames(output) %in% "barcodes"])
-    sc.data[["RNA"]]<- SeuratObject::AddMetaData(sc.data[["RNA"]], mdp, col.name = "mdp")
+    sc.data[["RNA"]]<- SeuratObject::AddMetaData(sc.data[["RNA"]], cgp, col.name = "cgp")
     
     return(sc.data)
   }else{
@@ -187,18 +187,18 @@ oar_by_factor <- function (data, count.filter = 1,
                      suffix = suffix, store.hamming = FALSE, cores = cores)
   
   #combine objects back together
-  collect <- paste0(c("OARscore","KW.pvalue","KW.BH.pvalue","pct.missing"),suffix)
+  collect <- paste0(c("OARscore","KW.pvalue","KW.BH.pvalue","sparsity"),suffix)
   oar_combine <- lapply(data_oar, function(x){x@meta.data %>% dplyr::select(dplyr::all_of(collect))})
   oar_combine <- do.call(rbind,oar_combine)
   data <- SeuratObject::AddMetaData(data, metadata = oar_combine)
   
-  mdp_combine <- lapply(data_oar, function(x){
-    rn = c("mdp")
-    names(rn) = paste0("mdp_",unique(x[[factor]]))
+  cgp_combine <- lapply(data_oar, function(x){
+    rn = c("cgp")
+    names(rn) = paste0("cgp_",unique(x[[factor]]))
     x[["RNA"]]@meta.data %>% dplyr::select(dplyr::any_of(rn))})
-  mdp_combine <- do.call(cbind,mdp_combine)
+  cgp_combine <- do.call(cbind,cgp_combine)
   
-  data[["RNA"]] <- SeuratObject::AddMetaData(data[["RNA"]], mdp_combine)
+  data[["RNA"]] <- SeuratObject::AddMetaData(data[["RNA"]], cgp_combine)
   
   return(data)
 }

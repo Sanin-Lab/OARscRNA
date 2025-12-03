@@ -10,27 +10,27 @@ reference:
   - oar
   - oar_by_factor
   - oar_deg
-  - get_missing_pattern_genes
+  - get_pattern_genes
 - subtitle: Visualize results
   desc: |
     A few convenient functions to visualize the results of your analysis.
   contents:
-  - scatter_score_missing
-  - oar_missing_data_plot
+  - scatter_score
+  - oar_gcp_plot
 - title: Step-by-step functions
   desc: |
     Run these in this order to achieve the same results as with the wrapper functions.
   contents:
   - oar_preprocess_data
   - oar_hamming_distance
-  - oar_missing_data_patterns
+  - oar_patterns
   - oar_base
 - title: Utility functions
   desc: |
     Called within other functions in the package.
   contents:
-  - missing_pattern_pval_kw
-  - oar_missing_data_graph
+  - pattern_pval_kw
+  - oar_gene_graph
 articles:
 - title: Tutorials
   navbar: ~

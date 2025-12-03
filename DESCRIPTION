@@ -1,5 +1,5 @@
 Package: OAR
-Title: Transcriptional shifts in scRNAseq revealed through Missingness
+Title: Scoring transcriptional shifts in scRNAseq
 Version: 1.0.0
 Authors@R: 
   c(

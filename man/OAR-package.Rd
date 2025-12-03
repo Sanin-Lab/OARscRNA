@@ -4,11 +4,11 @@
 \name{OAR-package}
 \alias{OAR}
 \alias{OAR-package}
-\title{OAR: Heterogeneity Scoring on scRNA Sequencing Data Based on Missingness}
+\title{OAR: Scoring transcriptional shifts in scRNAseq}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-OAR (observed at random) score is a measure of heterogeneity among cells, allowing cell prioritization for downstream applications. For best results, test a group of similar cells where you expect some heterogeneity - i.e. one cell type across various biological samples or conditions.
+OAR (observed at random) score is a measure of transcriptional shifts among cells, allowing cell prioritization for downstream applications. For best results, test a group of similar cells where you expect some heterogeneity - i.e. one cell type across various biological samples or conditions.
 }
 \seealso{
 Useful links:

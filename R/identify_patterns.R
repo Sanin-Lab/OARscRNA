@@ -43,21 +43,21 @@ oar_hamming_distance <- function (data, cores = 1) {
 }
 
 ##===================================================================
-#Identify missing data patterns allowing for mismatch
+# Identify gene co-expression patterns allowing for mismatch
 ##===================================================================
-#' Identify missing data patterns allowing for mismatch
+#' Identify gene co-expression patterns allowing for mismatch
 #'
 #' @param data a minimal dataset ready for processing.
 #' @param dm a matrix of hamming distances between gene vectors.
 #'
-#' @return Vector of missing data patterns
+#' @return Vector of gene co-expression patterns
 #' @export
 #'
 #' @examples 
 #' \dontrun{
-#' mdp <- oar_missing_data_patterns(data, dm)
+#' mdp <- oar_patterns(data, dm)
 #' }
-oar_missing_data_patterns <- function (data, dm) {
+oar_patterns <- function (data, dm) {
   g <- c()
   for(i in dm){g = c(g,nrow(i))}
   if(!sum(g) == nrow(data)){stop("Hamming distance matrix and count matrix have different number of genes.\nWhere similar filters applied?\n")}
@@ -78,7 +78,7 @@ oar_missing_data_patterns <- function (data, dm) {
     tol <- base::mean(vm) - 4*stats::sd(vm)
     if(tol < 0.01){tol = 0.01}
     
-    out <- oar_missing_data_graph(dm[[x]], tol = tol)
+    out <- oar_gene_graph(dm[[x]], tol = tol)
     out <- paste(x, out, sep = ".P")
     return(out)
   })
@@ -90,8 +90,8 @@ oar_missing_data_patterns <- function (data, dm) {
   mdp.t[idx] <- "Unique"
   mdp <- mdp.t
   
-  print(paste0("Identified ",length(unique(mdp))-1," non-unique missing data patterns"))
-  print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["Unique"])," genes captured in non-unique patterns"))
+  print(paste0("Identified ",length(unique(mdp))-1," gene co-expression patterns"))
+  print(paste0("A total of ",sum(table(mdp)) - sum(table(mdp)["Unique"])," genes captured with no co-expression patterns"))
   
   from = unique(mdp)[!unique(mdp) %chin% "Unique"]
   to = paste0("ptn.",1:length(from))
@@ -109,14 +109,14 @@ oar_missing_data_patterns <- function (data, dm) {
 #'
 #' @param data a Seurat object that has had `oar()` or `oar_by_cluster()` run on it previously. 
 #'
-#' @return data.frame of genes annotated with missing data pattern they participate in (globally or by cluster). 
+#' @return data.frame of genes annotated with gene co-expression pattern they participate in (globally or by cluster). 
 #' @export
 #'
 #' @examples 
 #' \dontrun{
-#' mdp <- get_missing_pattern_genes(data)
+#' mdp <- get_pattern_genes(data)
 #' }
-get_missing_pattern_genes <- function (data) {
+get_pattern_genes <- function (data) {
   mdp <- data@assays$RNA@meta.data
   
   mdp <- mdp %>% 

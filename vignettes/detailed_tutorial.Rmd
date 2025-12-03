@@ -81,7 +81,7 @@ Now lets set a count threshold where we only analyze genes expressed in at least
 tr = 1
 ```
 
-Next, we retrieve the un-normalized count data from the Seurat object, filter low abundance genes and remove genes that are uninformative[^2]. The output of this function is a list with the first element being the processed matrix and the second the list of genes in that matrix after filtering. We will skip the later for this tutorial. Missing values in the processed matrix of gene counts are denoted as `NA`.
+Next, we retrieve the un-normalized count data from the Seurat object, filter low abundance genes and remove genes that are uninformative[^2]. The output of this function is a list with the first element being the processed matrix and the second the list of genes in that matrix after filtering. We will skip the later for this tutorial. Zero-counts in the processed matrix are denoted as `NA`.
 
 [^2]: *Filtering genes may reduce the time it takes to run the analysis.*
 
@@ -98,15 +98,15 @@ For a full description of each parameter consult the documentation. Briefly:
 -   `tr` controls the minimum percentage of cells expressing any given gene for that gene to be retained in the analysis. Defaults to 1.
 -   `blacklisted.genes` allows you to provide a vector of uninformative gene names (i.e. non-coding genes) to exclude from the analysis. Defaults to `NULL`.
 
-## 2. Identifying Missing Data Patterns
+## 2. Identifying gene co-expression patterns
 
-Our scoring relies on identifying co-expressed genes patterns (which we call missing data patterns) which is a computationally intensive process. To do this, we can identify genes with minimal mismatch between them, but we need to first enable R to run in parallel. To determine how many thread are available in your computer, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as pattern identification will go much faster.
+Our scoring relies on defining gene co-expression patterns based on a binarized count matrix. To do this, we can identify genes with minimal mismatch between them, but we need to first enable R to run in parallel. To determine how many thread are available in your computer, you can run `parallelly::availableCores()`. Leave at least 1-2 cores available for other processes running in your computer to prevent crashing. Using multiple cores is recommended as pattern identification will go much faster.
 
 ```{r parallel cores, output.lines=5}
 parallelly::availableCores()
 ```
 
-Now we can select an appropriate number to set up parallel processing for this R session. To identify the missing data patterns allowing for mismatch, we calculate the hamming distance between all pairs of gene expression vectors. Internally, the gene vectors are converted to 0 (missing) and 1 (observed) values. This function needs to have the number of cores specified explicitly, and is the slowest portion of the analysis.
+Now we can select an appropriate number to set up parallel processing for this R session. To identify patterns allowing for mismatch, we calculate the hamming distance between all pairs of gene expression vectors. Internally, the gene vectors are converted to 0 (absent) and 1 (expressed) values. This function needs to have the number of cores specified explicitly.
 
 ```{r hamming distance calculation, output.lines=5}
 dm <- oar_hamming_distance(
@@ -114,21 +114,21 @@ dm <- oar_hamming_distance(
 dm[[1]][1:5,1:5]
 ```
 
-The output is a list of matrices where the hamming distance between each pair of gene expression vectors evenly divided across expression bins is calculated. Expression binning is introduced to increase computational performance and introduce a dynamic threshold to identify patterns. In the wrapper function `oar` you have the possibility of storing this result in your Seurat object, so that future score calculations are completed faster. The wrapper function automatically detects a previously calculated hamming distance matrix and uses that for further analysis. **WARNING: If you use a different count filter value, or a different set of cells, these distances will no longer be appropriate. In that case, remove previously calculated distance matrix using** `oar_obj[["RNA"]]@misc <- list()`.
+The output is a list of matrices, with each matrix containing a set of genes grouped based on overall sparsity, and where the hamming distance between pairs of gene expression vectors within each matrix is calculated. Expression binning is introduced to increase computational performance and introduce a dynamic threshold to identify patterns. In the wrapper function `oar` you have the possibility of storing this result in your Seurat object, so that future score calculations are completed faster. The wrapper function automatically detects a previously calculated hamming distance matrix and uses that for further analysis. **WARNING: If you use a different count filter value, or a different set of cells, these distances will no longer be appropriate. In that case, remove previously calculated distance matrix using** `oar_obj[["RNA"]]@misc <- list()`.
 
-Next, we want to group genes into co-expression patters based on a minimal hamming distance threshold.
+Next, we want to group genes into co-expression patterns based on a minimal hamming distance threshold.
 
-```{r mdp with automatic tolerance, output.lines=5}
-mdp <- oar_missing_data_patterns(oar_data[[1]], dm)
-table(mdp)
+```{r gcp with automatic tolerance, output.lines=5}
+gcp <- oar_patterns(oar_data[[1]], dm)
+table(gcp)
 ```
 
-**A few considerations on pattern matching:** Allowing only for exact matches results in very few, and often no, co-expressed gene patterns, which is why our method makes this process more flexible. Internally, each gene expression bin is assigned a separate minimal hamming distance threshold (minimum of 0.01), which is used to generate an adjacency matrix for all genes. Then a graph is built based on this matrix and the eccentricities of all nodes calculated. Then the minimal hamming distance threshold is adjusted to cap the eccentricity of all nodes to maintain pattern integrity. We recommended you plot `KW.BH.pvalue` vs. `pct.missing` to examine the results. You should obverve no relationship between these variables, other than higher p values in some **- but not all -** cells with a high pct.missing.
+**A few considerations on pattern matching:** Allowing only for exact matches results in very few, and often no, co-expressed gene patterns, which is why our method makes this process more flexible. Internally, each gene expression bin is assigned a separate minimal hamming distance threshold (minimum of 0.01), which is used to generate an adjacency matrix for all genes. Then a graph is built based on this matrix and the eccentricities of all nodes calculated. Then the minimal hamming distance threshold is adjusted to cap the eccentricity of all nodes to maintain pattern integrity. We recommended you plot `KW.BH.pvalue` vs. `sparsity` to examine the results. You should observe no relationship between these variables, other than higher p values in some **- but not all -** cells with a high sparsity (defined here as a percentage of genes with 0 counts within each cell).
 
 We can visualize these results of the pattern search by using:
 
-```{r patterns_found_mdp, out.width="150%", fig.cap="Missing Data Pattern Plot"}
-p3 <- oar_missing_data_plot(data = oar_data[[1]], mdp = mdp, seurat_v5 = FALSE)
+```{r patterns_found_gcp, out.width="150%", fig.cap="Gene co-expression patterns Plot"}
+p3 <- oar_gcp_plot(data = oar_data[[1]], gcp = gcp, seurat_v5 = FALSE)
 p3
 ```
 
@@ -136,10 +136,10 @@ Each slice of the bar represents a cell, and it is colored based on what percent
 
 ## 3. Calculate OAR scores
 
-Now we are ready to do a cell-wise estimation of the overlap between the gene expression distributions in each detected pattern. When these distributions are distinct, we find that the data is not missing at random (NOAR), with highly significant p values and an OAR score of less than 2. Alternatively, when these distributions overlap, gene expression appears more randomly distributed (OAR), and cells have a larger p value and an OAR score greater than 2. Critically, our test incorporates both the gene expression values and the missing data patterns.
+Now we are ready to do a cell-wise estimation of the overlap between the gene expression distributions in each detected pattern. When these distributions are distinct we obtain a highly significant p value and an OAR score of less than 2. Alternatively, when these distributions overlap cells have a larger p value and an OAR score greater than 2. **Thus, a cell where the patterns defined in the whole dataset do not explain gene expression, will have a with a high OAR score and is potentially distinct from all others.** Critically, our test incorporates both the gene expression values and the gene co-expression patterns.
 
 ```{r oar base, output.lines=5}
-output <- oar_base(data = oar_data[[1]], mdp = mdp)
+output <- oar_base(data = oar_data[[1]], gcp = gcp)
 output$barcodes = cells #add back our barcodes
 output
 ```
@@ -149,7 +149,7 @@ The result is a matrix with these columns:
 -   `OARscore` is a metric of transcriptional shifts in the data, with a higher OAR score highlighting cells with gene expression patterns dissimilar from all others tested.
 -   `KW.pvalue` is the p-value generated by Kruskal-Wallis test.
 -   `KW.BH.pvalue` is the Benjamini-Hochberg corrected p-value.
--   `pct.missing` is the percent of missing genes in each cell as a fraction of all genes expressed by all cells in the dataset.
+-   `sparsity` is the percent of genes in each cell with a count of 0.
 
 We can now proceed to visualize these results to identify which cells display transcriptional shifts.
 
@@ -161,12 +161,12 @@ A higher OAR score is a way to prioritize cells for further analysis. Greater sc
 library(ggplot2)
 p1 <-ggplot(
   data = output,
-  aes(x = pct.missing,
+  aes(x = sparsity,
       y = OARscore, 
       color = -log10(KW.BH.pvalue))) + 
   geom_point(size = 0.5) + 
   labs(
-    x = "% Missing Data",
+    x = "Sparsity (%)",
     y = "OAR score") +
   geom_hline(
     yintercept = 2, linetype = "dashed", 
@@ -195,13 +195,13 @@ p1 <-ggplot(
 p1
 ```
 
-You may recreate this plot using `scatter_score_missing()`.
+You may recreate this plot using `scatter_score()`.
 
 In order to fully understand the features in the dataset driving the high OAR score in some cells, it will be necessary to annotate these with their biological context. This is more easily achieved within a Seurat object with the additional experimental details.
 
 ## 5. Wrapper functions and result interpretation
 
-We can run this entire process with a single line. The result is the Seurat object with the `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `pct.missing` values in the `meta.data` slot. Additionally, genes are annotated by which missing data patterns (mdp) they have been included in `sc.data@assays$RNA@meta.data`.
+We can run this entire process with a single line. The result is the Seurat object with the `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `sparsity` values in the `meta.data` slot. Additionally, genes are annotated by which gene co-expression patterns they have been included in `sc.data@assays$RNA@meta.data`.
 
 ```{r oar wrapper, output.lines=5, eval = FALSE}
 sc.data <- oar(data = sc.data, 

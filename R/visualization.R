@@ -1,7 +1,7 @@
 ##===============================================
-# Score v Percent Missing Scatter Plot
+# OAR Scatter Plot
 ##===============================================
-#' Create scatter plot of OAR score vs percent missing
+#' Create scatter plot of OAR score vs sparsity
 #'
 #' @param data a seurat v5 object that has OAR score in meta data, or a data.frame with the OAR score results.
 #' @param group.by a meta data category to color data by. Default is seurat_clusters. 
@@ -9,18 +9,18 @@
 #' @param suffix a string that was previously appended to the output variables. Default is empty.
 #' @param pt.size a numerical value for the size of points to be passed to the size argument in `geom_point`. Default is 0.5.
 #' 
-#' @return Scatter plot of OAR score vs percent missing, colored by grouping of choice. 
+#' @return Scatter plot of OAR score vs sparsity, colored by grouping of choice. 
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' ##Starting from a Seurat object
-#' output <- scatter_score_missing(pmbcs_oar)
+#' output <- scatter_score(pmbcs_oar)
 #' 
 #' ##Starting from a oar results data.frame
-#' output <- scatter_score_missing(oar, seurat_v5 = F)
+#' output <- scatter_score(oar, seurat_v5 = F)
 #' }
-scatter_score_missing <- function(
+scatter_score <- function(
     data, group.by = 'seurat_clusters', seurat_v5 = TRUE, suffix = "",
     pt.size = 0.5) {
   if(seurat_v5){
@@ -28,12 +28,12 @@ scatter_score_missing <- function(
     
     plot <- ggplot(
       data = input_data,
-      aes(x = .data[[paste0("pct.missing", suffix)]],
+      aes(x = .data[[paste0("sparsity", suffix)]],
           y = .data[[paste0("OARscore", suffix)]],
           color = .data[[group.by]])) +
       geom_point(size = pt.size) +
       theme_classic() +
-      labs(x = "% Missing Values",
+      labs(x = "Sparsity (%)",
            y = paste0("OAR score", suffix)) +
       theme(aspect.ratio = 1)
     
@@ -42,11 +42,11 @@ scatter_score_missing <- function(
     
     plot <- ggplot(
       data = input_data,
-      aes(x = .data[[paste0("pct.missing", suffix)]],
+      aes(x = .data[[paste0("sparsity", suffix)]],
           y = .data[[paste0("OARscore", suffix)]])) +
       geom_point(size = pt.size) +
       theme_classic() +
-      labs(x = "% Missing Values",
+      labs(x = "Sparsity (%)",
            y = paste0("OAR score", suffix)) +
       theme(aspect.ratio = 1)
   }
@@ -57,37 +57,37 @@ scatter_score_missing <- function(
 ##===================================================================
 #Plot gene patterns in data
 ##===================================================================
-#' Plot identified missing data patterns
+#' Plot identified gene co-expression patterns
 #'
 #' @param data a gene-cell expression matrix with NA values in place of 0s and 1s everywhere else or a Seurat Object to which `oar` has been applied to.
-#' @param mdp a vector indicating the pattern to which each gene belongs. Default is NULL.
+#' @param cgp a vector indicating the pattern to which each gene belongs. Default is NULL.
 #' @param seurat_v5 a boolean to indicate where or not the input data is a Seurat object. Default is TRUE. 
 #'
-#' @return Plot of missing data patterns. 
+#' @return Plot of gene co-expression patterns. 
 #' 
 #' @export
 #'
 #' @examples
 #' \dontrun{
 #' ##Starting from a Seurat Object analysed jointly
-#' output <- oar_missing_data_plot(data, seurat_v5 = TRUE)
+#' output <- oar_gcp_plot(data, seurat_v5 = TRUE)
 #' 
 #' ##Starting from filtered and binarized expression matrix
-#' output <- oar_missing_data_plot(data, mdp, seurat_v5 = FALSE)
+#' output <- oar_gcp_plot(data, cgp, seurat_v5 = FALSE)
 #' }
-oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
+oar_gcp_plot <- function(data, cgp = NULL, seurat_v5 = TRUE) {
   if(seurat_v5){
-    mdp <- get_missing_pattern_genes(data) %>% 
-      dplyr::select(dplyr::all_of("mdp")) %>% 
-      dplyr::filter(!mdp == "Filtered") %>% 
-      .$mdp
+    cgp <- get_pattern_genes(data) %>% 
+      dplyr::select(dplyr::all_of("cgp")) %>% 
+      dplyr::filter(!cgp == "Filtered") %>% 
+      .$cgp
     
     output <- oar_preprocess_data(data)
     data <- output[[1]]
     
   }else{
     data <- data
-    mdp <- mdp
+    cgp <- cgp
   }
   
   m <- +(!is.na(data)) %>% 
@@ -95,7 +95,7 @@ oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
     dplyr::mutate(
       x = as.factor(Var2),
       group = as.factor(
-        rep(mdp,
+        rep(cgp,
             times = length(unique(Var2))))) %>% 
     dplyr::filter(!group == "Unique") %>% 
     dplyr::group_by(group, x) %>% 
@@ -109,7 +109,7 @@ oar_missing_data_plot <- function(data, mdp = NULL, seurat_v5 = TRUE) {
     matrix = m, 
     name = NULL, heatmap_legend_param = list(
       title = NULL, at = c(0, 1), 
-      labels = c("Missing", "Observed"),
+      labels = c("Absent", "Expressed"),
       legend_height = unit(1, "cm"),
       grid_width = unit(2, "mm"),
       labels_gp = grid::gpar(fontsize = 8),
