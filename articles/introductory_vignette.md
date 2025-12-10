@@ -52,7 +52,7 @@ oar_obj <- oar(data_obj, cores = 1)
 #> [1] "Extracting data..."
 #> [1] "Extracting count tables"
 #> [1] "Analysis started on:"
-#> [1] "2025-12-05 20:48:02 UTC"
+#> [1] "2025-12-10 18:18:25 UTC"
 #> [1] "Identifying gene co-expression patterns..."
 ...
 ```
@@ -217,7 +217,7 @@ oar_data<- oar(data, seurat_v5 = FALSE,
 #> Warning in oar(data, seurat_v5 = FALSE, cores = 1): Running process in fewer than 2 cores will considerably slow down progress
 #> [1] "Extracting data..."
 #> [1] "Analysis started on:"
-#> [1] "2025-12-05 20:48:17 UTC"
+#> [1] "2025-12-10 18:18:39 UTC"
 #> [1] "Identifying gene co-expression patterns..."
 #> [1] "Calculating Hamming distances between gene vectors using specified cores."
 ...

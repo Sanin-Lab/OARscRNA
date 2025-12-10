@@ -292,6 +292,13 @@ sc.data <- oar(data = sc.data,
                blacklisted.genes = NULL, suffix = "",
                store.hamming = T,
                cores = 1)
+#> Warning in oar(data = sc.data, seurat_v5 = T, count.filter = 1, blacklisted.genes = NULL, : Running process in fewer than 2 cores will considerably slow down progress
+#> [1] "Extracting data..."
+#> [1] "Extracting count tables"
+#> [1] "Analysis started on:"
+#> [1] "2025-12-10 18:16:55 UTC"
+#> [1] "Identifying gene co-expression patterns..."
+...
 ```
 
 We set these parameters based on our earlier discussion:
@@ -346,7 +353,6 @@ library(Seurat)
 p1 <- FeaturePlot(
   sc.data, features = c("OARscore","IFNA1"), order = T, pt.size = 0.5, 
   min.cutoff = "q40", max.cutoff = "q90", slot = "counts")
-#> Warning: The following requested variables were not found: OARscore
 p1
 ```
 

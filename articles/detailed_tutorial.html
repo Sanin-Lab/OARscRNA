@@ -361,7 +361,14 @@ gene co-expression patterns they have been included in
 <span>               seurat_v5 <span class="op">=</span> <span class="cn">T</span>, count.filter <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>               blacklisted.genes <span class="op">=</span> <span class="cn">NULL</span>, suffix <span class="op">=</span> <span class="st">""</span>,</span>
 <span>               store.hamming <span class="op">=</span> <span class="cn">T</span>,</span>
-<span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span>               cores <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in oar(data = sc.data, seurat_v5 = T, count.filter = 1, blacklisted.genes = NULL, : Running process in fewer than 2 cores will considerably slow down progress</span></span>
+<span><span class="co">#&gt; [1] "Extracting data..."</span></span>
+<span><span class="co">#&gt; [1] "Extracting count tables"</span></span>
+<span><span class="co">#&gt; [1] "Analysis started on:"</span></span>
+<span><span class="co">#&gt; [1] "2025-12-10 18:16:55 UTC"</span></span>
+<span><span class="co">#&gt; [1] "Identifying gene co-expression patterns..."</span></span>
+<span><span class="va">...</span></span></code></pre></div>
 <p>We set these parameters based on our earlier discussion:</p>
 <ul>
 <li>
@@ -419,7 +426,6 @@ activated plasmacytoid dendritic cells.</p>
 <span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/FeaturePlot.html" class="external-link">FeaturePlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">sc.data</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"OARscore"</span>,<span class="st">"IFNA1"</span><span class="op">)</span>, order <span class="op">=</span> <span class="cn">T</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span>, </span>
 <span>  min.cutoff <span class="op">=</span> <span class="st">"q40"</span>, max.cutoff <span class="op">=</span> <span class="st">"q90"</span>, slot <span class="op">=</span> <span class="st">"counts"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: The following requested variables were not found: OARscore</span></span>
 <span><span class="va">p1</span></span></code></pre></div>
 <div class="figure" style="text-align: center">
 <img src="figurefeatureplot_score-1.png" class="r-plt" alt="Feature plot of OAR score" width="100%"><p class="caption">
