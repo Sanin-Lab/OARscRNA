@@ -203,7 +203,7 @@ In order to fully understand the features in the dataset driving the high OAR sc
 
 We can run this entire process with a single line. The result is the Seurat object with the `OARscore`, `KW.pvalue`, `KW.BH.pvalue` and `sparsity` values in the `meta.data` slot. Additionally, genes are annotated by which gene co-expression patterns they have been included in `sc.data@assays$RNA@meta.data`.
 
-```{r oar wrapper, output.lines=5, eval = FALSE}
+```{r oar wrapper, output.lines=5}
 sc.data <- oar(data = sc.data, 
                seurat_v5 = T, count.filter = 1,
                blacklisted.genes = NULL, suffix = "",
