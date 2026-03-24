@@ -109,7 +109,7 @@ oar_gcp_plot <- function(data, gcp = NULL, seurat_v5 = TRUE) {
     matrix = m, 
     name = NULL, heatmap_legend_param = list(
       title = NULL, at = c(0, 1), 
-      labels = c("Absent", "Expressed"),
+      labels = c("Not expressed", "Expressed"),
       legend_height = unit(1, "cm"),
       grid_width = unit(2, "mm"),
       labels_gp = grid::gpar(fontsize = 8),
