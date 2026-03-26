@@ -296,7 +296,7 @@ sc.data <- oar(data = sc.data,
 #> [1] "Extracting data..."
 #> [1] "Extracting count tables"
 #> [1] "Analysis started on:"
-#> [1] "2025-12-10 18:16:55 UTC"
+#> [1] "2026-03-26 16:28:45 UTC"
 #> [1] "Identifying gene co-expression patterns..."
 ...
 ```
@@ -340,11 +340,8 @@ library(Seurat)
 #> Loading required package: SeuratObject
 #> Loading required package: sp
 #> 'SeuratObject' was built under R 4.5.0 but the current version is
-#> 4.5.2; it is recomended that you reinstall 'SeuratObject' as the ABI
+#> 4.5.3; it is recomended that you reinstall 'SeuratObject' as the ABI
 #> for R may have changed
-#> 'SeuratObject' was built with package 'Matrix' 1.7.3 but the current
-#> version is 1.7.4; it is recomended that you reinstall 'SeuratObject' as
-#> the ABI for 'Matrix' may have changed
 #> 
 #> Attaching package: 'SeuratObject'
 #> The following objects are masked from 'package:base':

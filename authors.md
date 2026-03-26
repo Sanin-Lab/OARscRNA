@@ -18,14 +18,14 @@
 Source:
 [`DESCRIPTION`](https://github.com/Sanin-Lab/OARscRNA/blob/main/DESCRIPTION)
 
-Sanin D, Chen R, Moore H, Lvovs D, Gueguen P (2025). *OAR: Scoring
+Sanin D, Chen R, Moore H, Lvovs D, Gueguen P (2026). *OAR: Scoring
 transcriptional shifts in scRNAseq*. R package version 1.0.0,
 <https://github.com/Sanin-Lab/OARscRNA>.
 
     @Manual{,
       title = {OAR: Scoring transcriptional shifts in scRNAseq},
       author = {David Sanin and Ruizhe Chen and Hannah Moore and Dmitrijs Lvovs and Paul Gueguen},
-      year = {2025},
+      year = {2026},
       note = {R package version 1.0.0},
       url = {https://github.com/Sanin-Lab/OARscRNA},
     }
